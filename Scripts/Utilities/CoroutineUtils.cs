@@ -1,0 +1,90 @@
+﻿using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace MustHave.Utilities
+{
+    public static class CoroutineUtils
+    {
+        public static void MoveThrough(this IEnumerator enumerator)
+        {
+            while (enumerator.MoveNext())
+            {
+                object current = enumerator.Current;
+                if (current is IEnumerator)
+                {
+                    (current as IEnumerator).MoveThrough();
+                }
+            }
+        }
+
+        public static IEnumerator ActionAfterPredicate(UnityAction action, Func<bool> predicate)
+        {
+            //IEnumerator yieldInstruction = new WaitWhile(predicate);
+            //CustomYieldInstruction yieldInstruction = new WaitWhile(predicate);
+            //yield return yieldInstruction;
+            yield return new WaitWhile(predicate);
+            action?.Invoke();
+        }
+
+        public static IEnumerator ActionAfterCustomYieldInstruction(UnityAction action, CustomYieldInstruction yieldInstruction)
+        {
+            yield return yieldInstruction;
+            action?.Invoke();
+        }
+
+        public static IEnumerator ActionAfterTime(UnityAction action, float delayInSeconds)
+        {
+            yield return new WaitForSeconds(delayInSeconds);
+            action?.Invoke();
+        }
+
+        public static IEnumerator ActionAfterFrames(UnityAction action, int framesNumber)
+        {
+            for (int i = 0; i < framesNumber; i++)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            action?.Invoke();
+        }
+
+        public static IEnumerator UpdateRoutine(Func<bool> predicate, UnityAction<float> onUpdate)
+        {
+            float startTime = Time.time;
+            float elapsedTime = 0f;
+            while (predicate())
+            {
+                onUpdate.Invoke(elapsedTime = Time.time - startTime);
+                yield return null;
+            }
+        }
+
+        public static IEnumerator UpdateRoutine(float duration, UnityAction<float, float> onUpdate)
+        {
+            float startTime = Time.time;
+            float elapsedTime = 0f;
+            while ((elapsedTime = Time.time - startTime) < duration)
+            {
+                onUpdate.Invoke(elapsedTime, elapsedTime / duration);
+                yield return null;
+            }
+        }
+
+        public static IEnumerator UpdateRoutine(float duration, IEnumerator onStartRoutine, UnityAction<float, float> onUpdate, IEnumerator onEndRoutine)
+        {
+            if (onStartRoutine != null)
+                yield return onStartRoutine;
+            yield return UpdateRoutine(duration, onUpdate);
+            if (onEndRoutine != null)
+                yield return onEndRoutine;
+        }
+
+        public static IEnumerator UpdateRoutine(float duration, UnityAction onStart, UnityAction<float, float> onUpdate, UnityAction onEnd)
+        {
+            onStart?.Invoke();
+            yield return UpdateRoutine(duration, onUpdate);
+            onEnd?.Invoke();
+        }
+    } 
+}
