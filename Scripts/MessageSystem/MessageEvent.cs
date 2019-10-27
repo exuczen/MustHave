@@ -3,13 +3,12 @@
 namespace MustHave
 {
     [CreateAssetMenu]
-    public class MessageEvent : ScriptableObject
-    {
-        public object param;
-    }
+    public class MessageEvent : ScriptableObject { }
 
     public class DataMessageEvent<T> : MessageEvent
     {
-        public T Data { get => (T)param; }
+        protected T _data = default;
+
+        public T Data { get => _data; set => _data = value; }
     }
 }

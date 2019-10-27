@@ -14,7 +14,7 @@ namespace MustHave.Utilities
 #if UNITY_EDITOR
             get => EditorApplication.isCompiling || EditorApplication.isUpdating;
 #else
-        get => false;
+            get => false;
 #endif
         }
 
@@ -23,7 +23,7 @@ namespace MustHave.Utilities
 #if UNITY_EDITOR
             get => !EditorApplication.isPlaying;
 #else
-        get => false;
+            get => false;
 #endif
         }
 

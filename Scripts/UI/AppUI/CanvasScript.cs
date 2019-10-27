@@ -119,7 +119,7 @@ namespace MustHave.UI
             }
             else
             {
-                _showScreenMessage.param = new ScreenData(typeof(T1), typeof(T2), SceneUtils.ActiveSceneName, keepOnStack, clearStack);
+                _showScreenMessage.Data = new ScreenData(typeof(T1), typeof(T2), SceneUtils.ActiveSceneName, keepOnStack, clearStack);
                 _appMessageBus.Notify(_showScreenMessage);
             }
         }
@@ -133,13 +133,13 @@ namespace MustHave.UI
         /// <param name="keepOnStack"></param>
         public void ShowScreenFromOtherScene<T1, T2>(Enum sceneName, bool keepOnStack = true, bool clearStack = false) where T1 : ScreenScript where T2 : CanvasScript
         {
-            _showScreenMessage.param = new ScreenData(typeof(T1), typeof(T2), sceneName.ToString(), keepOnStack, clearStack);
+            _showScreenMessage.Data = new ScreenData(typeof(T1), typeof(T2), sceneName.ToString(), keepOnStack, clearStack);
             _appMessageBus.Notify(_showScreenMessage);
         }
 
         public void ShowScreenFromAppUI<T>() where T : ScreenScript
         {
-            _showScreenMessage.param = new ScreenData(typeof(T), typeof(AppUIScript), SceneUtils.ActiveSceneName, false, false);
+            _showScreenMessage.Data = new ScreenData(typeof(T), typeof(AppUIScript), SceneUtils.ActiveSceneName, false, false);
             _appMessageBus.Notify(_showScreenMessage);
         }
 
@@ -159,7 +159,7 @@ namespace MustHave.UI
 
         public void ShowScreen(ScreenScript screen, bool keepOnStack = true, bool clearStack = false)
         {
-            _showScreenMessage.param = new ScreenData(screen, keepOnStack, clearStack);
+            _showScreenMessage.Data = new ScreenData(screen, keepOnStack, clearStack);
             _appMessageBus.Notify(_showScreenMessage);
         }
 

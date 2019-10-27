@@ -477,6 +477,15 @@ namespace MustHave.Utilities
                 );
         }
 
+        public static Vector3Int RoundToInt(Vector3 v)
+        {
+            return new Vector3Int(
+                Mathf.RoundToInt(v.x),
+                Mathf.RoundToInt(v.y),
+                Mathf.RoundToInt(v.z)
+                );
+        }
+
         public static Vector3 Modulo(this Vector3 v, float modulo)
         {
             return new Vector3(
