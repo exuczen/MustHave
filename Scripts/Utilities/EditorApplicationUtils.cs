@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MustHave.Utilities
 {
-    public static class EditorApplicationUtils
+    public struct EditorApplicationUtils
     {
         public static bool IsCompilingOrUpdating
         {

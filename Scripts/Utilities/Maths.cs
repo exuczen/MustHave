@@ -29,7 +29,7 @@ namespace MustHave.Utilities
         SYMMETRIC_INFLECTED,
     };
 
-    public static class Maths
+    public struct Maths
     {
         public const float M_2PI = 2 * Mathf.PI;
         public const float M_PI2 = Mathf.PI / 2;
@@ -284,58 +284,62 @@ namespace MustHave.Utilities
             return shift;
         }
 
-        public static float GetTransition(TransitionType transitionType, float timePassed, float duration, int power = 1)
+        public static float GetTransition(TransitionType transitionType, float elapsedTime, float duration, int power = 1)
+        {
+            return GetTransition(transitionType, elapsedTime / duration, power);
+        }
+
+        public static float GetTransition(TransitionType transitionType, float t, int power = 1)
         {
             float shift;
             switch (transitionType)
             {
                 case TransitionType.LINEAR:
-                    shift = timePassed / duration;
+                    shift = t;
                     break;
                 case TransitionType.PARABOLIC_ACC:
-                    shift = PowF(Mathf.Abs(timePassed / duration), power);
+                    shift = PowF(Mathf.Abs(t), power);
                     break;
                 case TransitionType.PARABOLIC_DEC:
-                    shift = -PowF(Mathf.Abs(timePassed - duration) / duration, power) + 1f;
+                    shift = -PowF(Mathf.Abs(t - 1f), power) + 1f;
                     break;
                 case TransitionType.HYPERBOLIC_ACC:
-                    shift = -1f / (0.5f * PowF(Mathf.Abs(timePassed / duration), power) - 1f) - 1f;
+                    shift = -1f / (0.5f * PowF(Mathf.Abs(t), power) - 1f) - 1f;
                     break;
                 case TransitionType.HYPERBOLIC_DEC:
-                    shift = 1f / (0.5f * PowF(Mathf.Abs(timePassed / duration - 1f), power) - 1f) + 2f;
+                    shift = 1f / (0.5f * PowF(Mathf.Abs(t - 1f), power) - 1f) + 2f;
                     break;
                 case TransitionType.SIN_IN_PI2_RANGE:
                     {
-
-                        float omegaT = timePassed * M_PI2 / duration;
+                        float omegaT = t * M_PI2;
                         float sinOmegaT = Mathf.Sin(omegaT);
                         shift = sinOmegaT;
                     }
                     break;
                 case TransitionType.SIN_IN_PI_RANGE:
                     {
-                        float omegaT = timePassed * M_PI / duration;
+                        float omegaT = t * M_PI;
                         float sinOmegaT = Mathf.Sin(omegaT);
                         shift = sinOmegaT;
                     }
                     break;
                 case TransitionType.SIN_IN_2PI_RANGE:
                     {
-                        float omegaT = timePassed * 2f * M_PI / duration;
+                        float omegaT = t * 2f * M_PI;
                         float sinOmegaT = Mathf.Sin(omegaT);
                         shift = sinOmegaT;
                     }
                     break;
                 case TransitionType.COS_IN_PI2_RANGE:
                     {
-                        float omegaT = timePassed * M_PI2 / duration;
+                        float omegaT = t * M_PI2;
                         float cosOmegaT = Mathf.Cos(omegaT);
                         shift = -cosOmegaT + 1f;
                     }
                     break;
                 case TransitionType.COS_IN_PI_RANGE:
                     {
-                        float omegaT = timePassed * M_PI / duration;
+                        float omegaT = t * M_PI;
                         float cosOmegaT = Mathf.Cos(omegaT);
                         shift = (-cosOmegaT + 1f) / 2f;
                     }
@@ -346,7 +350,7 @@ namespace MustHave.Utilities
                         //            float cosOmegaT=cosf(omegaT);
                         //            // cos(2x)=2*cos(x)^2-1
                         //            shift = (-PowF(cosOmegaT,2)+1.f);
-                        float omegaT = timePassed * 2f * M_PI / duration;
+                        float omegaT = t * 2f * M_PI;
                         float cosOmegaT = Mathf.Cos(omegaT);
                         shift = (-cosOmegaT + 1f) / 2f;
                     }
@@ -357,7 +361,6 @@ namespace MustHave.Utilities
                     }
                     break;
             }
-
             return shift;
         }
 
@@ -483,15 +486,6 @@ namespace MustHave.Utilities
                 Mathf.RoundToInt(v.x),
                 Mathf.RoundToInt(v.y),
                 Mathf.RoundToInt(v.z)
-                );
-        }
-
-        public static Vector3 Modulo(this Vector3 v, float modulo)
-        {
-            return new Vector3(
-                v.x % modulo,
-                v.y % modulo,
-                v.z % modulo
                 );
         }
 

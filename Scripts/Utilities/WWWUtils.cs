@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 
 namespace MustHave.Utilities
 {
-    public static class WWWUtils
+    public struct WWWUtils
     {
         public static void LoadBinaryFromWWW(MonoBehaviour context, string url, Action<byte[]> onSuccess, Action<string> onError = null)
         {

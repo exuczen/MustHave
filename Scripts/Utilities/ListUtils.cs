@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MustHave.Utilities
 {
-    public static class ListUtils
+    public struct ListUtils
     {
         public static string ToString<T>(List<T> list)
         {

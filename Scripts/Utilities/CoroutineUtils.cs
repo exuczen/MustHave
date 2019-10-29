@@ -5,20 +5,8 @@ using UnityEngine.Events;
 
 namespace MustHave.Utilities
 {
-    public static class CoroutineUtils
+    public struct CoroutineUtils
     {
-        public static void MoveThrough(this IEnumerator enumerator)
-        {
-            while (enumerator.MoveNext())
-            {
-                object current = enumerator.Current;
-                if (current is IEnumerator)
-                {
-                    (current as IEnumerator).MoveThrough();
-                }
-            }
-        }
-
         public static IEnumerator ActionAfterPredicate(UnityAction action, Func<bool> predicate)
         {
             //IEnumerator yieldInstruction = new WaitWhile(predicate);
@@ -49,25 +37,35 @@ namespace MustHave.Utilities
             action?.Invoke();
         }
 
-        public static IEnumerator UpdateRoutine(Func<bool> predicate, UnityAction<float> onUpdate)
+        public static IEnumerator FixedUpdateRoutine(float duration, UnityAction<float, float> onUpdate)
+        {
+            yield return UpdateRoutine(duration, onUpdate, new WaitForFixedUpdate());
+        }
+
+        public static IEnumerator FixedUpdateRoutine(Func<bool> predicate, UnityAction<float> onUpdate)
+        {
+            yield return UpdateRoutine(predicate, onUpdate, new WaitForFixedUpdate());
+        }
+
+        public static IEnumerator UpdateRoutine(Func<bool> predicate, UnityAction<float> onUpdate, YieldInstruction yieldInstruction = null)
         {
             float startTime = Time.time;
             float elapsedTime = 0f;
             while (predicate())
             {
                 onUpdate.Invoke(elapsedTime = Time.time - startTime);
-                yield return null;
+                yield return yieldInstruction;
             }
         }
 
-        public static IEnumerator UpdateRoutine(float duration, UnityAction<float, float> onUpdate)
+        public static IEnumerator UpdateRoutine(float duration, UnityAction<float, float> onUpdate, YieldInstruction yieldInstruction = null)
         {
             float startTime = Time.time;
             float elapsedTime = 0f;
             while ((elapsedTime = Time.time - startTime) < duration)
             {
                 onUpdate.Invoke(elapsedTime, elapsedTime / duration);
-                yield return null;
+                yield return yieldInstruction;
             }
         }
 
@@ -86,5 +84,5 @@ namespace MustHave.Utilities
             yield return UpdateRoutine(duration, onUpdate);
             onEnd?.Invoke();
         }
-    } 
+    }
 }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace MustHave.Utilities
 {
-    public class ImageDownloader
+    public struct ImageDownloader
     {
         private const int NETWORK_CONNECTION_DOWNLOAD_TIMEOUT = 20;
 

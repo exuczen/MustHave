@@ -80,7 +80,7 @@ namespace MustHave.Utilities
         {
             float initNormalizedPos = scrollRect.horizontalNormalizedPosition;
             yield return CoroutineUtils.UpdateRoutine(duration, (elapsedTime, transition) => {
-                transition = Maths.GetTransition(TransitionType.PARABOLIC_DEC, elapsedTime, duration, 2);
+                transition = Maths.GetTransition(TransitionType.PARABOLIC_DEC, transition, 2);
                 scrollRect.horizontalNormalizedPosition = Mathf.Lerp(initNormalizedPos, destNormalizedPos, transition);
             });
             scrollRect.horizontalNormalizedPosition = destNormalizedPos;

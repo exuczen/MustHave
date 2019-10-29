@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MustHave.Utilities
 {
-    public class TextureUtils
+    public struct TextureUtils
     {
         /// <summary>
         /// Creates the texture filled with given color.

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MustHave.Utilities
 {
-    public static class ReflectionUtils
+    public struct ReflectionUtils
     {
         public static List<string> GetFieldsToStrings(Type type, object owner)
         {

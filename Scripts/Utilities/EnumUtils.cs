@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MustHave.Utilities
 {
-    public static class EnumUtils
+    public struct EnumUtils
     {
         public static List<string> GetNamesList<T>()
         {
@@ -20,16 +20,6 @@ namespace MustHave.Utilities
         public static List<T> GetList<T>()
         {
             return GetValues<T>().ToList();
-        }
-
-        public static IEnumerable<string> CastToStringEnumerable(this Enum[] array)
-        {
-            return array.Select(enumName => enumName.ToString());
-        }
-
-        public static List<string> CastToStringList(this Enum[] array)
-        {
-            return CastToStringEnumerable(array).ToList();
         }
 
         public static void AddEnumNamesWithPrefixToFloatDictionary<T>(Dictionary<string, float> dict, string prefix)

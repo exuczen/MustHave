@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace MustHave.Utilities
 {
-    public class ColorUtils
+    public struct ColorUtils
     {
         public static Color ColorWithAlpha(Color color, float alpha)
         {

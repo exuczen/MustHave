@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MustHave.Utilities
 {
-    public static class AudioUtils
+    public struct AudioUtils
     {
     }
 }

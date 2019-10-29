@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace MustHave.Utilities
 {
-    public static class SceneUtils
+    public struct SceneUtils
     {
         public static bool IsLoadingScene { get; private set; }
 

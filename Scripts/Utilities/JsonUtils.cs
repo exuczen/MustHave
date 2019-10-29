@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MustHave.Utilities
 {
-    public static class JsonUtils
+    public struct JsonUtils
     {
         public static T LoadFromJson<T>(string filepath)
         {
