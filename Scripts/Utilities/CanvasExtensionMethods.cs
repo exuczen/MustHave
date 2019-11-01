@@ -18,7 +18,7 @@ namespace MustHave.Utilities
                     canvas.worldCamera = null;
                     break;
                 case RenderMode.ScreenSpaceCamera:
-                    canvas.worldCamera = Camera.main ?? Camera.current;
+                    canvas.worldCamera = CameraUtils.MainOrCurrent;
                     break;
                 default:
                     break;

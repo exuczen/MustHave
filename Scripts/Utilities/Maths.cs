@@ -386,7 +386,8 @@ namespace MustHave.Utilities
 
         public static bool IsPowerOf2(int i)
         {
-            return i > 0 && (i & (i - 1)) == 0;
+            //return i > 0 && (i & (i - 1)) == 0;
+            return Mathf.IsPowerOfTwo(i);
         }
 
         public static int Clamp(int value, int min, int max)

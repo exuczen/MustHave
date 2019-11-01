@@ -119,7 +119,7 @@ namespace MustHave.Utilities
 
         public static void CaptureScreenshotToImage(Image image, string spriteName = null)
         {
-            CaptureScreenshotToImage(Camera.main ?? Camera.current, image, spriteName);
+            CaptureScreenshotToImage(CameraUtils.MainOrCurrent, image, spriteName);
         }
     } 
 }
