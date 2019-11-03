@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public class CameraUtils
+namespace MustHave
 {
-    public static Camera MainOrCurrent { get => Camera.main ?? Camera.current; }
+    public struct CameraUtils
+    {
+        public static Camera MainOrCurrent { get => Camera.main ?? Camera.current; }
+    }
 }
