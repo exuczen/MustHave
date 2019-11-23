@@ -24,14 +24,15 @@ namespace MustHave.Utilities
         {
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
-            if (Input.GetMouseButton(2))
+            if (Input.GetMouseButton(2) || Input.GetMouseButton(1))
             {
                 Vector3 translation = _translationSpeed * Time.deltaTime * new Vector3(-mouseX, -mouseY, 0f);
                 transform.Translate(translation, Space.Self);
             }
-            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetMouseButton(0))
+            else if (Input.GetMouseButton(0))
             {
-                if (Maths.GetRayIntersectionWithPlane(transform.position, transform.forward, Vector3.up, Vector3.zero, out Vector3 rotationPivot))
+                if (Input.GetKey(KeyCode.LeftAlt) &&
+                    Maths.GetRayIntersectionWithPlane(transform.position, transform.forward, Vector3.up, Vector3.zero, out Vector3 rotationPivot))
                 {
                     transform.RotateAround(rotationPivot, transform.right, -mouseY * ROTATION_RATE * Time.deltaTime);
                     transform.RotateAround(rotationPivot, Vector3.up, mouseX * ROTATION_RATE * Time.deltaTime);
