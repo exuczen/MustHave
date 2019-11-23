@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MustHave
+namespace MustHave.Utilities
 {
     public struct CameraUtils
     {

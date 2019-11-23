@@ -2,7 +2,7 @@
 
 namespace MustHave.Utilities
 {
-    public static class MatrixExtensionMethods
+    public static class ProjectionExtensionMethods
     {
         public static float GetTanHalfFovFromProjection(this Matrix4x4 m)
         {
