@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/SetAlertPopupMessageEvent")]
     public class SetAlertPopupMessageEvent : DataMessageEvent<Type> { } 
 }
 

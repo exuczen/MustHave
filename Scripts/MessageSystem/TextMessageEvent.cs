@@ -5,6 +5,6 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/TextMessageEvent")]
     public class TextMessageEvent : DataMessageEvent<string> { }
 }

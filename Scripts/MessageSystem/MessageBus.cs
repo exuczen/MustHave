@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/MessageBus")]
     public class MessageBus : ScriptableObject
     {
         private List<Action<MessageEvent>> _listeners = default;

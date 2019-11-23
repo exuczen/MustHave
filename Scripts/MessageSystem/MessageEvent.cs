@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/MessageEvent")]
     public class MessageEvent : ScriptableObject { }
 
     public class DataMessageEvent<T> : MessageEvent

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/IntMessageEvent")]
     public class IntMessageEvent : DataMessageEvent<int> { }
 }
 

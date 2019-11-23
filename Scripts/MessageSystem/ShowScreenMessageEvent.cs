@@ -4,6 +4,6 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "MessageSystem/ShowScreenMessageEvent")]
     public class ShowScreenMessageEvent : DataMessageEvent<ScreenData> { }
 }
