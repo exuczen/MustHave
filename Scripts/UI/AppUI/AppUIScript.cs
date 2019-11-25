@@ -111,7 +111,7 @@ namespace MustHave.UI
         {
             _sceneMessageBusList.ForEach(bus => bus.Clear());
 
-            // clear screen objects in stack
+            // Clear screen objects in stack
             foreach (var screenData in _screenDataStack)
             {
                 if (screenData.Screen)
@@ -182,7 +182,7 @@ namespace MustHave.UI
                 _sceneChangeListener?.OnSceneClose(_activeSceneName, out showProgressSpinner);
                 _activeCanvas.StopAllCoroutines();
                 _activeScreenData.Screen.gameObject.SetActive(true);
-                //take and show screenshot
+                // Take and show screenshot
                 yield return new WaitForEndOfFrame();
                 Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture();
                 _screenshotImage.sprite = TextureUtils.CreateSpriteFromTexture(texture);
@@ -191,11 +191,11 @@ namespace MustHave.UI
                     _progressSpinnerPanel.Show();
                 _activeScreenData.Screen.Hide();
                 _activeCanvas.Hide();
-                //clear data
+                // Clear data
                 _activeSceneName = null;
                 _activeCanvas = null;
                 _activeScreenData = null;
-                //invoke callback
+                // Invoke callback
                 if (onSuccess != null)
                     onSuccess.Invoke();
             }
@@ -272,7 +272,7 @@ namespace MustHave.UI
                     }
                     else if (_activeCanvas && _activeCanvas.GetType() != screenData.CanvasType)
                     {
-                        // hide old canvas
+                        // Hide old canvas
                         _activeCanvas.StopAllCoroutines();
                         _activeCanvas.SetProgressSpinnerPanel(null);
                         _activeCanvas.SetAlertPopup(null);
@@ -284,7 +284,8 @@ namespace MustHave.UI
                     }
                     else
                     {
-                        _activeCanvas = SetActiveCanvas(screenData, false, false);
+                        _activeCanvas = FindCanvasInActiveScene(screenData.CanvasType);
+                        SetPersistentComponentsParent(_activeCanvas.TopLayer);
                         screen = screen ?? _activeCanvas.GetScreen(screenData.ScreenType);
                         //Debug.Log(GetType() + ".ShowScreen: found screen: " + screen + " " + screen.Canvas);
                         screenData = new ScreenData(screen, screenData.KeepOnStack, screenData.ClearStack);
@@ -307,24 +308,10 @@ namespace MustHave.UI
             return null;
         }
 
-        private CanvasScript SetActiveCanvas(ScreenData screenData, bool intialize, bool show)
+        private CanvasScript FindCanvasInActiveScene(Type canvasType)
         {
             List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(SceneManager.GetActiveScene(), true);
-            CanvasScript canvas = canvasList.Find(c => c.GetType() == screenData.CanvasType);
-            //Debug.Log(GetType() + ".SetActiveCanvas: found canvas: " + canvas);
-            SetPersistentComponentsParent(canvas.TopLayer);
-            _activeCanvas = canvas;
-            _activeCanvas.SetProgressSpinnerPanel(_progressSpinnerPanel);
-            _activeCanvas.SetAlertPopup(_activeAlertPopup);
-            if (intialize)
-            {
-                _activeCanvas.Init();
-            }
-            if (show)
-            {
-                _activeCanvas.Show();
-            }
-            return _activeCanvas;
+            return canvasList.Find(c => c.GetType() == canvasType);
         }
 
         private void SetAppCanvasRenderMode(RenderMode renderMode)

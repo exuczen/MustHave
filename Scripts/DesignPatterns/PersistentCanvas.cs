@@ -64,8 +64,7 @@ namespace MustHave.DesignPatterns
 
         public void SetPersistentComponentsParent(Transform parent)
         {
-            List<Component> list = _persistentComponentsList;
-            list.ForEach(component => component.transform.SetParent(parent, false));
+            _persistentComponentsList.ForEach(component => component.transform.SetParent(parent, false));
         }
 
         public Component GetFirstPersistentComponent()
@@ -90,5 +89,5 @@ namespace MustHave.DesignPatterns
         {
             return _persistentObjectsList.Find(obj => obj && (obj is T1) && obj.name.Equals(name)) as T1;
         }
-    } 
+    }
 }
