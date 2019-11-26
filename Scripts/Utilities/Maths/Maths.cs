@@ -151,9 +151,9 @@ namespace MustHave.Utilities
             eulerAngles.x = Mathf.Clamp(AngleModulo360(eulerAngles.x), -eulerMax.x, eulerMax.x);
             eulerAngles.y = Mathf.Clamp(AngleModulo360(eulerAngles.y), -eulerMax.y, eulerMax.y);
             eulerAngles.z = Mathf.Clamp(AngleModulo360(eulerAngles.z), -eulerMax.z, eulerMax.z);
-            float xMax = Mathf.Lerp(eulerMin.x, eulerMax.x, 1 - (Mathf.Abs(eulerAngles.y) + Mathf.Abs(eulerAngles.z)) / (eulerMax.y + eulerMax.z));
-            float yMax = Mathf.Lerp(eulerMin.y, eulerMax.y, 1 - (Mathf.Abs(eulerAngles.x) + Mathf.Abs(eulerAngles.z)) / (eulerMax.x + eulerMax.z));
-            float zMax = Mathf.Lerp(eulerMin.z, eulerMax.z, 1 - (Mathf.Abs(eulerAngles.x) + Mathf.Abs(eulerAngles.y)) / (eulerMax.x + eulerMax.y));
+            float xMax = Mathf.Lerp(eulerMin.x, eulerMax.x, 1f - (Mathf.Abs(eulerAngles.y) + Mathf.Abs(eulerAngles.z)) / (eulerMax.y + eulerMax.z));
+            float yMax = Mathf.Lerp(eulerMin.y, eulerMax.y, 1f - (Mathf.Abs(eulerAngles.x) + Mathf.Abs(eulerAngles.z)) / (eulerMax.x + eulerMax.z));
+            float zMax = Mathf.Lerp(eulerMin.z, eulerMax.z, 1f - (Mathf.Abs(eulerAngles.x) + Mathf.Abs(eulerAngles.y)) / (eulerMax.x + eulerMax.y));
             eulerAngles.x = Mathf.Clamp(eulerAngles.x, -xMax, xMax);
             eulerAngles.y = Mathf.Clamp(eulerAngles.y, -yMax, yMax);
             eulerAngles.z = Mathf.Clamp(eulerAngles.z, -zMax, zMax);
@@ -216,13 +216,13 @@ namespace MustHave.Utilities
             return z;
         }
 
-        public static float GetTransitionAsymPolynom32(float timePassed, float duration, int n, int m)
+        public static float GetTransitionAsymPolynom32(float elapsedTime, float duration, int n, int m)
         {
-            float x = timePassed / duration;
-            return -2 * PowF(x, n) + 3 * PowF(x, m);
+            float x = elapsedTime / duration;
+            return -2f * PowF(x, n) + 3f * PowF(x, m);
         }
 
-        public static float GetTransitionAsymNormalised(float timePassed, float duration, float inflectionPointNormalized, int n, int m)
+        public static float GetTransitionAsymNormalised(float elapsedTime, float duration, float inflectionPointNormalized, int n, int m)
         {
             float x0 = inflectionPointNormalized * duration;
             float denomPart = m * x0 - n * (x0 - duration);
@@ -232,35 +232,35 @@ namespace MustHave.Utilities
             //    float b = n/(PowF(x0-duration, m-1)*denomPart);
             //    printf("n=%i m=%i x0=%f duration=%f a=%.10f b=%.10f\n",n,m,x0,duration,a,b);
 
-            if (timePassed < x0)
+            if (elapsedTime < x0)
             {
                 denom = PowF(x0, n - 1) * denomPart;
-                shift = m * PowF(timePassed, n) / denom;
+                shift = m * PowF(elapsedTime, n) / denom;
             }
             else
             {
                 denom = PowF(x0 - duration, m - 1) * denomPart;
-                shift = n * PowF(timePassed - duration, m) / denom + 1;
+                shift = n * PowF(elapsedTime - duration, m) / denom + 1;
             }
             return shift;
         }
 
-        public static float GetTransitionSymmInflected(float timePassed, float duration, float inflPtNorm, int n, int m)
+        public static float GetTransitionSymmInflected(float elapsedTime, float duration, float inflPtNorm, int n, int m)
         {
             float halfDuration = duration * 0.5f;
             float shift;
-            if (timePassed < halfDuration)
+            if (elapsedTime < halfDuration)
             {
-                shift = GetTransitionAsymNormalised(timePassed, halfDuration, inflPtNorm, n, m);
+                shift = GetTransitionAsymNormalised(elapsedTime, halfDuration, inflPtNorm, n, m);
             }
             else
             {
-                shift = (1.0f - GetTransitionAsymNormalised(timePassed - halfDuration, halfDuration, 1.0f - inflPtNorm, m, n));
+                shift = (1.0f - GetTransitionAsymNormalised(elapsedTime - halfDuration, halfDuration, 1.0f - inflPtNorm, m, n));
             }
             return shift;
         }
 
-        public static float GetTransitionAsymInflected(float timePassed, float duration,
+        public static float GetTransitionAsymInflected(float elapsedTime, float duration,
                                                        int N, int M, int n, int m, float xMax, float yMax,
                                                        float inflPtNorm0, float inflPtNorm1)
         {
@@ -273,13 +273,13 @@ namespace MustHave.Utilities
             // inflPtNorm0 = inflPtNorm1 = 0.5f;
             float shift;
             float t0 = duration * xMax;
-            if (timePassed < t0)
+            if (elapsedTime < t0)
             {
-                shift = yMax * GetTransitionAsymNormalised(timePassed, t0, inflPtNorm0, N, M);
+                shift = yMax * GetTransitionAsymNormalised(elapsedTime, t0, inflPtNorm0, N, M);
             }
             else
             {
-                shift = 1.0f + (yMax - 1.0f) * (1.0f - GetTransitionAsymNormalised(timePassed - t0, duration * (1.0f - xMax), inflPtNorm1, n, m));
+                shift = 1.0f + (yMax - 1.0f) * (1.0f - GetTransitionAsymNormalised(elapsedTime - t0, duration * (1.0f - xMax), inflPtNorm1, n, m));
             }
             return shift;
         }
@@ -416,6 +416,15 @@ namespace MustHave.Utilities
                 UnityEngine.Random.Range(min, max),
                 UnityEngine.Random.Range(min, max)
             );
+        }
+
+        public static Vector3 Abs(Vector3 v)
+        {
+            return new Vector3(
+                Mathf.Abs(v.x),
+                Mathf.Abs(v.y),
+                Mathf.Abs(v.z)
+                );
         }
 
         public static Vector3 Mul(Vector3 v1, Vector3 v2)

@@ -141,5 +141,14 @@ namespace MustHave.Utilities
         {
             list.RemoveAll(item => item == null);
         }
-    } 
+
+        public static void AddIntRange(this List<int> list, int beg, int count)
+        {
+            int end = beg + count;
+            for (int i = beg; i < end; i++)
+            {
+                list.Add(i);
+            }
+        }
+    }
 }

@@ -26,5 +26,21 @@ namespace MustHave.Utilities
         {
             return camera.projectionMatrix.GetFovFromProjection();
         }
+
+        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos)
+        {
+            if (camera.orthographic)
+            {
+                return screenDeltaPos * camera.orthographicSize * 2f / Screen.height;
+            }
+            else
+            {
+                float cameraDistance = camera.transform.localPosition.z;
+                Vector3 screenPoint = new Vector3(Screen.width / 2f + screenDeltaPos.x, Screen.height / 2f + screenDeltaPos.y, -cameraDistance);
+                Vector3 worldPoint = camera.ScreenToWorldPoint(screenPoint);
+                Vector3 cameraPlaneWorldPoint = camera.transform.TransformPoint(new Vector3(0f, 0f, -cameraDistance));
+                return worldPoint - cameraPlaneWorldPoint;
+            }
+        }
     }
 }

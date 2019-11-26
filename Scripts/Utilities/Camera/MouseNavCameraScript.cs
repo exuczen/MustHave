@@ -6,31 +6,39 @@ namespace MustHave.Utilities
     [RequireComponent(typeof(Camera))]
     public class MouseNavCameraScript : MonoBehaviour
     {
-        [SerializeField]
-        private float _translationSpeed = default;
-        [SerializeField]
-        private float _zoomSpeed = default;
+        [SerializeField] private float _translationSpeed = default;
+        [SerializeField] private float _zoomSpeed = default;
 
         private const float ROTATION_RATE = 240f;
 
         private Camera _camera = default;
+        private Vector3 _mousePositionPrev = default;
 
         private void Awake()
         {
+#if UNITY_EDITOR || UNITY_STANDALONE
             _camera = GetComponent<Camera>();
+#else
+            Destroy(this);
+#endif
         }
 
         private void Update()
         {
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
+            Vector3 mousePosition = Input.mousePosition;
+            Vector3 mouseDeltaPos = mousePosition - _mousePositionPrev;
+            _mousePositionPrev = mousePosition;
+
             if (Input.GetMouseButton(2) || Input.GetMouseButton(1))
             {
-                Vector3 translation = _translationSpeed * Time.deltaTime * new Vector3(-mouseX, -mouseY, 0f);
+                Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(mouseDeltaPos);
                 transform.Translate(translation, Space.Self);
             }
             else if (Input.GetMouseButton(0))
             {
+                float mouseX = Input.GetAxis("Mouse X");
+                float mouseY = Input.GetAxis("Mouse Y");
+
                 if (Input.GetKey(KeyCode.LeftAlt) &&
                     Maths.GetRayIntersectionWithPlane(transform.position, transform.forward, Vector3.up, Vector3.zero, out Vector3 rotationPivot))
                 {

@@ -18,11 +18,7 @@ namespace MustHave.Utilities
         public static List<int> CreateIntList(int beg, int count)
         {
             List<int> list = new List<int>();
-            int end = beg + count;
-            for (int i = beg; i < end; i++)
-            {
-                list.Add(i);
-            }
+            list.AddIntRange(beg, count);
             return list;
         }
 
