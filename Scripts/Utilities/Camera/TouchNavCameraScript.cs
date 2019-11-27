@@ -26,20 +26,22 @@ namespace MustHave.Utilities
             {
                 Touch[] touches = Input.touches;
                 Vector2 deltaPosition = Vector2.zero;
-                float[] deltaSqrLengths = new float[touchCount];
-                float deltaSqrLengthSum = 0f;
+                Vector2 absDeltaSum = Vector2.zero;
                 for (int i = 0; i < touchCount; i++)
                 {
-                    deltaSqrLengths[i] = touches[i].deltaPosition.sqrMagnitude;
-                    deltaSqrLengthSum += deltaSqrLengths[i];
+                    float deltaPosX = touches[i].deltaPosition.x;
+                    float deltaPosY = touches[i].deltaPosition.y;
+                    float absDeltaPosX = Mathf.Abs(deltaPosX);
+                    float absDeltaPosY = Mathf.Abs(deltaPosY);
+                    deltaPosition.x += absDeltaPosX * deltaPosX;
+                    deltaPosition.y += absDeltaPosY * deltaPosY;
+                    absDeltaSum.x += absDeltaPosX;
+                    absDeltaSum.y += absDeltaPosY;
                 }
-                if (deltaSqrLengthSum > 0f)
+                deltaPosition.x = absDeltaSum.x > 0f ? deltaPosition.x / absDeltaSum.x : 0f;
+                deltaPosition.y = absDeltaSum.y > 0f ? deltaPosition.y / absDeltaSum.y : 0f;
+                if (deltaPosition != Vector2.zero)
                 {
-                    for (int i = 0; i < touchCount; i++)
-                    {
-                        deltaPosition += deltaSqrLengths[i] * touches[i].deltaPosition;
-                    }
-                    deltaPosition /= deltaSqrLengthSum;
                     Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(deltaPosition);
                     transform.Translate(translation, Space.Self);
                 }
