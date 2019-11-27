@@ -23,6 +23,11 @@ namespace MustHave.Utilities
 #endif
         }
 
+        private void OnEnable()
+        {
+            _mousePositionPrev = Input.mousePosition;
+        }
+
         private void Update()
         {
             Vector3 mousePosition = Input.mousePosition;

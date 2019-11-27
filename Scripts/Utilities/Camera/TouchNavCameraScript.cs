@@ -21,17 +21,28 @@ namespace MustHave.Utilities
 
         private void Update()
         {
-            if (Input.touchCount >= 2)
+            int touchCount = Input.touchCount;
+            if (touchCount >= 2)
             {
                 Touch[] touches = Input.touches;
-                Vector2 deltaPositionMax = Vector2.zero;
-                foreach (var touch in touches)
+                Vector2 deltaPosition = Vector2.zero;
+                float[] deltaSqrLengths = new float[touchCount];
+                float deltaSqrLengthSum = 0f;
+                for (int i = 0; i < touchCount; i++)
                 {
-                    deltaPositionMax.x = Mathf.Abs(touch.deltaPosition.x) > Mathf.Abs(deltaPositionMax.x) ? touch.deltaPosition.x : deltaPositionMax.x;
-                    deltaPositionMax.y = Mathf.Abs(touch.deltaPosition.y) > Mathf.Abs(deltaPositionMax.y) ? touch.deltaPosition.y : deltaPositionMax.y;
+                    deltaSqrLengths[i] = touches[i].deltaPosition.sqrMagnitude;
+                    deltaSqrLengthSum += deltaSqrLengths[i];
                 }
-                Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(deltaPositionMax);
-                transform.Translate(translation, Space.Self);
+                if (deltaSqrLengthSum > 0f)
+                {
+                    for (int i = 0; i < touchCount; i++)
+                    {
+                        deltaPosition += deltaSqrLengths[i] * touches[i].deltaPosition;
+                    }
+                    deltaPosition /= deltaSqrLengthSum;
+                    Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(deltaPosition);
+                    transform.Translate(translation, Space.Self);
+                }
             }
         }
     }
