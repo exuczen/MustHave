@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave
 {
     public enum RotationOrder
     {

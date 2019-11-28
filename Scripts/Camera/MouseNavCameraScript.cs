@@ -1,7 +1,7 @@
 ﻿using MustHave.Utilities;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
     public class MouseNavCameraScript : MonoBehaviour

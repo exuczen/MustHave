@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave
 {
     public struct Matrix2 : IEquatable<Matrix2>
     {

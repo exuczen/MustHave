@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave
 {
     public static class CameraExtensionMethods
     {
