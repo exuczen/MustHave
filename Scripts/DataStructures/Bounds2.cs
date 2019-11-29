@@ -15,7 +15,7 @@ namespace MustHave
         {
             this.center = center;
             this.size = size;
-            extents = new Vector2(size.x / 2f, size.y / 2f);
+            extents = size / 2f;
             min = center - extents;
             max = center + extents;
         }
@@ -25,7 +25,7 @@ namespace MustHave
             get { return size; }
             set {
                 size = value;
-                extents = new Vector2(size.x / 2f, size.y / 2f);
+                extents = size / 2f;
                 min = center - extents;
                 max = center + extents;
             }
@@ -36,7 +36,7 @@ namespace MustHave
             get { return extents; }
             set {
                 extents = value;
-                size = new Vector2(extents.x * 2f, extents.y * 2f);
+                size = extents * 2f;
                 min = center - extents;
                 max = center + extents;
             }
@@ -57,7 +57,8 @@ namespace MustHave
             get { return min; }
             set {
                 min = value;
-                max = min + size;
+                size = max - min;
+                extents = size / 2f;
                 center = min + extents;
             }
         }
@@ -67,7 +68,8 @@ namespace MustHave
             get { return min; }
             set {
                 max = value;
-                min = max - size;
+                size = max - min;
+                extents = size / 2f;
                 center = max - extents;
             }
         }
