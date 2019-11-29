@@ -472,6 +472,22 @@ namespace MustHave
             );
         }
 
+        public static Vector2Int Min(Vector2Int v1, Vector2Int v2)
+        {
+            return new Vector2Int(
+                Mathf.Min(v1.x, v2.x),
+                Mathf.Min(v1.y, v2.y)
+            );
+        }
+
+        public static Vector2Int Max(Vector2Int v1, Vector2Int v2)
+        {
+            return new Vector2Int(
+                Mathf.Max(v1.x, v2.x),
+                Mathf.Max(v1.y, v2.y)
+            );
+        }
+
         public static Vector3Int Min(Vector3Int v1, Vector3Int v2)
         {
             return new Vector3Int(
