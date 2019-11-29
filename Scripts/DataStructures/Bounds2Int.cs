@@ -12,35 +12,8 @@ namespace MustHave
         public Bounds2Int(Vector2Int min, Vector2Int size)
         {
             this.min = min;
-            this.max = min + size;
+            this.max = min + size - Vector2Int.one;
             this.size = size;
-        }
-
-        public Bounds2Int GetScaledBounds(int bitShift)
-        {
-            Bounds2Int bounds;
-            if (bitShift == 0)
-            {
-                return this;
-            }
-            else if (bitShift < 0)
-            {
-                bitShift = -bitShift;
-                bounds = new Bounds2Int {
-                    size = new Vector2Int(size.x >> bitShift, size.y >> bitShift),
-                    min = new Vector2Int(min.x >> bitShift, min.y >> bitShift),
-                    max = new Vector2Int(max.x >> bitShift, max.y >> bitShift)
-                };
-            }
-            else
-            {
-                bounds = new Bounds2Int {
-                    size = new Vector2Int(size.x << bitShift, size.y << bitShift),
-                    min = new Vector2Int(min.x << bitShift, min.y << bitShift),
-                    max = new Vector2Int(max.x << bitShift, max.y << bitShift)
-                };
-            }
-            return bounds;
         }
 
         public Vector2Int Size
@@ -48,7 +21,7 @@ namespace MustHave
             get { return size; }
             set {
                 size = value;
-                max = min + size;
+                max = min + size - Vector2Int.one;
             }
         }
 
@@ -57,7 +30,7 @@ namespace MustHave
             get { return min; }
             set {
                 min = value;
-                size = max - min;
+                size = max - min + Vector2Int.one;
             }
         }
 
@@ -66,7 +39,7 @@ namespace MustHave
             get { return max; }
             set {
                 max = value;
-                size = max - min;
+                size = max - min + Vector2Int.one;
             }
         }
 
