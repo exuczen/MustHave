@@ -17,12 +17,10 @@ namespace MustHave.UI
         public const string WARNING_QUIT_CONFIRM = "Do you really want to quit?";
         public const string WARNING_NOT_IMPLEMENTED = "This feature will be available soon.";
 
-        [SerializeField]
-        private Button _dismissButton = default;
-        [SerializeField]
-        private Button[] _buttons = default;
-        [SerializeField]
-        protected Text _popupText = default;
+        [SerializeField] private Button _dismissButton = default;
+        [SerializeField] private Button[] _buttons = default;
+        [SerializeField] protected Text _popupText = default;
+        [SerializeField] protected Text _emptyLineText = default;
 
         private ActionWithText[] _onButtonClickActions = default;
         private Action _dismissButtonAction = default;
@@ -83,6 +81,10 @@ namespace MustHave.UI
         public AlertPopupScript SetText(string text)
         {
             //_popupText.text = string.Concat("\n", text, "\n");
+            bool textIsNullOrEmpty = string.IsNullOrEmpty(text);
+            _popupText.gameObject.SetActive(!textIsNullOrEmpty);
+            if (_emptyLineText)
+                _emptyLineText.gameObject.SetActive(!textIsNullOrEmpty);
             _popupText.text = text;
             return this;
         }
