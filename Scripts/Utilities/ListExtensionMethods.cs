@@ -125,6 +125,17 @@ namespace MustHave.Utilities
             return element;
         }
 
+        public static T PickFirstElement<T>(this List<T> list)
+        {
+            if (list.Count > 0)
+            {
+                T element = list[0];
+                list.RemoveAt(0);
+                return element;
+            }
+            return default;
+        }
+
         public static T PickLastElement<T>(this List<T> list)
         {
             if (list.Count > 0)
