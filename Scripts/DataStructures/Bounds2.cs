@@ -65,13 +65,22 @@ namespace MustHave
 
         public Vector2 Max
         {
-            get { return min; }
+            get { return max; }
             set {
                 max = value;
                 size = max - min;
                 extents = size / 2f;
                 center = max - extents;
             }
+        }
+
+        public void SetMinMax(Vector2 min, Vector2 max)
+        {
+            this.min = min;
+            this.max = max;
+            size = max - min;
+            extents = size / 2f;
+            center = max - extents;
         }
 
         public bool Contains(Vector2 pos)
