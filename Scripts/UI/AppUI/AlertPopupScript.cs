@@ -113,8 +113,8 @@ namespace MustHave.UI
         {
             if (_dismissButton.interactable)
             {
-                HideWithAnimator(_dismissButtonAction != null, () => {
-                    _dismissButtonAction.Invoke();
+                HideWithAnimator(() => {
+                    _dismissButtonAction?.Invoke();
                     _dismissButtonAction = null;
                 });
                 _onButtonClickActions = null;
@@ -131,9 +131,7 @@ namespace MustHave.UI
                 {
                     if (buttonAction.DismissWithAnimator)
                     {
-                        HideWithAnimator(buttonAction.action != null, () => {
-                            buttonAction.action.Invoke();
-                        });
+                        HideWithAnimator(() => { buttonAction.action?.Invoke(); });
                     }
                     else
                     {
@@ -170,15 +168,14 @@ namespace MustHave.UI
             OnHide();
         }
 
-        private void HideWithAnimator(bool onHideResult, Action onHide)
+        private void HideWithAnimator(Action onHide)
         {
             if (gameObject.activeSelf)
             {
                 Animator.SetTrigger(ANIMATOR_TRIGGER_HIDE);
                 _context?.StartCoroutineActionAfterPredicate(() => {
                     Hide();
-                    if (onHideResult)
-                        onHide?.Invoke();
+                    onHide?.Invoke();
                 }, () => gameObject.activeSelf);
             }
         }
