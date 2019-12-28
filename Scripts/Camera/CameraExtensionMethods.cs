@@ -27,7 +27,7 @@ namespace MustHave
             return camera.projectionMatrix.GetFovFromProjection();
         }
 
-        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos)
+        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos, float cameraDistance)
         {
             if (camera.orthographic)
             {
@@ -35,12 +35,22 @@ namespace MustHave
             }
             else
             {
-                float cameraDistance = camera.transform.localPosition.z;
                 Vector3 screenPoint = new Vector3(Screen.width / 2f + screenDeltaPos.x, Screen.height / 2f + screenDeltaPos.y, -cameraDistance);
                 Vector3 worldPoint = camera.ScreenToWorldPoint(screenPoint);
                 Vector3 cameraPlaneWorldPoint = camera.transform.TransformPoint(new Vector3(0f, 0f, -cameraDistance));
                 return worldPoint - cameraPlaneWorldPoint;
             }
+        }
+
+        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos)
+        {
+            return ScreenToWorldTranslation(camera, screenDeltaPos, camera.transform.localPosition.z);
+        }
+
+        public static bool GetRayIntersectionWithPlane(this Camera camera, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
+        {
+            Ray ray = new Ray(camera.transform.position, camera.transform.forward);
+            return Maths.GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out distance);
         }
     }
 }

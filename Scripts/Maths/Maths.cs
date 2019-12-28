@@ -533,37 +533,44 @@ namespace MustHave
             );
         }
 
-        public static bool GetRayIntersectionWithPlane(Ray ray, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
+        public static bool GetRayIntersectionWithPlane(Ray ray, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
         {
             Plane plane = new Plane(planeUp, planePos);
             if (plane.Raycast(ray, out float rayDistance))
             {
+                distance = rayDistance;
                 isecPt = ray.GetPoint(rayDistance);
                 return true;
             }
             else
             {
+                distance = 0f;
                 isecPt = Vector3.zero;
                 return false;
             }
         }
 
+        public static bool GetRayIntersectionWithPlane(Ray ray, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
+        {
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
+        }
+
         public static bool GetRayIntersectionWithPlane(Vector3 rayOrig, Vector3 rayDir, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = new Ray(rayOrig, rayDir);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
         }
 
         public static bool GetLineIntersectionWithPlane(Vector3 pt1, Vector3 pt2, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = new Ray(pt1, pt2 - pt1);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
         }
 
         public static bool GetTouchRayIntersectionWithPlane(Camera camera, Vector3 touchPos, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = camera.ScreenPointToRay(touchPos);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
         }
 
         public static bool GetTouchRayIntersectionWithPlane(Camera camera, Vector3 touchPos, Transform planeTransform, out Vector3 isecPt)
