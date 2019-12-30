@@ -91,16 +91,15 @@ namespace MustHave.UI
 
         public void ShowNotImplementedWarning(Action action = null)
         {
-            _dismissButtonAction = action;
-            ShowWithConfirmButton(WARNING_NOT_IMPLEMENTED, action);
+            ShowWithConfirmButton(WARNING_NOT_IMPLEMENTED, action, false);
         }
 
-        public void ShowWithConfirmButton(string text, Action action = null)
+        public void ShowWithConfirmButton(string text, Action action = null, bool invokeActionOnHide = true)
         {
-            _dismissButtonAction = action;
             SetButtons(ActionWithText.Create(BUTTON_OK, action));
             SetText(text);
             Show();
+            _dismissButtonAction = invokeActionOnHide ? action : null;
         }
 
         public void ShowQuitWarning()
