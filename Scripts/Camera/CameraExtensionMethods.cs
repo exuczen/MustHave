@@ -27,24 +27,22 @@ namespace MustHave
             return camera.projectionMatrix.GetFovFromProjection();
         }
 
-        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos, float cameraDistance)
+        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenTranslation, float cameraDistance)
         {
             if (camera.orthographic)
             {
-                return screenDeltaPos * camera.orthographicSize * 2f / Screen.height;
+                return screenTranslation * camera.orthographicSize * 2f / Screen.height;
             }
             else
             {
-                Vector3 screenPoint = new Vector3(Screen.width / 2f + screenDeltaPos.x, Screen.height / 2f + screenDeltaPos.y, -cameraDistance);
-                Vector3 worldPoint = camera.ScreenToWorldPoint(screenPoint);
-                Vector3 cameraPlaneWorldPoint = camera.transform.TransformPoint(new Vector3(0f, 0f, -cameraDistance));
-                return worldPoint - cameraPlaneWorldPoint;
+                float cameraWorldPlaneHeight = 2f * Mathf.Abs(cameraDistance) * Mathf.Tan(Mathf.Deg2Rad * camera.fieldOfView / 2f);
+                return screenTranslation * cameraWorldPlaneHeight / Screen.height;
             }
         }
 
-        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenDeltaPos)
+        public static Vector3 ScreenToWorldTranslation(this Camera camera, Vector2 screenTranslation)
         {
-            return ScreenToWorldTranslation(camera, screenDeltaPos, camera.transform.localPosition.z);
+            return ScreenToWorldTranslation(camera, screenTranslation, camera.transform.localPosition.z);
         }
 
         public static bool GetRayIntersectionWithPlane(this Camera camera, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
