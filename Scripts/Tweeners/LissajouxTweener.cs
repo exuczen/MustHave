@@ -50,7 +50,7 @@ namespace MustHave.Tweeners
                 Vector3 frequency = _frequency;
                 frequency *= _frequencyScale;
                 Vector3 phase = (_phaseDivPI + Vector3.one * _totalPhaseDivPI) * Mathf.PI;
-                Vector3 translation = Maths.Mul(_amplitude, Maths.Sin(frequency * elapsedTime + phase));
+                Vector3 translation = Mathv.Mul(_amplitude, Mathv.Sin(frequency * elapsedTime + phase));
                 transform.localPosition = _initialPosition + translation;
             });
         }
