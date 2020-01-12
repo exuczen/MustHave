@@ -26,10 +26,5 @@ namespace MustHave.Utilities
             get => false;
 #endif
         }
-
-        public static bool ApplicationIsPlaying
-        {
-            get => !IsInEditMode;
-        }
     }
 }
