@@ -1,0 +1,14 @@
+{
+    "name": "MustHave",
+    "references": [
+        "GUID:9e04c6f1d83f64c85a18cbf2fcccc31c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
