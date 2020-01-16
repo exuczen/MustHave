@@ -6,11 +6,8 @@ namespace MustHave.StateMachine
 {
     public class ActiveOnEnterBehaviour : StateMachineBehaviour
     {
-        [SerializeField]
-        private bool _activeOnEnter = default;
-
-        [SerializeField]
-        private bool _activeOnExit = default;
+        [SerializeField] private bool _activeOnEnter = default;
+        [SerializeField] private bool _activeOnExit = default;
 
         // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
         override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -41,5 +38,5 @@ namespace MustHave.StateMachine
         //{
         //    // Implement code that sets up animation IK (inverse kinematics)
         //}
-    } 
+    }
 }

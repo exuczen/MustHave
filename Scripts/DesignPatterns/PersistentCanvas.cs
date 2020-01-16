@@ -7,11 +7,8 @@ namespace MustHave.DesignPatterns
     [RequireComponent(typeof(Canvas))]
     public class PersistentCanvas<T> : PersistentSingleton<T> where T : MonoBehaviour
     {
-        [SerializeField]
-        protected List<Object> _persistentObjectsList = new List<Object>();
-
-        [SerializeField]
-        protected List<Component> _persistentComponentsList = new List<Component>();
+        [SerializeField] protected List<Object> _persistentObjectsList = new List<Object>();
+        [SerializeField] protected List<Component> _persistentComponentsList = new List<Component>();
 
         public void ClearPersistentComponentsList()
         {

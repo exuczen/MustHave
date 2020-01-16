@@ -12,16 +12,11 @@ namespace MustHave.UI
     [RequireComponent(typeof(Canvas))]
     public class CanvasScript : UIBehaviour
     {
-        [SerializeField]
-        private bool _activeOnAppAwake = false;
-        [SerializeField]
-        protected MessageBus _appMessageBus = default;
-        [SerializeField]
-        protected ShowScreenMessageEvent _showScreenMessage = default;
-        [SerializeField]
-        protected MessageEvent _backMessage = default;
-        [SerializeField]
-        private RectTransform _topLayer = default;
+        [SerializeField] private bool _activeOnAppAwake = false;
+        [SerializeField] protected MessageBus _appMessageBus = default;
+        [SerializeField] protected ShowScreenMessageEvent _showScreenMessage = default;
+        [SerializeField] protected MessageEvent _backMessage = default;
+        [SerializeField] private RectTransform _topLayer = default;
 
         private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
         private string _sceneName = default;

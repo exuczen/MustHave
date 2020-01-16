@@ -10,13 +10,11 @@ namespace MustHave.Audio
     [CreateAssetMenu]
     public class CustomAudioClip : ScriptableObject
     {
-        [SerializeField]
-        private AudioClip _audioClip = default;
-        [SerializeField, Range(0f, 1f)]
-        private float _volume = 1f;
+        [SerializeField] private AudioClip _audioClip = default;
+        [SerializeField, Range(0f, 1f)] private float _volume = 1f;
 
         public AudioClip AudioClip { get => _audioClip; }
         public float Volume { get => _volume; }
-    } 
+    }
 }
 

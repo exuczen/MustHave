@@ -8,20 +8,13 @@ namespace MustHave.Tweeners
 {
     public abstract class TweenerScript : MonoBehaviour
     {
-        [SerializeField]
-        private bool _randomDelay = default;
-        [SerializeField, ConditionalHide("_randomDelay", true)]
-        private float _randomDelayMin = default;
-        [SerializeField, ConditionalHide("_randomDelay", true)]
-        private float _randomDelayMax = default;
-        [SerializeField]
-        private float _intervalDuration = 1f;
-        [SerializeField]
-        protected int _intervalIterations = 1;
-        [SerializeField]
-        protected bool _loop = true;
-        [SerializeField]
-        protected AudioClip _audioClip = default;
+        [SerializeField] private bool _randomDelay = default;
+        [SerializeField, ConditionalHide("_randomDelay", true)] private float _randomDelayMin = default;
+        [SerializeField, ConditionalHide("_randomDelay", true)] private float _randomDelayMax = default;
+        [SerializeField] private float _intervalDuration = 1f;
+        [SerializeField] protected int _intervalIterations = 1;
+        [SerializeField] protected bool _loop = true;
+        [SerializeField] protected AudioClip _audioClip = default;
 
         protected float _totalDuration = default;
         protected Vector3 _initialPosition = default;
@@ -129,5 +122,5 @@ namespace MustHave.Tweeners
         {
             return StartCoroutine(UpdateRoutine(duration));
         }
-    } 
+    }
 }

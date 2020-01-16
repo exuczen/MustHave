@@ -18,8 +18,7 @@ namespace MustHave.UI
     [RequireComponent(typeof(Image))]
     public class ImageDownloadScript : MonoBehaviour
     {
-        [SerializeField]
-        private Animator _progressSpinner = default;
+        [SerializeField] private Animator _progressSpinner = default;
 
         private Image _image = default;
         private CanvasScript _canvas = default;

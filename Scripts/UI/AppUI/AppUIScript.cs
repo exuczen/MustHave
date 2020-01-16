@@ -13,22 +13,14 @@ namespace MustHave.UI
     [RequireComponent(typeof(Canvas))]
     public class AppUIScript : PersistentCanvas<AppUIScript>
     {
-        [SerializeField]
-        private List<MessageBus> _sceneMessageBusList = default;
-        [SerializeField]
-        private MessageBus _appMessageBus = default;
-        [SerializeField]
-        private ShowScreenMessageEvent _showScreenMessage = default;
-        [SerializeField]
-        private MessageEvent _backMessage = default;
-        [SerializeField]
-        private SetAlertPopupMessageEvent _setAlertPopupMessage = default;
-        [SerializeField]
-        private Image _screenshotImage = default;
-        [SerializeField]
-        private AlertPopupScript _alertPopup = default;
-        [SerializeField]
-        private ProgressSpinnerPanel _progressSpinnerPanel = default;
+        [SerializeField] private List<MessageBus> _sceneMessageBusList = default;
+        [SerializeField] private MessageBus _appMessageBus = default;
+        [SerializeField] private ShowScreenMessageEvent _showScreenMessage = default;
+        [SerializeField] private MessageEvent _backMessage = default;
+        [SerializeField] private SetAlertPopupMessageEvent _setAlertPopupMessage = default;
+        [SerializeField] private Image _screenshotImage = default;
+        [SerializeField] private AlertPopupScript _alertPopup = default;
+        [SerializeField] private ProgressSpinnerPanel _progressSpinnerPanel = default;
 
         private List<ScreenData> _screenDataStack = new List<ScreenData>();
         private string _activeSceneName = default;

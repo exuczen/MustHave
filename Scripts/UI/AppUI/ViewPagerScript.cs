@@ -12,7 +12,6 @@ namespace MustHave.UI
     public class ViewPagerScript : ScrollRect, IPointerDownHandler, IPointerUpHandler
     {
         private HorizontalLayoutGroup _layoutGroup = default;
-
         private Coroutine _swipeRoutine = default;
 
         protected override void Awake()

@@ -7,16 +7,11 @@ namespace MustHave.Audio
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticlesAudioScript : MonoBehaviour
     {
-        [SerializeField]
-        private AudioSource _suicidalAudioPrefab = default;
-        [SerializeField]
-        private AudioClip _birthClip = default;
-        [SerializeField]
-        private AudioClip _deathClip = default;
-        [SerializeField, Range(0f, 1f)]
-        private float _birthClipVolume = 1f;
-        [SerializeField, Range(0f, 1f)]
-        private float _deathClipVolume = 1f;
+        [SerializeField] private AudioSource _suicidalAudioPrefab = default;
+        [SerializeField] private AudioClip _birthClip = default;
+        [SerializeField] private AudioClip _deathClip = default;
+        [SerializeField, Range(0f, 1f)] private float _birthClipVolume = 1f;
+        [SerializeField, Range(0f, 1f)] private float _deathClipVolume = 1f;
 
         private ParticleSystem _particleSystem = default;
         private int _particlesCount = default;
@@ -66,5 +61,5 @@ namespace MustHave.Audio
                 Destroy(audios[i].gameObject);
             }
         }
-    } 
+    }
 }
