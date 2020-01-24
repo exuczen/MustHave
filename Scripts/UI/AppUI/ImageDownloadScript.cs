@@ -1,18 +1,24 @@
-﻿using System;
+﻿//#define WEBP
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using MustHave.Utilities;
+#if WEBP
 using WebP;
+#endif
 
 namespace MustHave.UI
 {
     public enum ImageDownloadFormat
     {
         PNG_JPG,
+#if WEBP
         WebP
+#endif
     }
 
     [RequireComponent(typeof(Image))]
@@ -46,15 +52,17 @@ namespace MustHave.UI
                     case ImageDownloadFormat.PNG_JPG:
                         ImageDownloader.DownloadIntoOrLoadFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
                         break;
+#if WEBP
                     case ImageDownloadFormat.WebP:
                         DownloadIntoOrLoadWebPFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
                         break;
+#endif
                     default:
                         break;
                 }
             }
         }
-
+#if WEBP
         private void DownloadIntoOrLoadWebPFromFolder(string appDataFolderName, MonoBehaviour context, string url, Image image, Action onSuccess = null, Action<string> onError = null)
         {
             string folderPath = Path.Combine(Application.persistentDataPath, appDataFolderName);
@@ -91,5 +99,6 @@ namespace MustHave.UI
             else
                 Debug.LogError(GetType() + ".LoadTextureFromWebP: WebP Load Error : " + lError.ToString());
         }
+#endif
     }
 }

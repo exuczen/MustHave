@@ -9,9 +9,6 @@ namespace MustHave.Utilities
     {
         public static IEnumerator ActionAfterPredicate(UnityAction action, Func<bool> predicate)
         {
-            //IEnumerator yieldInstruction = new WaitWhile(predicate);
-            //CustomYieldInstruction yieldInstruction = new WaitWhile(predicate);
-            //yield return yieldInstruction;
             yield return new WaitWhile(predicate);
             action?.Invoke();
         }
