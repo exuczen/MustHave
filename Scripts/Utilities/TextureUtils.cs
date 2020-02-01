@@ -36,14 +36,10 @@ namespace MustHave.Utilities
 
         public static void LoadImageFromFilepath(string filePath, Image image)
         {
-            Texture2D texture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
             var bytes = File.ReadAllBytes(filePath);
+            Texture2D texture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
             texture.LoadImage(bytes);
-            Sprite sprite = CreateSpriteFromTexture(texture);
-            if (image)
-            {
-                image.sprite = sprite;
-            }
+            image.sprite = CreateSpriteFromTexture(texture);
         }
 
         public static IEnumerator CaptureScreenshotWithoutCanvasRoutine(Camera camera, Canvas canvas, System.Action<Texture2D> resultCallback)
@@ -121,5 +117,5 @@ namespace MustHave.Utilities
         {
             CaptureScreenshotToImage(CameraUtils.MainOrCurrent, image, spriteName);
         }
-    } 
+    }
 }

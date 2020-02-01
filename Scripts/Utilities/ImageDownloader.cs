@@ -25,6 +25,28 @@ namespace MustHave.Utilities
         }
 
         /// <summary>
+        /// Download texture with callback.
+        /// </summary>
+        public static Coroutine DownloadInto(MonoBehaviour context, string url, Action<string, Texture2D> resultCallback)
+        {
+            if (string.IsNullOrEmpty(url) || resultCallback == null || context == null)
+                return null;
+
+            return context.StartCoroutine(DownloadIntoRoutine(url, resultCallback));
+        }
+
+        /// <summary>
+        /// Download sprite with callback.
+        /// </summary>
+        public static Coroutine DownloadInto(MonoBehaviour context, string url, Action<string, Texture2D, Sprite> resultCallback)
+        {
+            if (string.IsNullOrEmpty(url) || resultCallback == null || context == null)
+                return null;
+
+            return context.StartCoroutine(DownloadIntoRoutine(url, resultCallback));
+        }
+
+        /// <summary>
         /// Downloads image from url into image as a sprite.
         /// To access cross-domain WWW resources in WebGL, the server you are trying to access needs to authorize this using CORS.
         /// https://docs.unity3d.com/Manual/webgl-networking.html
@@ -34,7 +56,7 @@ namespace MustHave.Utilities
             if (string.IsNullOrEmpty(url) || image == null || context == null)
                 return null;
 
-            return context.StartCoroutine(DownloadIntoRoutine(context, url, image, color));
+            return context.StartCoroutine(DownloadIntoRoutine(url, image, color));
         }
 
         /// <summary>
@@ -60,28 +82,6 @@ namespace MustHave.Utilities
         }
 
         /// <summary>
-        /// Download sprite with callback.
-        /// </summary>
-        public static Coroutine DownloadInto(MonoBehaviour context, string url, Action<Sprite> resultCallback)
-        {
-            if (string.IsNullOrEmpty(url) || resultCallback == null || context == null)
-                return null;
-
-            return context.StartCoroutine(DownloadIntoRoutine(context, url, resultCallback));
-        }
-
-        /// <summary>
-        /// Download texture with callback.
-        /// </summary>
-        public static Coroutine DownloadInto(MonoBehaviour context, string url, Action<string, Texture2D> resultCallback)
-        {
-            if (string.IsNullOrEmpty(url) || resultCallback == null || context == null)
-                return null;
-
-            return context.StartCoroutine(DownloadIntoRoutine(context, url, resultCallback));
-        }
-
-        /// <summary>
         /// Download texture routine.
         /// </summary>
         private static IEnumerator DownloadIntoRoutine(string url, Action<Texture2D> onSuccess, Action<string> onError = null)
@@ -103,15 +103,36 @@ namespace MustHave.Utilities
         }
 
         /// <summary>
+        /// Download texture with callback routine.
+        /// </summary>
+        private static IEnumerator DownloadIntoRoutine(string url, Action<string, Texture2D> resultCallback)
+        {
+            yield return DownloadIntoRoutine(url, texture => {
+                resultCallback.Invoke(url, texture);
+            });
+        }
+
+        /// <summary>
+        /// Download sprite with callback routine.
+        /// </summary>
+        private static IEnumerator DownloadIntoRoutine(string url, Action<string, Texture2D, Sprite> resultCallback)
+        {
+            yield return DownloadIntoRoutine(url, texture => {
+                Sprite sprite = TextureUtils.CreateSpriteFromTexture(texture);
+                resultCallback.Invoke(url, texture, sprite);
+            });
+        }
+
+        /// <summary>
         /// Download texture into image routine.
         /// </summary>
-        private static IEnumerator DownloadIntoRoutine(MonoBehaviour context, string url, Image image, Color color)
+        private static IEnumerator DownloadIntoRoutine(string url, Image image, Color color)
         {
-            yield return context.StartCoroutine(DownloadIntoRoutine(url, texture => {
+            yield return DownloadIntoRoutine(url, texture => {
                 Sprite sprite = TextureUtils.CreateSpriteFromTexture(texture);
                 image.sprite = sprite;
                 image.color = color;
-            }));
+            });
         }
 
         public static string GetImageFileNameFromUrl(string url, string extension = null)
@@ -121,9 +142,6 @@ namespace MustHave.Utilities
             clearName = clearName.Replace(":", "");
             clearName = clearName.Replace("=", "");
             clearName = clearName.Replace("?", "");
-            //clearName = clearName.Replace("https:graph.facebook.com", "");
-            //clearName = clearName.Replace("picture?width=320", "");
-            //clearName = clearName.Replace("http:pictorygramDev.pixzell.pluploadsavatars", "");
             return !string.IsNullOrEmpty(extension) ? string.Concat(clearName, ".", extension) : clearName;
         }
 
@@ -175,37 +193,9 @@ namespace MustHave.Utilities
             }
             else
             {
-                Texture2D texture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
-                var bytes = File.ReadAllBytes(filePath);
-                texture.LoadImage(bytes);
-                Sprite sprite = TextureUtils.CreateSpriteFromTexture(texture);
-                if (image)
-                {
-                    image.sprite = sprite;
-                }
+                TextureUtils.LoadImageFromFilepath(filePath, image);
                 onSuccess?.Invoke();
             }
         }
-
-        /// <summary>
-        /// Download texture with callback routine.
-        /// </summary>
-        private static IEnumerator DownloadIntoRoutine(MonoBehaviour context, string url, Action<string, Texture2D> resultCallback)
-        {
-            yield return context.StartCoroutine(DownloadIntoRoutine(url, texture => {
-                resultCallback.Invoke(url, texture);
-            }));
-        }
-
-        /// <summary>
-        /// Download sprite with callback routine.
-        /// </summary>
-        private static IEnumerator DownloadIntoRoutine(MonoBehaviour context, string url, Action<Sprite> resultCallback)
-        {
-            yield return context.StartCoroutine(DownloadIntoRoutine(url, texture => {
-                Sprite sprite = TextureUtils.CreateSpriteFromTexture(texture);
-                resultCallback.Invoke(sprite);
-            }));
-        }
-    } 
+    }
 }
