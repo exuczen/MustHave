@@ -118,5 +118,17 @@ namespace MustHave.Utilities
             }
             return results;
         }
+
+        public static T FindRootObjectOfType<T>(Scene scene) where T : Component
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            foreach (GameObject root in roots)
+            {
+                T component = root.GetComponent<T>();
+                if (component)
+                    return component;
+            }
+            return null;
+        }
     }
 }
