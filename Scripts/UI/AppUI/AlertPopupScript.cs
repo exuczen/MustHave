@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using MustHave.Utilities;
+using UnityEditor;
 
 namespace MustHave.UI
 {
@@ -28,6 +29,9 @@ namespace MustHave.UI
         private MonoBehaviour _context = default;
         private int _initialFontSize = default;
 
+        private Action _onShowQuitWarning = default;
+        private Action _onDismissQuitWarning = default;
+
         public Animator Animator { get => _animator ?? (_animator = GetComponent<Animator>()); }
         public int FontSize { get => _popupText.fontSize; set { _popupText.fontSize = value; } }
 
@@ -48,6 +52,12 @@ namespace MustHave.UI
             _initialFontSize = _popupText.fontSize;
             _context = context;
             OnInit();
+        }
+
+        public void SetQuitWarningActions(Action onShow, Action onDismiss)
+        {
+            _onShowQuitWarning = onShow;
+            _onDismissQuitWarning = onDismiss;
         }
 
         public void SetDismissButtonEnabled(bool enabled)
@@ -104,8 +114,16 @@ namespace MustHave.UI
 
         public void ShowQuitWarning()
         {
-            SetButtons(ActionWithText.Create(BUTTON_NO, null), ActionWithText.Create(BUTTON_YES, Application.Quit)).
-            SetText(WARNING_QUIT_CONFIRM).Show();
+            _onShowQuitWarning?.Invoke();
+            SetButtons(
+                ActionWithText.Create(BUTTON_NO, _onDismissQuitWarning),
+                ActionWithText.Create(BUTTON_YES, () => {
+#if UNITY_EDITOR
+                    EditorApplication.isPlaying = false;
+#else
+                    Application.Quit();
+#endif
+                })).SetText(WARNING_QUIT_CONFIRM).Show();
         }
 
         public void OnDismissButtonClick()
