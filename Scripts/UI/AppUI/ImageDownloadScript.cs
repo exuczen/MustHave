@@ -1,4 +1,4 @@
-﻿//#define WEBP
+﻿#define WEBP
 
 using System;
 using System.Collections;
