@@ -1,8 +1,9 @@
 {
     "name": "MustHaveEditor",
     "references": [
-        "GUID:982f2a63d1c3af2439b7f1422ffc1024"
+        "MustHave"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -11,6 +12,5 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": []
 }
