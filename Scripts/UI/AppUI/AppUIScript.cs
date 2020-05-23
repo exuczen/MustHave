@@ -13,11 +13,8 @@ namespace MustHave.UI
     [RequireComponent(typeof(Canvas))]
     public class AppUIScript : PersistentCanvas<AppUIScript>
     {
-        [SerializeField] private List<MessageBus> _sceneMessageBusList = default;
-        [SerializeField] private MessageBus _appMessageBus = default;
-        [SerializeField] private ShowScreenMessageEvent _showScreenMessage = default;
-        [SerializeField] private MessageEvent _backMessage = default;
-        [SerializeField] private SetAlertPopupMessageEvent _setAlertPopupMessage = default;
+        [SerializeField] private List<MessageEventGroup> _sceneMessageGroups = default;
+        [SerializeField] private AppMessageEvents _appMessages = default;
         [SerializeField] private Image _screenshotImage = default;
         [SerializeField] private AlertPopupScript _alertPopup = default;
         [SerializeField] private ProgressSpinnerPanel _progressSpinnerPanel = default;
@@ -42,7 +39,10 @@ namespace MustHave.UI
             //SceneManager.sceneUnloaded += OnSceneUnloaded;
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
-            _appMessageBus.Register(OnNotify);
+            _appMessages.ShowScreenMessage.AddListener(ShowScreen);
+            _appMessages.BackToPrevScreenMessage.AddListener(BackToPrevScreen);
+            _appMessages.SetAlertPopupMessage.AddListener(SetActiveAlertPopup);
+
             _activeSceneName = activeScene.name;
 
             AlertPopupScript[] alertPopups = GetComponentsInChildren<AlertPopupScript>(true);
@@ -62,10 +62,13 @@ namespace MustHave.UI
                     screen.gameObject.SetActive(false);
                 }
             }
+
             List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(activeScene, true);
             _activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
             if (_activeCanvas)
+            {
                 SetPersistentComponentsParent(_activeCanvas.TopLayer);
+            }
 
             foreach (var canvas in canvasList)
             {
@@ -83,25 +86,9 @@ namespace MustHave.UI
             QualitySettings.vSyncCount = 0; // Other values will cause to ignore targetFrameRate
         }
 
-        private void OnNotify(MessageEvent obj)
-        {
-            if (_showScreenMessage.Equals(obj))
-            {
-                ShowScreen(_showScreenMessage.Data);
-            }
-            else if (_backMessage.Equals(obj))
-            {
-                BackToPrevScreen();
-            }
-            else if (_setAlertPopupMessage.Equals(obj))
-            {
-                SetActiveAlertPopup(_setAlertPopupMessage.Data);
-            }
-        }
-
         private void OnScenePreload(string sceneName)
         {
-            _sceneMessageBusList.ForEach(bus => bus.Clear());
+            _sceneMessageGroups.ForEach(group => group.ClearEventListeners());
 
             // Clear screen objects in stack
             foreach (var screenData in _screenDataStack)
@@ -204,6 +191,7 @@ namespace MustHave.UI
             {
                 return;
             }
+
             if (_activeScreenData != null)
             {
                 if (_activeScreenData.Screen == screenData.Screen)
@@ -219,6 +207,7 @@ namespace MustHave.UI
                     _activeScreenData.Screen.Hide();
                 }
             }
+
             if (screenData != null)
             {
                 if (screenData.ClearStack)
@@ -270,6 +259,7 @@ namespace MustHave.UI
                         _activeCanvas.SetAlertPopup(null);
                         _activeCanvas.Hide();
                     }
+
                     if (screen && screen.Canvas)
                     {
                         _activeCanvas = screen.Canvas;

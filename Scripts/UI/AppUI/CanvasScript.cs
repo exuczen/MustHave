@@ -13,9 +13,8 @@ namespace MustHave.UI
     public class CanvasScript : UIBehaviour
     {
         [SerializeField] private bool _activeOnAppAwake = false;
-        [SerializeField] protected MessageBus _appMessageBus = default;
-        [SerializeField] protected ShowScreenMessageEvent _showScreenMessage = default;
-        [SerializeField] protected MessageEvent _backMessage = default;
+        [SerializeField] private AppMessageEvents _appMessages = default;
+
         [SerializeField] private RectTransform _topLayer = default;
 
         private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
@@ -114,8 +113,7 @@ namespace MustHave.UI
             }
             else
             {
-                _showScreenMessage.Data = new ScreenData(typeof(T1), typeof(T2), SceneUtils.ActiveSceneName, keepOnStack, clearStack);
-                _appMessageBus.Notify(_showScreenMessage);
+                ShowScreen(new ScreenData(typeof(T1), typeof(T2), SceneUtils.ActiveSceneName, keepOnStack, clearStack));
             }
         }
 
@@ -128,14 +126,12 @@ namespace MustHave.UI
         /// <param name="keepOnStack"></param>
         public void ShowScreenFromOtherScene<T1, T2>(Enum sceneName, bool keepOnStack = true, bool clearStack = false) where T1 : ScreenScript where T2 : CanvasScript
         {
-            _showScreenMessage.Data = new ScreenData(typeof(T1), typeof(T2), sceneName.ToString(), keepOnStack, clearStack);
-            _appMessageBus.Notify(_showScreenMessage);
+            ShowScreen(new ScreenData(typeof(T1), typeof(T2), sceneName.ToString(), keepOnStack, clearStack));
         }
 
         public void ShowScreenFromAppUI<T>() where T : ScreenScript
         {
-            _showScreenMessage.Data = new ScreenData(typeof(T), typeof(AppUIScript), SceneUtils.ActiveSceneName, false, false);
-            _appMessageBus.Notify(_showScreenMessage);
+            ShowScreen(new ScreenData(typeof(T), typeof(AppUIScript), SceneUtils.ActiveSceneName, false, false));
         }
 
         public void ShowScreen<T>(bool keepOnStack = true, bool clearStack = false)
@@ -154,8 +150,12 @@ namespace MustHave.UI
 
         public void ShowScreen(ScreenScript screen, bool keepOnStack = true, bool clearStack = false)
         {
-            _showScreenMessage.Data = new ScreenData(screen, keepOnStack, clearStack);
-            _appMessageBus.Notify(_showScreenMessage);
+            ShowScreen(new ScreenData(screen, keepOnStack, clearStack));
+        }
+
+        public void ShowScreen(ScreenData screenData)
+        {
+            _appMessages.ShowScreenMessage.Invoke(screenData);
         }
 
         public ScreenScript GetScreen(Type screenType)
@@ -180,7 +180,7 @@ namespace MustHave.UI
 
         public void BackToPrevScreen()
         {
-            _appMessageBus.Notify(_backMessage);
+            _appMessages.BackToPrevScreenMessage.Invoke();
         }
 
         public void SetProgressSpinnerPanel(ProgressSpinnerPanel progressSpinnerPanel)
@@ -195,6 +195,11 @@ namespace MustHave.UI
             _alertPopup = alertPopup;
             if (_alertPopup)
                 _alertPopup.transform.SetParent(_topLayer, false);
+        }
+
+        public void SetAlertPopup<T>()
+        {
+            _appMessages.SetAlertPopupMessage.Invoke(typeof(T));
         }
     }
 }
