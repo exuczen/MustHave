@@ -3,8 +3,14 @@ using UnityEngine;
 
 namespace MustHave
 {
+    public interface IMessageEvent
+    {
+        void Invoke();
+        void RemoveAllListeners();
+    }
+
     [CreateAssetMenu(menuName = "MessageSystem/MessageEvent")]
-    public class MessageEvent : ScriptableObject
+    public class MessageEvent : ScriptableObject, IMessageEvent
     {
         private event Action _event = default;
 
@@ -18,18 +24,18 @@ namespace MustHave
             _event -= listener;
         }
 
-        public virtual void Invoke()
+        public void Invoke()
         {
-            _event.Invoke();
+            _event?.Invoke();
         }
 
-        public virtual void Clear()
+        public void RemoveAllListeners()
         {
             _event = null;
         }
     }
 
-    public class DataMessageEvent<T> : MessageEvent
+    public class DataMessageEvent<T> : ScriptableObject, IMessageEvent
     {
         private event Action<T> _event = default;
 
@@ -49,15 +55,15 @@ namespace MustHave
 
         public void Invoke(T data, bool setData = true)
         {
-            _event.Invoke(setData ? (_data = data) : data);
+            _event?.Invoke(setData ? (_data = data) : data);
         }
 
-        public override void Invoke()
+        public void Invoke()
         {
-            _event.Invoke(_data);
+            _event?.Invoke(_data);
         }
 
-        public override void Clear()
+        public void RemoveAllListeners()
         {
             _event = null;
         }

@@ -88,7 +88,7 @@ namespace MustHave.UI
 
         private void OnScenePreload(string sceneName)
         {
-            _sceneMessageGroups.ForEach(group => group.ClearEventListeners());
+            _sceneMessageGroups.ForEach(group => group.RemoveAllListeners());
 
             // Clear screen objects in stack
             foreach (var screenData in _screenDataStack)

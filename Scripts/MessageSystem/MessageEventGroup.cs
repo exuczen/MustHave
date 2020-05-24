@@ -9,12 +9,9 @@ namespace MustHave
     {
         [SerializeField] private List<MessageEvent> _events = default;
 
-        public void ClearEventListeners()
+        public void RemoveAllListeners()
         {
-            foreach (var e in _events)
-            {
-                e.Clear();
-            }
+            _events.ForEach(e => e.RemoveAllListeners());
         }
     }
 }
