@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MustHave
 {
-    public class DataMessageEvent<T> : ScriptableObject, IMessageEvent
+    public class DataMessageEvent<T> : MessageEventSO
     {
         private event Action<T> _event = default;
 
@@ -26,12 +26,12 @@ namespace MustHave
             _event?.Invoke(setData ? (_data = data) : data);
         }
 
-        public void Invoke()
+        public override void Invoke()
         {
             _event?.Invoke(_data);
         }
 
-        public void RemoveAllListeners()
+        public override void RemoveAllListeners()
         {
             _event = null;
         }

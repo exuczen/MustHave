@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MustHave
 {
     [CreateAssetMenu(menuName = "MessageSystem/MessageEvent")]
-    public class MessageEvent : ScriptableObject, IMessageEvent
+    public class MessageEvent : MessageEventSO
     {
         private event Action _event = default;
 
@@ -18,12 +18,12 @@ namespace MustHave
             _event -= listener;
         }
 
-        public void Invoke()
+        public override void Invoke()
         {
             _event?.Invoke();
         }
 
-        public void RemoveAllListeners()
+        public override void RemoveAllListeners()
         {
             _event = null;
         }

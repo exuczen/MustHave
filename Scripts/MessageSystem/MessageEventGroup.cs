@@ -6,7 +6,7 @@ namespace MustHave
     [CreateAssetMenu(menuName = "MessageSystem/MessageEventGroup")]
     public class MessageEventGroup : ScriptableObject
     {
-        [SerializeField] private List<MessageEvent> _events = default;
+        [SerializeField] private List<MessageEventSO> _events = new List<MessageEventSO>();
 
         public void RemoveAllListeners()
         {
