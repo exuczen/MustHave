@@ -67,6 +67,7 @@ namespace MustHave.UI
             _activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
             if (_activeCanvas)
             {
+                _activeCanvas.SetAlertPopup(_activeAlertPopup);
                 SetPersistentComponentsParent(_activeCanvas.TopLayer);
             }
 

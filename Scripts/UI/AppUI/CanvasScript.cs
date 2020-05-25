@@ -50,7 +50,9 @@ namespace MustHave.UI
         public void OnAppAwake()
         {
             if (_activeOnAppAwake)
+            {
                 Show();
+            }
             OnAppAwake(_activeOnAppAwake);
         }
 
