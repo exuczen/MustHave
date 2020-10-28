@@ -36,9 +36,9 @@ namespace MustHave.Utilities
 
         private static IEnumerator LoadSceneAsyncRoutine(string sceneName, LoadSceneMode mode, Action<float> onProgress = null, Action<Scene> onComplete = null)
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
 #if DEBUG_LOADING_SCENE
-        yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1f);
 #endif
 
             // The Application loads the Scene in the background as the current Scene runs.
@@ -78,29 +78,39 @@ namespace MustHave.Utilities
             }
         }
 
-        public static Canvas FindCanvas(Scene scene, Transform persistentCanvasTransform)
+        public static Canvas FindCanvas(Transform excludeCanvasTransform)
         {
             List<GameObject> rootGameObjects = new List<GameObject>();
+            Scene scene = SceneManager.GetActiveScene();
             scene.GetRootGameObjects(rootGameObjects);
             Canvas sceneCanvas = null;
-            rootGameObjects.Find(root => { return root.transform != persistentCanvasTransform && (sceneCanvas = root.GetComponent<Canvas>()) != null; });
+            rootGameObjects.Find(root => root.transform != excludeCanvasTransform && (sceneCanvas = root.GetComponent<Canvas>()) != null);
             if (!sceneCanvas)
-                rootGameObjects.Find(root => { return (sceneCanvas = root.GetComponentInChildren<Canvas>()) != null; });
+                rootGameObjects.Find(root => (sceneCanvas = root.GetComponentInChildren<Canvas>()) != null);
             return sceneCanvas;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="scene"></param>
-        /// <param name="onlyFirstInRoot">depth first search</param>
-        /// <returns></returns>
-        public static List<T> FindObjectsOfType<T>(Scene scene, bool onlyFirstInRoot = false) where T : Component
+        public static T FindObjectOfType<T>() where T : Component
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            List<GameObject> roots = scene.GetRootGameObjects().ToList();
+            foreach (GameObject root in roots)
+            {
+                T component = root.GetComponentInChildren<T>(true);
+                if (component)
+                {
+                    return component;
+                }
+            }
+            return null;
+        }
+
+        public static List<T> FindObjectsOfType<T>(bool firstDepthSearch = false) where T : Component
         {
             List<T> results = new List<T>();
+            Scene scene = SceneManager.GetActiveScene();
             List<GameObject> roots = scene.GetRootGameObjects().ToList();
-            if (onlyFirstInRoot)
+            if (firstDepthSearch)
             {
                 foreach (GameObject root in roots)
                 {
@@ -119,8 +129,9 @@ namespace MustHave.Utilities
             return results;
         }
 
-        public static T FindRootObjectOfType<T>(Scene scene) where T : Component
+        public static T FindRootObjectOfType<T>() where T : Component
         {
+            Scene scene = SceneManager.GetActiveScene();
             GameObject[] roots = scene.GetRootGameObjects();
             foreach (GameObject root in roots)
             {
