@@ -63,7 +63,7 @@ namespace MustHave.UI
                 }
             }
 
-            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(activeScene, true);
+            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
             _activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
             if (_activeCanvas)
             {
@@ -114,7 +114,7 @@ namespace MustHave.UI
                 SceneManager.SetActiveScene(scene);
                 _activeSceneName = scene.name;
                 _loadingSceneScreenData = null;
-                List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(scene, true);
+                List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
                 foreach (var canvas in canvasList)
                 {
                     canvas.Init();
@@ -293,7 +293,7 @@ namespace MustHave.UI
 
         private CanvasScript FindCanvasInActiveScene(Type canvasType)
         {
-            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(SceneManager.GetActiveScene(), true);
+            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
             return canvasList.Find(c => c.GetType() == canvasType);
         }
 
