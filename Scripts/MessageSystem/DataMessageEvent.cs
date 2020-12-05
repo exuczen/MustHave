@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MustHave
 {
-    public class DataMessageEvent<T> : MessageEventSO
+    public class DataMessageEvent<T> : MessageEvent
     {
         private event Action<T> _event = default;
 
