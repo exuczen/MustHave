@@ -7,7 +7,7 @@ namespace MustHave
     {
         public DataMessageEvent<ScreenData> ShowScreenMessage { get; } = new DataMessageEvent<ScreenData>();
         public ActionMessageEvent BackToPrevScreenMessage { get; } = new ActionMessageEvent();
-        public DataMessageEvent<Type> SetAlertPopupMessage { get; } = new DataMessageEvent<Type>();
+        public TypeMessageEvent SetAlertPopupMessage { get; } = new TypeMessageEvent();
 
         public override void Initialize()
         {
