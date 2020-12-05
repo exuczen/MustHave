@@ -1,16 +1,17 @@
-﻿using UnityEngine;
+﻿using System;
+using MustHave.UI;
 
 namespace MustHave
 {
-    [CreateAssetMenu(menuName = "MessageSystem/AppMessageEvents")]
     public class AppMessageEvents : MessageEventGroup
     {
-        [SerializeField] private ShowScreenMessageEvent _showScreenMessage = default;
-        [SerializeField] private ActionMessageEvent _backToPrevScreenMessage = default;
-        [SerializeField] private SetAlertPopupMessageEvent _setAlertPopupMessage = default;
+        public DataMessageEvent<ScreenData> ShowScreenMessage { get; } = new DataMessageEvent<ScreenData>();
+        public ActionMessageEvent BackToPrevScreenMessage { get; } = new ActionMessageEvent();
+        public DataMessageEvent<Type> SetAlertPopupMessage { get; } = new DataMessageEvent<Type>();
 
-        public ShowScreenMessageEvent ShowScreenMessage => _showScreenMessage;
-        public ActionMessageEvent BackToPrevScreenMessage => _backToPrevScreenMessage;
-        public SetAlertPopupMessageEvent SetAlertPopupMessage => _setAlertPopupMessage;
+        public override void Initialize()
+        {
+            AddToList(ShowScreenMessage, BackToPrevScreenMessage, SetAlertPopupMessage);
+        }
     }
 }

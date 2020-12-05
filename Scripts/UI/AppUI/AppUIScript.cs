@@ -39,6 +39,7 @@ namespace MustHave.UI
             //SceneManager.sceneUnloaded += OnSceneUnloaded;
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
+            _appMessages.Initialize();
             _appMessages.ShowScreenMessage.AddListener(ShowScreen);
             _appMessages.BackToPrevScreenMessage.AddListener(BackToPrevScreen);
             _appMessages.SetAlertPopupMessage.AddListener(SetActiveAlertPopup);
