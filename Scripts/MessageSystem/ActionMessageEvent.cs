@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CreateAssetMenu(menuName = "MessageSystem/MessageEvent")]
-    public class MessageEvent : MessageEventSO
+    [CreateAssetMenu(menuName = "MessageSystem/ActionMessageEvent")]
+    public class ActionMessageEvent : MessageEventSO
     {
         private event Action _event = default;
 
