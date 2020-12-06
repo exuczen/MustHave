@@ -1,30 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace MustHave.Utilities
 {
     public struct EditorApplicationUtils
     {
-        public static bool IsCompilingOrUpdating
-        {
 #if UNITY_EDITOR
-            get => EditorApplication.isCompiling || EditorApplication.isUpdating;
+        public static bool IsCompilingOrUpdating => EditorApplication.isCompiling || EditorApplication.isUpdating;
+        public static bool IsInEditMode => !EditorApplication.isPlaying;
 #else
-            get => false;
+        public static bool IsCompilingOrUpdating => false;
+        public static bool IsInEditMode => false;
 #endif
-        }
-
-        public static bool IsInEditMode
-        {
-#if UNITY_EDITOR
-            get => !EditorApplication.isPlaying;
-#else
-            get => false;
-#endif
-        }
     }
 }

@@ -59,6 +59,17 @@ namespace MustHave.Utilities
             return destList;
         }
 
+        public static List<T> Shuffle<T>(this List<T> list)
+        {
+            List<T> pool = new List<T>(list);
+            List<T> shuffled = new List<T>();
+            while (pool.Count > 0)
+            {
+                shuffled.Add(pool.PickRandomElement());
+            }
+            return shuffled;
+        }
+
         public static void RemoveOverlapsOfSortedLists(this List<List<int>> lists)
         {
             for (int i = 0; i < lists.Count; i++)
@@ -115,6 +126,18 @@ namespace MustHave.Utilities
             }
             list.Clear();
             list.AddRange(listInv);
+        }
+
+        public static T GetRandomElementInRange<T>(this List<T> list, int min, int max)
+        {
+            int randIndex = UnityEngine.Random.Range(Mathf.Clamp(min, 0, list.Count), Mathf.Clamp(max, 0, list.Count));
+            return list[randIndex];
+        }
+
+        public static T GetRandomElement<T>(this List<T> list)
+        {
+            int randIndex = UnityEngine.Random.Range(0, list.Count);
+            return list[randIndex];
         }
 
         public static T PickRandomElement<T>(this List<T> list)
