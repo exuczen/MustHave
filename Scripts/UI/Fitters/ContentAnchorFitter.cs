@@ -12,9 +12,9 @@ namespace MustHave.UI
         [SerializeField]
         private RectTransform _content = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMin = default;
+        private float _aspectRatioMin = 1f;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMax = default;
+        private float _aspectRatioMax = 2f;
         [SerializeField, Tooltip("MIN anchor for MIN aspect ratio height / width")]
         private Vector2 _aspectRatioMinAnchorMin = Vector2.zero;
         [SerializeField, Tooltip("MAX anchor for MIN aspect ratio height / width")]
@@ -38,10 +38,10 @@ namespace MustHave.UI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _content)
+            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _content && Screen.width > 0)
             {
                 float aspectRatio = 1f * Screen.height / Screen.width;
-                float anchorTransition = Maths.LerpInverse(_aspectRatioMin, _aspectRatioMax, aspectRatio);
+                float anchorTransition = Mathf.InverseLerp(_aspectRatioMin, _aspectRatioMax, aspectRatio);
                 Vector2 minAnchor = Vector2.Lerp(_aspectRatioMinAnchorMin, _aspectRatioMaxAnchorMin, anchorTransition);
                 Vector2 maxAnchor = Vector2.Lerp(_aspectRatioMinAnchorMax, _aspectRatioMaxAnchorMax, anchorTransition);
                 _content.anchorMin = minAnchor;
