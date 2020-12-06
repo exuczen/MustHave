@@ -310,56 +310,56 @@ namespace MustHave
                     shift = 1f / (0.5f * PowF(Mathf.Abs(t - 1f), power) - 1f) + 2f;
                     break;
                 case TransitionType.SIN_IN_PI2_RANGE:
-                    {
-                        float omegaT = t * M_PI2;
-                        float sinOmegaT = Mathf.Sin(omegaT);
-                        shift = sinOmegaT;
-                    }
-                    break;
+                {
+                    float omegaT = t * M_PI2;
+                    float sinOmegaT = Mathf.Sin(omegaT);
+                    shift = sinOmegaT;
+                }
+                break;
                 case TransitionType.SIN_IN_PI_RANGE:
-                    {
-                        float omegaT = t * M_PI;
-                        float sinOmegaT = Mathf.Sin(omegaT);
-                        shift = sinOmegaT;
-                    }
-                    break;
+                {
+                    float omegaT = t * M_PI;
+                    float sinOmegaT = Mathf.Sin(omegaT);
+                    shift = sinOmegaT;
+                }
+                break;
                 case TransitionType.SIN_IN_2PI_RANGE:
-                    {
-                        float omegaT = t * 2f * M_PI;
-                        float sinOmegaT = Mathf.Sin(omegaT);
-                        shift = sinOmegaT;
-                    }
-                    break;
+                {
+                    float omegaT = t * 2f * M_PI;
+                    float sinOmegaT = Mathf.Sin(omegaT);
+                    shift = sinOmegaT;
+                }
+                break;
                 case TransitionType.COS_IN_PI2_RANGE:
-                    {
-                        float omegaT = t * M_PI2;
-                        float cosOmegaT = Mathf.Cos(omegaT);
-                        shift = -cosOmegaT + 1f;
-                    }
-                    break;
+                {
+                    float omegaT = t * M_PI2;
+                    float cosOmegaT = Mathf.Cos(omegaT);
+                    shift = -cosOmegaT + 1f;
+                }
+                break;
                 case TransitionType.COS_IN_PI_RANGE:
-                    {
-                        float omegaT = t * M_PI;
-                        float cosOmegaT = Mathf.Cos(omegaT);
-                        shift = (-cosOmegaT + 1f) / 2f;
-                    }
-                    break;
+                {
+                    float omegaT = t * M_PI;
+                    float cosOmegaT = Mathf.Cos(omegaT);
+                    shift = (-cosOmegaT + 1f) / 2f;
+                }
+                break;
                 case TransitionType.COS_IN_2PI_RANGE:
-                    {
-                        //            float omegaT=timePassed*M_PI/duration;
-                        //            float cosOmegaT=cosf(omegaT);
-                        //            // cos(2x)=2*cos(x)^2-1
-                        //            shift = (-PowF(cosOmegaT,2)+1.f);
-                        float omegaT = t * 2f * M_PI;
-                        float cosOmegaT = Mathf.Cos(omegaT);
-                        shift = (-cosOmegaT + 1f) / 2f;
-                    }
-                    break;
+                {
+                    //            float omegaT=timePassed*M_PI/duration;
+                    //            float cosOmegaT=cosf(omegaT);
+                    //            // cos(2x)=2*cos(x)^2-1
+                    //            shift = (-PowF(cosOmegaT,2)+1.f);
+                    float omegaT = t * 2f * M_PI;
+                    float cosOmegaT = Mathf.Cos(omegaT);
+                    shift = (-cosOmegaT + 1f) / 2f;
+                }
+                break;
                 default:
-                    {
-                        shift = 0;
-                    }
-                    break;
+                {
+                    shift = 0;
+                }
+                break;
             }
             return shift;
         }
@@ -425,19 +425,19 @@ namespace MustHave
         public static bool GetRayIntersectionWithPlane(Vector3 rayOrig, Vector3 rayDir, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = new Ray(rayOrig, rayDir);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
         }
 
         public static bool GetLineIntersectionWithPlane(Vector3 pt1, Vector3 pt2, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = new Ray(pt1, pt2 - pt1);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
         }
 
         public static bool GetTouchRayIntersectionWithPlane(Camera camera, Vector3 touchPos, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
             Ray ray = camera.ScreenPointToRay(touchPos);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
         }
 
         public static bool GetTouchRayIntersectionWithPlane(Camera camera, Vector3 touchPos, Transform planeTransform, out Vector3 isecPt)
