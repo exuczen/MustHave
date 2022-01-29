@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class DropdownExtensionMethods
     {

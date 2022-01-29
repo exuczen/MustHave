@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using MustHave.Utilities;
+using MustHave.Utils;
 
 namespace MustHave.UI
 {

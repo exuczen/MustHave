@@ -1,4 +1,4 @@
-﻿namespace MustHave.Utilities
+﻿namespace MustHave.Utils
 {
     public struct ByteUtils
     {

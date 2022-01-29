@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct JsonUtils
     {

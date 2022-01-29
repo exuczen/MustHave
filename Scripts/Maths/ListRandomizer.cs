@@ -1,4 +1,4 @@
-﻿using MustHave.Utilities;
+﻿using MustHave.Utils;
 using System.Collections.Generic;
 
 namespace MustHave

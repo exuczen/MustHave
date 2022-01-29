@@ -2,7 +2,7 @@
 using UnityEditor;
 #endif
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct EditorApplicationUtils
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class CoroutineExtensionMethods
     {

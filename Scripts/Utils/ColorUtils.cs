@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct ColorUtils
     {

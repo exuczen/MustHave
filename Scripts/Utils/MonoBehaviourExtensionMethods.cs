@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class MonoBehaviourExtensionMethods
     {

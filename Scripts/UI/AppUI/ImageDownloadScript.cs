@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using MustHave.Utilities;
+using MustHave.Utils;
 #if WEBP
 using WebP;
 #endif

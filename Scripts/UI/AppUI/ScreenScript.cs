@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using MustHave.Utilities;
+using MustHave.Utils;
 using MustHave.UI;
 
 namespace MustHave.UI

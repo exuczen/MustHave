@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct WWWUtils
     {

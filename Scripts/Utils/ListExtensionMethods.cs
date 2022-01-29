@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class ListExtensionMethods
     {

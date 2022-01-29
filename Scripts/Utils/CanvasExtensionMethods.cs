@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class CanvasExtensionMethods
     {

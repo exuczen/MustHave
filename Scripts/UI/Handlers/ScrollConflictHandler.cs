@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using MustHave.Utilities;
+using MustHave.Utils;
 
 namespace MustHave.UI
 {

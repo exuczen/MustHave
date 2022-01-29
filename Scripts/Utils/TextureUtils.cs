@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct TextureUtils
     {

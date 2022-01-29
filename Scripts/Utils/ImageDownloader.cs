@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct ImageDownloader
     {

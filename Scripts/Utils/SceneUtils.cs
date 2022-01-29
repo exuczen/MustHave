@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct SceneUtils
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct AudioUtils
     {

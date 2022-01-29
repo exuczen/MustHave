@@ -5,7 +5,7 @@ using UnityEditor.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using MustHave.Utilities;
+using MustHave.Utils;
 
 public class FindMissingScriptsEditor : Editor
 {

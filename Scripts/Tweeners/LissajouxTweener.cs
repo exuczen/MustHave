@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MustHave.Utilities;
+using MustHave.Utils;
 
 namespace MustHave.Tweeners
 {

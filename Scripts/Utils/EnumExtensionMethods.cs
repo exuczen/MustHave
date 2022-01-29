@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public static class EnumExtensionMethods
     {

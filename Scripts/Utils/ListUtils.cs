@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace MustHave.Utilities
+namespace MustHave.Utils
 {
     public struct ListUtils
     {
