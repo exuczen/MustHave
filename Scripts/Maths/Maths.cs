@@ -31,41 +31,18 @@ namespace MustHave
 
     public struct Maths
     {
-        public const float M_2PI = 2 * Mathf.PI;
-        public const float M_PI2 = Mathf.PI / 2;
+        public const float M_2PI = 2f * Mathf.PI;
+        public const float M_PI2 = Mathf.PI / 2f;
         public const float M_PI = Mathf.PI;
 
         public static float LerpInverse(float min, float max, float value)
         {
-            float delta = max - min;
-            return delta > float.MinValue ? (Mathf.Clamp(value, min, max) - min) / delta : 0f;
-        }
-
-        public static short ConvertFloatToShort(float value, float max)
-        {
-            value = Mathf.Clamp01(value / max) * short.MaxValue;
-            return (short)value;
-        }
-
-        public static float ConvertShortToFloat(short value, float max)
-        {
-            return value * max / short.MaxValue;
-        }
-
-        public static float ConvertInchToCm(float inches)
-        {
-            return inches * 2.54f;
-        }
-
-        public static float ConvertCmToInch(float centimeters)
-        {
-            return centimeters / 2.54f;
+            return Mathf.InverseLerp(min, max, value);
         }
 
         public static Quaternion GetRotationWithOrder(Vector3 euler, RotationOrder order)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             switch (order)
             {
                 case RotationOrder.XYZ: return qx * qy * qz;
@@ -79,7 +56,7 @@ namespace MustHave
             }
         }
 
-        public static Vector3 GetEulerAnglesWithOrder(Vector3 euler, RotationOrder order)
+        public static Vector3 GetComponentsWithOrder(Vector3 euler, RotationOrder order)
         {
             float x = euler.x;
             float y = euler.y;
@@ -106,43 +83,37 @@ namespace MustHave
 
         public static Quaternion GetRotationXYZ(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qx * qy * qz;
         }
 
         public static Quaternion GetRotationXZY(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qx * qz * qy;
         }
 
         public static Quaternion GetRotationYZX(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qy * qz * qx;
         }
 
         public static Quaternion GetRotationYXZ(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qy * qx * qz;
         }
 
         public static Quaternion GetRotationZXY(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qz * qx * qy;
         }
 
         public static Quaternion GetRotationZYX(Vector3 euler)
         {
-            Quaternion qx, qy, qz;
-            GetRotationComponents(out qx, out qy, out qz, euler);
+            GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
             return qz * qy * qx;
         }
 
@@ -160,6 +131,16 @@ namespace MustHave
             return eulerAngles;
         }
 
+        public static int GetDivisionCount(float value, float delta, float epsilon)
+        {
+            return (int)((value + Mathf.Sign(value) * epsilon) / delta);
+        }
+
+        public static int GetAngleDivisions(float angle, float delta, float epsilon = 0.0001f)
+        {
+            return GetDivisionCount(AngleModulo360(angle, false), delta, epsilon);
+        }
+
         /// <summary></summary>
         /// <param name="angle">amgle in degrees</param>
         /// <param name="midZeroRange">true for (-180,180) output range, false for (0,360)</param>
@@ -168,15 +149,15 @@ namespace MustHave
         {
             if (midZeroRange)
             {
-                angle = angle % 360;
-                if (Mathf.Abs(angle) > 180)
+                angle %= 360f;
+                if (Mathf.Abs(angle) > 180f)
                 {
-                    angle -= Mathf.Sign(angle) * 360;
+                    angle -= Mathf.Sign(angle) * 360f;
                 }
             }
             else
             {
-                angle = ((angle % 360) + 360) % 360;
+                angle = ((angle % 360f) + 360f) % 360f;
             }
             return angle;
         }
@@ -194,22 +175,33 @@ namespace MustHave
                 );
         }
 
+        public static bool Between(float value, float left, float right)
+        {
+            left = AngleModulo360(left);
+            right = AngleModulo360(right);
+            if (left > right)
+            {
+                return !Between(value, right, left);
+            }
+            value = AngleModulo360(value);
+            return left <= value && value <= right;
+        }
+
         public static float PowF(float a, int n)
         {
             float z = 1f;
 
-            for (int i = 0; i < Math.Abs(n); i++)
+            for (int i = 0; i < Mathf.Abs(n); i++)
             {
                 z *= a;
             }
-            if (n < 0) z = 1f / z;
-            return z;
+            return n < 0 ? 1f / z : z;
         }
 
         public static int PowI(int a, int n)
         {
             int z = 1;
-            for (int i = 0; i < Math.Abs(n); i++)
+            for (int i = 0; i < Mathf.Abs(n); i++)
             {
                 z *= a;
             }
@@ -255,7 +247,7 @@ namespace MustHave
             }
             else
             {
-                shift = (1.0f - GetTransitionAsymNormalised(elapsedTime - halfDuration, halfDuration, 1.0f - inflPtNorm, m, n));
+                shift = 1f - GetTransitionAsymNormalised(elapsedTime - halfDuration, halfDuration, 1f - inflPtNorm, m, n);
             }
             return shift;
         }
@@ -279,7 +271,7 @@ namespace MustHave
             }
             else
             {
-                shift = 1.0f + (yMax - 1.0f) * (1.0f - GetTransitionAsymNormalised(elapsedTime - t0, duration * (1.0f - xMax), inflPtNorm1, n, m));
+                shift = 1f + (yMax - 1f) * (1f - GetTransitionAsymNormalised(elapsedTime - t0, duration * (1f - xMax), inflPtNorm1, n, m));
             }
             return shift;
         }
@@ -366,33 +358,40 @@ namespace MustHave
 
         public static int GetClosestPowerOf2(int i, bool upper)
         {
-            //    int x = 1;
-            //    while (x<i) {
-            //        x<<=1;
-            //    }
-            //    return greater ? x : (x>>1);
-            int x = i;
-            if (x < 0)
-                return 0;
-            x--;
-            x |= x >> 1;
-            x |= x >> 2;
-            x |= x >> 4;
-            x |= x >> 8;
-            x |= x >> 16;
-            x++;
-            return upper ? x : (x >> 1);
+            ////    int x = 1;
+            ////    while (x<i) {
+            ////        x<<=1;
+            ////    }
+            ////    return greater ? x : (x>>1);
+            //int x = i;
+            //if (x < 0)
+            //    return 0;
+            //x--;
+            //x |= x >> 1;
+            //x |= x >> 2;
+            //x |= x >> 4;
+            //x |= x >> 8;
+            //x |= x >> 16;
+            //x++;
+            int x = Mathf.ClosestPowerOfTwo(i);
+            if (upper && x < i)
+            {
+                return x << 1;
+            }
+            else if (!upper && x > i)
+            {
+                return x >> 1;
+            }
+            else
+            {
+                return x;
+            }
         }
 
         public static bool IsPowerOf2(int i)
         {
             //return i > 0 && (i & (i - 1)) == 0;
             return Mathf.IsPowerOfTwo(i);
-        }
-
-        public static int Clamp(int value, int min, int max)
-        {
-            return Math.Max(min, Math.Min(max, value));
         }
 
         public static short Clamp(short value, short min, short max)
@@ -422,10 +421,10 @@ namespace MustHave
             return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out _);
         }
 
-        public static bool GetRayIntersectionWithPlane(Vector3 rayOrig, Vector3 rayDir, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
+        public static bool GetRayIntersectionWithPlane(Vector3 rayOrig, Vector3 rayDir, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
         {
             Ray ray = new Ray(rayOrig, rayDir);
-            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
+            return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out distance);
         }
 
         public static bool GetLineIntersectionWithPlane(Vector3 pt1, Vector3 pt2, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
@@ -445,9 +444,41 @@ namespace MustHave
             return GetTouchRayIntersectionWithPlane(camera, touchPos, planeTransform.up, planeTransform.position, out isecPt);
         }
 
+        public static Vector3 GetClosestPointOnPlane(Transform planeTransform, Vector3 point)
+        {
+            return new Plane(planeTransform.up, planeTransform.position).ClosestPointOnPlane(point);
+        }
+
+        public static Vector3 GetClosestPointOnPlane(Vector3 planeUp, Vector3 planePos, Vector3 point)
+        {
+            return new Plane(planeUp, planePos).ClosestPointOnPlane(point);
+        }
+
+        public static float GetDistanceFromPlane(Vector3 planeUp, Vector3 planePos, Vector3 point)
+        {
+            //return new Plane(planeUp, planePos).GetDistanceToPoint(point);
+            return Vector3.Dot(point - planePos, planeUp);
+        }
+
         public static float GetGeometricSum(float a, float q, int n)
         {
             return a * (1f - PowF(q, n)) / (1f - q);
+        }
+
+        public static Bounds MergeBounds(params Bounds[] bounds)
+        {
+            int len = bounds.Length;
+            if (len == 0)
+            {
+                return default;
+            }
+            var result = bounds[0];
+            for (int i = 1; i < len; i++)
+            {
+                result.min = Mathv.Min(result.min, bounds[i].min);
+                result.max = Mathv.Max(result.max, bounds[i].max);
+            }
+            return result;
         }
     }
 }

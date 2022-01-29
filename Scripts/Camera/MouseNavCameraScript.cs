@@ -45,7 +45,7 @@ namespace MustHave
                 float mouseY = Input.GetAxis("Mouse Y");
 
                 if (Input.GetKey(KeyCode.LeftAlt) &&
-                    Maths.GetRayIntersectionWithPlane(transform.position, transform.forward, Vector3.up, Vector3.zero, out Vector3 rotationPivot))
+                    Maths.GetRayIntersectionWithPlane(transform.position, transform.forward, Vector3.up, Vector3.zero, out Vector3 rotationPivot, out _))
                 {
                     transform.RotateAround(rotationPivot, transform.right, -mouseY * ROTATION_RATE * Time.deltaTime);
                     transform.RotateAround(rotationPivot, Vector3.up, mouseX * ROTATION_RATE * Time.deltaTime);
