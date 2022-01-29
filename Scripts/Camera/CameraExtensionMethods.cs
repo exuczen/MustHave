@@ -50,8 +50,8 @@ namespace MustHave
                     {
                         Vector3 corner = center + boxCollider.transform.TransformVector(Mathv.Mul(new Vector3(x, y, z), extents));
                         Vector3 vpPoint = camera.WorldToViewportPoint(corner);
-                        min = Mathv.Min(vpPoint, min);
-                        max = Mathv.Max(vpPoint, max);
+                        min = Vector3.Min(vpPoint, min);
+                        max = Vector3.Max(vpPoint, max);
                         //Debug.Log(GetType() + ".vpPoint: " + vpPoint.ToString("f2"));
                     }
                 }

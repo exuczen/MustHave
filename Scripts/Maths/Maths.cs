@@ -475,8 +475,8 @@ namespace MustHave
             var result = bounds[0];
             for (int i = 1; i < len; i++)
             {
-                result.min = Mathv.Min(result.min, bounds[i].min);
-                result.max = Mathv.Max(result.max, bounds[i].max);
+                result.min = Vector3.Min(result.min, bounds[i].min);
+                result.max = Vector3.Max(result.max, bounds[i].max);
             }
             return result;
         }
