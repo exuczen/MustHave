@@ -4,18 +4,9 @@ namespace MustHave
 {
     public class PersistentSingleton<T> : Singleton<T> where T : MonoBehaviour
     {
-        protected override void Awake()
+        protected override void OnAwake()
         {
-            if (instance == null || instance == this)
-            {
-                instance = this as T;
-                DontDestroyOnLoad(gameObject);
-                OnAwake();
-            }
-            else if (instance != this)
-            {
-                Destroy(gameObject);
-            }
+            DontDestroyOnLoad(gameObject);
         }
     }
 }

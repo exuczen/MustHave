@@ -33,6 +33,8 @@ namespace MustHave.UI
 
         protected override void OnAwake()
         {
+            base.OnAwake();
+
             Scene activeScene = SceneManager.GetActiveScene();
             SceneManager.sceneLoaded += OnSceneLoaded;
             //SceneManager.sceneUnloaded += OnSceneUnloaded;
