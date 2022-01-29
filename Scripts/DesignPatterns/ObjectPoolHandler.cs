@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace MustHave.DesignPatterns
+namespace MustHave
 {
     public abstract class ObjectPoolHandler<T> : MonoBehaviour where T : PoolObject
     {

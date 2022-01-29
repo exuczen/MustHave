@@ -1,22 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-namespace MustHave.DesignPatterns
+namespace MustHave
 {
     public class PersistentSingleton<T> : Singleton<T> where T : MonoBehaviour
     {
         protected override void Awake()
         {
-            if (_instance == null || _instance == this)
+            if (instance == null || instance == this)
             {
-                _instance = this as T;
+                instance = this as T;
                 DontDestroyOnLoad(gameObject);
                 OnAwake();
             }
-            else if (_instance != this)
+            else if (instance != this)
             {
                 Destroy(gameObject);
             }
         }
-    } 
+    }
 }

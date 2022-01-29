@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using MustHave.Utils;
 using UnityEngine.UI;
+using MustHave.Utils;
 
 namespace MustHave.UI
 {
@@ -42,7 +40,7 @@ namespace MustHave.UI
                 && _canvasScaler && _canvasScaler.screenMatchMode == CanvasScaler.ScreenMatchMode.MatchWidthOrHeight)
             {
                 float aspectRatio = 1f * Screen.height / Screen.width;
-                float anchorTransition = Maths.LerpInverse(_aspectRatioMin, _aspectRatioMax, aspectRatio);
+                float anchorTransition = Mathf.InverseLerp(_aspectRatioMin, _aspectRatioMax, aspectRatio);
                 float match = Mathf.Lerp(_aspectRatioMinMatch, _aspectRatioMaxMatch, anchorTransition);
                 _canvasScaler.matchWidthOrHeight = match;
             }

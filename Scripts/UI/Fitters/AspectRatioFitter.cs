@@ -1,8 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using MustHave.Utils;
 using static UnityEngine.UI.AspectRatioFitter;
+using MustHave.Utils;
 
 namespace MustHave.UI
 {
