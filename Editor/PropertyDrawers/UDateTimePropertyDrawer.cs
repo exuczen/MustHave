@@ -32,5 +32,5 @@ namespace MustHave.UI
 
             EditorGUI.EndProperty();
         }
-    } 
+    }
 }

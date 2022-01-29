@@ -4,11 +4,13 @@ namespace MustHave.UI
 {
     public class ArrayElementTitleAttribute : PropertyAttribute
     {
-        public string title;
+        public string Title;
+        public bool ShowIndex;
 
-        public ArrayElementTitleAttribute(string title)
+        public ArrayElementTitleAttribute(string title, bool showIndex = false)
         {
-            this.title = title;
+            Title = title;
+            ShowIndex = showIndex;
         }
-    } 
+    }
 }

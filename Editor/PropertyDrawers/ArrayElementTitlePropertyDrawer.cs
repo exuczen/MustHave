@@ -17,15 +17,18 @@ namespace MustHave.UI
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            string fullPathName = property.propertyPath + "." + Attribute.title;
+            string fullPathName = property.propertyPath + "." + Attribute.Title;
             titleProperty = property.serializedObject.FindProperty(fullPathName);
-            string newlabel = GetTitle();
+            string title = titleProperty != null ? GetTitle(titleProperty) : property.objectReferenceValue.name;
+            string newlabel = Attribute.ShowIndex ? string.Format("[{0}] {1}", label.text.Replace("Element ", ""), title) : title;
             if (string.IsNullOrEmpty(newlabel))
+            {
                 newlabel = label.text;
+            }
             EditorGUI.PropertyField(position, property, new GUIContent(newlabel, label.tooltip), true);
         }
 
-        private string GetTitle()
+        private string GetTitle(SerializedProperty titleProperty)
         {
             switch (titleProperty.propertyType)
             {
@@ -72,5 +75,5 @@ namespace MustHave.UI
             }
             return "";
         }
-    } 
+    }
 }

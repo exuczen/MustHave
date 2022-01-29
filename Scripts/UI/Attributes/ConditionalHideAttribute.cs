@@ -17,6 +17,7 @@ namespace MustHave.UI
         public bool HideInInspector = false;
         public bool Inverse = false;
         public bool UseOrLogic = false;
+        public int ConditionalSourceFieldValue = -1;
 
         public bool InverseCondition1 = false;
         public bool InverseCondition2 = false;
@@ -28,6 +29,15 @@ namespace MustHave.UI
             this.ConditionalSourceField = conditionalSourceField;
             this.HideInInspector = false;
             this.Inverse = false;
+        }
+
+        public ConditionalHideAttribute(string conditionalSourceField, int conditionalSourceFieldValue)
+        {
+            this.ConditionalSourceField = conditionalSourceField;
+            this.HideInInspector = false;
+            this.Inverse = false;
+
+            ConditionalSourceFieldValue = conditionalSourceFieldValue;
         }
 
         public ConditionalHideAttribute(string conditionalSourceField, bool hideInInspector)
