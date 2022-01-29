@@ -4,6 +4,75 @@ namespace MustHave.Utils
 {
     public static class TextureExtensionMethods
     {
+        public static Texture2D ToTexture2D(this RenderTexture renderTexture, TextureFormat textureFormat, bool destroyRenderTexture)
+        {
+            Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, textureFormat, false);
+            RenderTexture activePreviously = RenderTexture.active;
+            RenderTexture.active = renderTexture;
+            // Read screen contents into the texture
+            texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            texture.Apply();
+            RenderTexture.active = activePreviously;
+            if (destroyRenderTexture)
+            {
+                if (Application.isPlaying)
+                {
+                    Object.Destroy(renderTexture);
+                }
+                else
+                {
+                    Object.DestroyImmediate(renderTexture);
+                }
+            }
+            texture.name = "ScreenshotTexture";
+            return texture;
+        }
+
+
+        public static Texture2D CopyTexture(this Texture2D texture)
+        {
+            var textureCopy = new Texture2D(texture.width, texture.height);
+            textureCopy.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+            return textureCopy;
+        }
+
+        public static bool SetPixelColor(this Texture2D texture, int x, int y, TexArrayColor color, int texArrayLength, out Vector2 colorUV, out Vector2 controlUV, bool applyToTexture)
+        {
+            if (texture.SetPixelColor(x, y, color.Color, out colorUV, false) &&
+                texture.SetPixelColor(x, y + 1, color.GetControlColor(texArrayLength), out controlUV, false))
+            {
+                if (applyToTexture)
+                {
+                    texture.Apply();
+                }
+                return true;
+            }
+            controlUV = default;
+            return false;
+        }
+
+        public static bool SetPixelColor(this Texture2D texture, int x, int y, Color color, out Vector2 uv, bool applyToTexture)
+        {
+            if (x >= 0 && x < texture.width && y >= 0 && y < texture.height)
+            {
+                texture.SetPixel(x, y, color);
+                if (applyToTexture)
+                {
+                    texture.Apply();
+                }
+                float u = (x + 0.5f) / texture.width;
+                float v = (y + 0.5f) / texture.height;
+                uv = new Vector2(u, v);
+                return true;
+            }
+            else
+            {
+                Debug.LogError("TextureExtensionMethods.SetPixelColor: out of texture bounds: " + x + ", " + y);
+                uv = Vector2.zero;
+                return false;
+            }
+        }
+
         /// <summary>
         /// Scales the texture data of the given texture.
         /// </summary>
@@ -60,8 +129,8 @@ namespace MustHave.Utils
         private static void ScaleByDrawToRenderTexture(Texture2D src, int width, int height, FilterMode fmode)
         {
             //We need the source texture in VRAM because we render with it
-            src.filterMode = fmode;
-            src.Apply(true);
+            //src.filterMode = fmode;
+            //src.Apply(true);
 
             //Using RTT for best quality and performance. Thanks, Unity 5
             RenderTexture rtt = new RenderTexture(width, height, 32);

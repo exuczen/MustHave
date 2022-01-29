@@ -5,6 +5,16 @@ namespace MustHave.Utils
 {
     public static class TransformExtensionMethods
     {
+        public static void Reset(this Transform transform, bool resetScale = true)
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            if (resetScale)
+            {
+                transform.localScale = Vector3.one;
+            }
+        }
+
         public static void DestroyAllChildren(this Transform transform)
         {
             for (int i = 0; i < transform.childCount; i++)

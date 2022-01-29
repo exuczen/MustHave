@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace MustHave.Utils
 {
     public struct EnumUtils
     {
+        public static string[] GetNames<T>()
+        {
+            return Enum.GetNames(typeof(T));
+        }
+
         public static List<string> GetNamesList<T>()
         {
-            string[] names = Enum.GetNames(typeof(T));
-            return new List<string>(names);
+            return Enum.GetNames(typeof(T)).ToList();
         }
 
         public static T[] GetValues<T>()
@@ -46,6 +51,17 @@ namespace MustHave.Utils
             List<string> names = EnumUtils.GetNamesList<T>();
             names = names.FindAll(name => !list.Contains(name));
             list.AddRange(names);
+        }
+
+        public static void PrintEnumList<T>(Func<string, string> getLine) where T : System.Enum
+        {
+            var names = EnumUtils.GetNamesList<T>();
+            string log = "\n";
+            foreach (var name in names)
+            {
+                log += getLine(name);
+            }
+            Debug.Log("EnumUtils.PrintEnumList: " + names.Count + log);
         }
     }
 }

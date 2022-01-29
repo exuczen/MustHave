@@ -5,14 +5,34 @@ namespace MustHave.Utils
 {
     public struct ListUtils
     {
-        public static string ToString<T>(List<T> list)
+        public static string ToString<T>(List<T> list, string separator = ", ")
         {
             string s = "";
             for (int i = 0; i < list.Count; i++)
             {
-                s += list[i].ToString() + ", ";
+                s += list[i].ToString() + separator;
             }
             return s;
+        }
+
+        public static List<int> CreateIntRange(int beg, int end)
+        {
+            List<int> list = new List<int>();
+            if (end >= beg)
+            {
+                for (int i = beg; i <= end; i++)
+                {
+                    list.Add(i);
+                }
+            }
+            else
+            {
+                for (int i = beg; i >= end; i--)
+                {
+                    list.Add(i);
+                }
+            }
+            return list;
         }
 
         public static List<int> CreateIntList(int beg, int count)
@@ -22,9 +42,9 @@ namespace MustHave.Utils
             return list;
         }
 
-        public static void PrintList<T>(string prefix, List<T> list)
+        public static void PrintList<T>(string prefix, List<T> list, string separator = ", ")
         {
-            Debug.Log("ListUtils.PrintList: " + prefix + ToString(list));
+            Debug.Log("ListUtils.PrintList:\n" + prefix + ToString(list, separator));
         }
 
         public static bool CompareLists<T>(List<T> listA, List<T> listB)

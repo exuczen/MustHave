@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MustHave.Utils
 {
     public static class ListExtensionMethods
     {
-        public static void Print<T>(this List<T> list, string prefix)
+        public static void Print<T>(this List<T> list, string prefix, string separator = ", ")
         {
-            ListUtils.PrintList(prefix, list);
+            ListUtils.PrintList(prefix, list, separator);
         }
 
         public static bool CompareTo<T>(this List<T> listA, List<T> listB)

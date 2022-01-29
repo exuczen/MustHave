@@ -13,7 +13,12 @@ namespace MustHave.Utils
     {
         public static bool IsLoadingScene { get; private set; }
 
-        public static string ActiveSceneName { get { return SceneManager.GetActiveScene().name; } }
+        public static bool IsActiveScene(Enum sceneName)
+        {
+            return ActiveSceneName.Equals(sceneName.ToString());
+        }
+
+        public static string ActiveSceneName => SceneManager.GetActiveScene().name;
 
         public static T GetActiveSceneName<T>()
         {
@@ -34,31 +39,6 @@ namespace MustHave.Utils
             return null;
         }
 
-        private static IEnumerator LoadSceneAsyncRoutine(string sceneName, LoadSceneMode mode, Action<float> onProgress = null, Action<Scene> onComplete = null)
-        {
-            yield return null;
-#if DEBUG_LOADING_SCENE
-            yield return new WaitForSeconds(1f);
-#endif
-
-            // The Application loads the Scene in the background as the current Scene runs.
-            // This is particularly good for creating loading screens.
-            // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
-            // a sceneBuildIndex of 1 as shown in Build Settings.
-
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, mode);
-
-            // Wait until the asynchronous scene fully loads
-            while (!asyncLoad.isDone)
-            {
-                onProgress?.Invoke(asyncLoad.progress);
-                yield return null;
-            }
-            onProgress?.Invoke(1f);
-
-            onComplete?.Invoke(SceneManager.GetSceneByName(sceneName));
-        }
-
         public static Scene GetDontDestroyOnLoadScene()
         {
             GameObject temp = null;
@@ -74,7 +54,9 @@ namespace MustHave.Utils
             finally
             {
                 if (temp != null)
+                {
                     UnityEngine.Object.DestroyImmediate(temp);
+                }
             }
         }
 
@@ -140,6 +122,43 @@ namespace MustHave.Utils
                     return component;
             }
             return null;
+        }
+
+#if UNITY_EDITOR
+        public static bool NotPartOfPrefabApartFromSelf(GameObject gameObject)
+        {
+            bool addedOverride = UnityEditor.PrefabUtility.IsAddedGameObjectOverride(gameObject);
+            bool insideMax1Prefab = UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(gameObject) == UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
+            bool isPrefab = UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(gameObject) == gameObject;
+            bool notPrefab = UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(gameObject) == null;
+
+            return addedOverride || notPrefab || (isPrefab && insideMax1Prefab);
+        }
+#endif
+
+        private static IEnumerator LoadSceneAsyncRoutine(string sceneName, LoadSceneMode mode, Action<float> onProgress = null, Action<Scene> onComplete = null)
+        {
+            yield return null;
+#if DEBUG_LOADING_SCENE
+            yield return new WaitForSeconds(1f);
+#endif
+
+            // The Application loads the Scene in the background as the current Scene runs.
+            // This is particularly good for creating loading screens.
+            // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
+            // a sceneBuildIndex of 1 as shown in Build Settings.
+
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, mode);
+
+            // Wait until the asynchronous scene fully loads
+            while (!asyncLoad.isDone)
+            {
+                onProgress?.Invoke(asyncLoad.progress);
+                yield return null;
+            }
+            onProgress?.Invoke(1f);
+
+            onComplete?.Invoke(SceneManager.GetSceneByName(sceneName));
         }
     }
 }

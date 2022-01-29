@@ -49,5 +49,5 @@ namespace MustHave.Utils
         {
             SaveToJson(serializable, filepath, Encoding.ASCII);
         }
-    } 
+    }
 }

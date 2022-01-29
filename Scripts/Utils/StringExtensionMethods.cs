@@ -9,6 +9,11 @@ namespace MustHave.Utils
 {
     public static class StringExtensionMethods
     {
+        public static string[] SplitCamelCase(this string input)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(input, "([A-Z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim().Split(' ');
+        }
+
         public static bool Contains(this string text, string substring, StringComparison comp)
         {
             if (substring == null)

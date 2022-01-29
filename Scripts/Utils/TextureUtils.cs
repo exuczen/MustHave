@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,14 +49,16 @@ namespace MustHave.Utils
             Texture2D texture = CaptureScreenshotByRenderingToTexture(camera, TextureFormat.ARGB32);
             canvas.enabled = canvasEnabled;
             if (resultCallback != null)
+            {
                 resultCallback.Invoke(texture);
+            }
         }
 
-        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat)
+        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, System.Action<Texture2D> postprocess = null)
         {
             int width = Screen.width;
             int height = Screen.height;
-            return CaptureScreenshotByRenderingToTexture(camera, textureFormat, width, height);
+            return CaptureScreenshotByRenderingToTexture(camera, textureFormat, width, height, postprocess);
         }
 
         /// <summary>
@@ -65,24 +66,25 @@ namespace MustHave.Utils
         /// </summary>
         /// <param name="resultCallback"></param>
         /// <returns></returns>
-        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, int width, int height)
+        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, int width, int height, System.Action<Texture2D> postprocess = null)
         {
-            RenderTexture renderTexture = new RenderTexture(width, height, 24/*, RenderTextureFormat.ARGB32*/);
-            // TODO: Customize anti-aliasing value. Anti-aliasing value must be one of (1, 2, 4 or 8), indicating the number of samples per pixel.
-            renderTexture.antiAliasing = 4;
-            RenderTexture activePreviously = RenderTexture.active;
-            RenderTexture.active = renderTexture;
+            RenderTexture renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32) {
+                // TODO: Customize anti-aliasing value. Anti-aliasing value must be one of (1, 2, 4 or 8), indicating the number of samples per pixel.
+                antiAliasing = 4
+            };
+
             RenderTexture target = camera.targetTexture;
             camera.targetTexture = renderTexture;
             camera.Render();
-            Texture2D texture = new Texture2D(width, height, textureFormat, false);
-            // Read screen contents into the texture
-            texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-            texture.Apply();
-            RenderTexture.active = activePreviously;
             camera.targetTexture = target;
-            UnityEngine.Object.Destroy(renderTexture);
-            texture.name = "ScreenshotTexture";
+
+            Texture2D texture = renderTexture.ToTexture2D(textureFormat, true);
+            if (postprocess != null)
+            {
+                postprocess?.Invoke(texture);
+                texture.Apply();
+            }
+
             return texture;
         }
 
@@ -96,7 +98,9 @@ namespace MustHave.Utils
             yield return new WaitForEndOfFrame();
             Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture();
             if (resultCallback != null)
+            {
                 resultCallback.Invoke(texture);
+            }
         }
 
         /// <summary>
@@ -107,15 +111,100 @@ namespace MustHave.Utils
         public static void CaptureScreenshotToImage(Camera camera, Image image, string spriteName = null)
         {
             if (image.sprite)
-                UnityEngine.Object.Destroy(image.sprite);
+            {
+                if (Application.isPlaying)
+                {
+                    Object.Destroy(image.sprite);
+                }
+                else
+                {
+                    Object.DestroyImmediate(image.sprite);
+                }
+            }
             image.sprite = CreateSpriteFromTexture(CaptureScreenshotByRenderingToTexture(camera, TextureFormat.RGB24));
             if (!string.IsNullOrEmpty(spriteName))
+            {
                 image.sprite.name = spriteName;
+            }
         }
 
-        public static void CaptureScreenshotToImage(Image image, string spriteName = null)
+        public static void SaveTextureToPNG(Texture2D texture, string filepath)
         {
-            CaptureScreenshotToImage(CameraUtils.MainOrCurrent, image, spriteName);
+            var bytes = texture.EncodeToPNG();
+            File.WriteAllBytes(filepath, bytes);
+        }
+
+        public static void SaveTextureToPNG(Texture2D texture, string folderPath, string filename)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            SaveTextureToPNG(texture, Path.Combine(folderPath, filename));
+        }
+
+        public static void CaptureScreenshotToPNG(Camera camera, TextureFormat textureFormat, int width, int height, string folderPath, string filename, System.Action<Texture2D> postprocess = null)
+        {
+            var texture = CaptureScreenshotByRenderingToTexture(camera, textureFormat, width, height, postprocess);
+            SaveTextureToPNG(texture, folderPath, filename);
+        }
+
+        public static void SetPixelsAlphaFromClosestPixels(Texture2D texture, byte cutoff = 0)
+        {
+            var pixels = texture.GetPixels32();
+            if (cutoff > 0)
+            {
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    if (pixels[i].a <= cutoff)
+                    {
+                        pixels[i].a = 0;
+                    }
+                }
+            }
+            int width = texture.width;
+            int height = texture.height;
+            for (int y = 1; y < height - 1; y++)
+            {
+                int yOffset = y * width;
+                for (int x = 1; x < width - 1; x++)
+                {
+                    int index = yOffset + x;
+                    if (pixels[index].a > 0)
+                    {
+                        //int opaqueNgbrCount = 0;
+                        //for (int i = 0; i < 2; i++)
+                        //{
+                        //    for (int j = -1; j < 2; j += 2)
+                        //    {
+                        //        int dx = i * j;
+                        //        int dy = (1 - i) * j;
+                        //        int ngbrIndex = x + dx + (y + dy) * width;
+                        //        opaqueNgbrCount += pixels[ngbrIndex].a > 0 ? 1 : 0;
+                        //    }
+                        //}
+                        //pixels[index].a = (byte)((opaqueNgbrCount * 255) >> 2);
+                        int opaqueNgbrCount = 0;
+                        for (int dy = -1; dy < 2; dy++)
+                        {
+                            int ngbrOffsetY = (y + dy) * width;
+                            for (int dx = -1; dx < 2; dx++)
+                            {
+                                int ngbrIndex = x + dx + ngbrOffsetY;
+                                opaqueNgbrCount += pixels[ngbrIndex].a > 0 ? 1 : 0;
+                            }
+                        }
+                        opaqueNgbrCount--;
+                        pixels[index].a = (byte)((opaqueNgbrCount * opaqueNgbrCount * 255) >> 6);
+                    }
+                }
+            }
+            texture.SetPixels32(pixels);
+        }
+
+        public static bool ColorHasRGB(Color32 color)
+        {
+            return color.r > 0 || color.g > 0 || color.b > 0;
         }
     }
 }

@@ -1,9 +1,38 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace MustHave.Utils
 {
     public static class RectTransformExtensionMethods
     {
+        public static void ForceRebuildLayoutImmediate(this CanvasGroup canvasGroup, MonoBehaviour context, int framesCount = 1)
+        {
+            context.StartCoroutine(canvasGroup.ForceRebuildLayoutImmediateRoutine(framesCount));
+        }
+
+        public static void ForceRebuildLayoutImmediate(this RectTransform rectTransform, MonoBehaviour context, int framesCount = 1)
+        {
+            context.StartCoroutine(rectTransform.ForceRebuildLayoutImmediateRoutine(framesCount));
+        }
+
+        private static IEnumerator ForceRebuildLayoutImmediateRoutine(this CanvasGroup canvasGroup, int framesCount = 1)
+        {
+            RectTransform rectTransform = canvasGroup.transform as RectTransform;
+            canvasGroup.alpha = 0f;
+            yield return rectTransform.ForceRebuildLayoutImmediateRoutine(framesCount);
+            canvasGroup.alpha = 1f;
+        }
+
+        private static IEnumerator ForceRebuildLayoutImmediateRoutine(this RectTransform rectTransform, int framesCount = 1)
+        {
+            for (int i = 0; i < framesCount; i++)
+            {
+                yield return CoroutineUtils.WaitForEndOfFrame;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            }
+        }
+
         public static void FillParent(this RectTransform rectTransform)
         {
             rectTransform.anchorMin = new Vector2(0, 0);
@@ -29,14 +58,14 @@ namespace MustHave.Utils
             if (upsideDown)
             {
                 rect = new Rect(transform.position.x, Screen.height - transform.position.y, size.x, size.y);
-                rect.x -= (transform.pivot.x * size.x);
-                rect.y -= ((1.0f - transform.pivot.y) * size.y);
+                rect.x -= transform.pivot.x * size.x;
+                rect.y -= (1.0f - transform.pivot.y) * size.y;
             }
             else
             {
                 rect = new Rect(transform.position.x, transform.position.y, size.x, size.y);
-                rect.x -= (transform.pivot.x * size.x);
-                rect.y -= (transform.pivot.y * size.y);
+                rect.x -= transform.pivot.x * size.x;
+                rect.y -= transform.pivot.y * size.y;
             }
             return rect;
         }
