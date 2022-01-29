@@ -38,10 +38,5 @@ namespace MustHave
                 viewportPos.x > -viewportOffsetX && viewportPos.x < 1f + viewportOffsetX &&
                 viewportPos.y > -viewportOffsetY && viewportPos.y < 1f + viewportOffsetY;
         }
-
-        public static Vector2Int Negative(this Vector2Int v)
-        {
-            return new Vector2Int(-v.x, -v.y);
-        }
     }
 }
