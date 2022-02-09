@@ -2,7 +2,7 @@
 
 namespace MustHave.UI
 {
-    public class ActionWithText
+    public class AlertButtonData
     {
         public string text = default;
         public Action action = default;
@@ -15,7 +15,7 @@ namespace MustHave.UI
             get { return dismiss && _dismissWithAnimator; }
         }
 
-        public ActionWithText(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
+        public AlertButtonData(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
         {
             this.text = text;
             this.action = action;
@@ -23,16 +23,16 @@ namespace MustHave.UI
             _dismissWithAnimator = dismiss && dismissWithAnimator;
         }
 
-        public ActionWithText(ActionWithText src) : this(src.text, src.action, src.dismiss, src._dismissWithAnimator) { }
+        public AlertButtonData(AlertButtonData src) : this(src.text, src.action, src.dismiss, src._dismissWithAnimator) { }
 
-        public static ActionWithText CreateCopy(ActionWithText src)
+        public static AlertButtonData CreateCopy(AlertButtonData src)
         {
             return Create(src.text, src.action, src.dismiss, src._dismissWithAnimator);
         }
 
-        public static ActionWithText Create(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
+        public static AlertButtonData Create(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
         {
-            return new ActionWithText(text, action, dismiss, dismissWithAnimator);
+            return new AlertButtonData(text, action, dismiss, dismissWithAnimator);
         }
     }
 }

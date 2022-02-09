@@ -15,7 +15,7 @@ namespace MustHave.UI
         [SerializeField] private List<MessageEventGroup> _sceneMessageGroups = default;
         [SerializeField] private AppMessageEvents _appMessages = default;
         [SerializeField] private Image _screenshotImage = default;
-        [SerializeField] private AlertPopupScript _alertPopup = default;
+        [SerializeField] private AlertPopup _alertPopup = default;
         [SerializeField] private ProgressSpinnerPanel _progressSpinnerPanel = default;
 
         private List<ScreenData> _screenDataStack = new List<ScreenData>();
@@ -26,9 +26,9 @@ namespace MustHave.UI
         private ISceneChangeListener _sceneChangeListener = default;
         private float _sceneLoadingStartTime = -1f;
         private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
-        private AlertPopupScript _activeAlertPopup = default;
+        private AlertPopup _activeAlertPopup = default;
 
-        public AlertPopupScript ActiveAlertPopup { get => _activeAlertPopup; }
+        public AlertPopup ActiveAlertPopup { get => _activeAlertPopup; }
         public ProgressSpinnerPanel ProgressSpinnerPanel { get => _progressSpinnerPanel; }
 
         protected override void OnAwake()
@@ -47,7 +47,7 @@ namespace MustHave.UI
 
             _activeSceneName = activeScene.name;
 
-            AlertPopupScript[] alertPopups = GetComponentsInChildren<AlertPopupScript>(true);
+            AlertPopup[] alertPopups = GetComponentsInChildren<AlertPopup>(true);
             foreach (var popup in alertPopups)
             {
                 popup.Init(this);
@@ -307,7 +307,7 @@ namespace MustHave.UI
 
         private void SetActiveAlertPopup(Type type)
         {
-            _activeAlertPopup = (_activeCanvas?.TopLayer.GetComponentInChildren(type, true) ?? transform.GetComponentInChildren(type, true)) as AlertPopupScript;
+            _activeAlertPopup = (_activeCanvas?.TopLayer.GetComponentInChildren(type, true) ?? transform.GetComponentInChildren(type, true)) as AlertPopup;
             //Debug.Log(GetType() + ".SetActiveAlertPopup: _activeAlertPopup=" + _activeAlertPopup + " _activeCanvas=" + _activeCanvas);
             if (_activeAlertPopup && _activeCanvas)
             {

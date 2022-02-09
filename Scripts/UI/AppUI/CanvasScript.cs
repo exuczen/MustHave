@@ -19,13 +19,13 @@ namespace MustHave.UI
 
         private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
         private string _sceneName = default;
-        private AlertPopupScript _alertPopup = default;
+        private AlertPopup _alertPopup = default;
         private ProgressSpinnerPanel _progressSpinnerPanel = default;
         private Canvas _canvas = default;
         private ScreenScript _activeScreen = default;
 
         public string SceneName { get => string.IsNullOrEmpty(_sceneName) ? (_sceneName = SceneUtils.ActiveSceneName) : _sceneName; }
-        public AlertPopupScript AlertPopup { get => _alertPopup; }
+        public AlertPopup AlertPopup { get => _alertPopup; }
         public ProgressSpinnerPanel ProgressSpinnerPanel { get => _progressSpinnerPanel; }
         public Canvas Canvas { get => _canvas ?? (_canvas = GetComponent<Canvas>()); }
         public ScreenScript ActiveScreen { get => _activeScreen; set => _activeScreen = value; }
@@ -192,7 +192,7 @@ namespace MustHave.UI
                 _progressSpinnerPanel.transform.SetParent(_topLayer, false);
         }
 
-        public void SetAlertPopup(AlertPopupScript alertPopup)
+        public void SetAlertPopup(AlertPopup alertPopup)
         {
             _alertPopup = alertPopup;
             if (_alertPopup)

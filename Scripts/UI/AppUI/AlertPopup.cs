@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using MustHave.Utils;
@@ -8,7 +6,7 @@ using UnityEditor;
 
 namespace MustHave.UI
 {
-    public class AlertPopupScript : UIScript
+    public class AlertPopup : UIScript
     {
         public const string ANIMATOR_TRIGGER_SHOW = "show";
         public const string ANIMATOR_TRIGGER_HIDE = "hide";
@@ -23,7 +21,7 @@ namespace MustHave.UI
         [SerializeField] protected Text _popupText = default;
         [SerializeField] protected Text _emptyLineText = default;
 
-        private ActionWithText[] _onButtonClickActions = default;
+        private AlertButtonData[] _onButtonClickActions = default;
         private Action _dismissButtonAction = default;
         private Animator _animator = default;
         private MonoBehaviour _context = default;
@@ -65,10 +63,10 @@ namespace MustHave.UI
             _dismissButton.interactable = enabled;
         }
 
-        public AlertPopupScript SetButtons(params ActionWithText[] onClickActions)
+        public AlertPopup SetButtons(params AlertButtonData[] onClickActions)
         {
             int buttonsCount = Mathf.Min(_buttons.Length, onClickActions.Length);
-            _onButtonClickActions = new ActionWithText[buttonsCount];
+            _onButtonClickActions = new AlertButtonData[buttonsCount];
 
             SetDismissButtonEnabled(buttonsCount == 1);
             if (buttonsCount == 1 && onClickActions.Length > 0 && onClickActions[0] != null)
@@ -77,7 +75,7 @@ namespace MustHave.UI
             for (int i = 0; i < buttonsCount; i++)
             {
                 Button button = _buttons[i];
-                _onButtonClickActions[i] = new ActionWithText(onClickActions[i]);
+                _onButtonClickActions[i] = new AlertButtonData(onClickActions[i]);
                 _buttons[i].GetComponentInChildren<Text>().text = onClickActions[i].text;
                 _buttons[i].transform.parent.gameObject.SetActive(true);
             }
@@ -88,7 +86,7 @@ namespace MustHave.UI
             return this;
         }
 
-        public AlertPopupScript SetText(string text)
+        public AlertPopup SetText(string text)
         {
             //_popupText.text = string.Concat("\n", text, "\n");
             bool textIsNullOrEmpty = string.IsNullOrEmpty(text);
@@ -106,7 +104,7 @@ namespace MustHave.UI
 
         public void ShowWithConfirmButton(string text, Action action = null, bool invokeActionOnHide = true)
         {
-            SetButtons(ActionWithText.Create(BUTTON_OK, action));
+            SetButtons(AlertButtonData.Create(BUTTON_OK, action));
             SetText(text);
             Show();
             _dismissButtonAction = invokeActionOnHide ? action : null;
@@ -116,8 +114,8 @@ namespace MustHave.UI
         {
             _onShowQuitWarning?.Invoke();
             SetButtons(
-                ActionWithText.Create(BUTTON_NO, _onDismissQuitWarning),
-                ActionWithText.Create(BUTTON_YES, () => {
+                AlertButtonData.Create(BUTTON_NO, _onDismissQuitWarning),
+                AlertButtonData.Create(BUTTON_YES, () => {
 #if UNITY_EDITOR
                     EditorApplication.isPlaying = false;
 #else
@@ -140,7 +138,7 @@ namespace MustHave.UI
 
         private void OnButtonClick(int i)
         {
-            ActionWithText buttonAction = null;
+            AlertButtonData buttonAction = null;
             if (_onButtonClickActions != null && i >= 0 && i < _onButtonClickActions.Length
                 && (buttonAction = _onButtonClickActions[i]) != null)
             {
