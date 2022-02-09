@@ -2,12 +2,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using MustHave.Utils;
-using UnityEditor;
 
 namespace MustHave.UI
 {
     public class AlertPopup : UIScript
     {
+        public bool Active => gameObject.activeSelf;
+        public Animator Animator => animator;
+        public int FontSize { get => popupText.fontSize; set { popupText.fontSize = value; } }
+
         public const string ANIMATOR_TRIGGER_SHOW = "show";
         public const string ANIMATOR_TRIGGER_HIDE = "hide";
         public const string BUTTON_OK = "OK";
@@ -16,84 +19,77 @@ namespace MustHave.UI
         public const string WARNING_QUIT_CONFIRM = "Do you really want to quit?";
         public const string WARNING_NOT_IMPLEMENTED = "This feature will be available soon.";
 
-        [SerializeField] private Button _dismissButton = default;
-        [SerializeField] private Button[] _buttons = default;
-        [SerializeField] protected Text _popupText = default;
-        [SerializeField] protected Text _emptyLineText = default;
+        [SerializeField] private Button dismissButton = default;
+        [SerializeField] private Button[] buttons = default;
+        [SerializeField] protected Text popupText = default;
+        [SerializeField] protected Text emptyLineText = default;
+        [SerializeField] private CanvasGroup canvasGroup = null;
 
-        private AlertButtonData[] _onButtonClickActions = default;
-        private Action _dismissButtonAction = default;
-        private Animator _animator = default;
-        private MonoBehaviour _context = default;
-        private int _initialFontSize = default;
+        private AlertButtonData[] buttonsData = default;
+        private Action dismissButtonAction = default;
+        private Animator animator = default;
+        private MonoBehaviour context = default;
+        private int initialFontSize = default;
 
-        private Action _onShowQuitWarning = default;
-        private Action _onDismissQuitWarning = default;
-
-        public Animator Animator { get => _animator ?? (_animator = GetComponent<Animator>()); }
-        public int FontSize { get => _popupText.fontSize; set { _popupText.fontSize = value; } }
-
-        protected virtual void OnInit() { }
-
-        protected virtual void OnHide() { }
+        private Action onShowQuitWarning = default;
+        private Action onDismissQuitWarning = default;
 
         public void Init(MonoBehaviour context)
         {
-            for (int i = 0; i < _buttons.Length; i++)
+            buttonsData = new AlertButtonData[buttons.Length];
+            for (int i = 0; i < buttons.Length; i++)
             {
                 int buttonIndex = i;
-                _buttons[i].onClick.AddListener(() => {
+                buttons[i].onClick.AddListener(() => {
                     OnButtonClick(buttonIndex);
                 });
             }
-            _dismissButton.onClick.AddListener(OnDismissButtonClick);
-            _initialFontSize = _popupText.fontSize;
-            _context = context;
-            OnInit();
+            animator = GetComponent<Animator>();
+            dismissButton.onClick.AddListener(OnDismissButtonClick);
+            initialFontSize = popupText.fontSize;
+            this.context = context;
         }
 
         public void SetQuitWarningActions(Action onShow, Action onDismiss)
         {
-            _onShowQuitWarning = onShow;
-            _onDismissQuitWarning = onDismiss;
+            onShowQuitWarning = onShow;
+            onDismissQuitWarning = onDismiss;
         }
 
         public void SetDismissButtonEnabled(bool enabled)
         {
-            _dismissButton.interactable = enabled;
+            dismissButton.interactable = enabled;
         }
 
-        public AlertPopup SetButtons(params AlertButtonData[] onClickActions)
+        public AlertPopup SetButtons(params AlertButtonData[] buttonsData)
         {
-            int buttonsCount = Mathf.Min(_buttons.Length, onClickActions.Length);
-            _onButtonClickActions = new AlertButtonData[buttonsCount];
+            int buttonsCount = Mathf.Min(buttons.Length, buttonsData.Length);
 
             SetDismissButtonEnabled(buttonsCount == 1);
-            if (buttonsCount == 1 && onClickActions.Length > 0 && onClickActions[0] != null)
-                _dismissButtonAction = onClickActions[0].action;
-
+            if (buttonsCount == 1 && buttonsData.Length > 0 && buttonsData[0].Action != null)
+            {
+                dismissButtonAction = buttonsData[0].Action;
+            }
             for (int i = 0; i < buttonsCount; i++)
             {
-                Button button = _buttons[i];
-                _onButtonClickActions[i] = new AlertButtonData(onClickActions[i]);
-                _buttons[i].GetComponentInChildren<Text>().text = onClickActions[i].text;
-                _buttons[i].transform.parent.gameObject.SetActive(true);
+                this.buttonsData[i] = new AlertButtonData(buttonsData[i]);
+                buttons[i].GetComponentInChildren<Text>().text = buttonsData[i].Text;
+                buttons[i].transform.parent.SetGameObjectActive(true);
             }
-            for (int i = buttonsCount; i < _buttons.Length; i++)
+            for (int i = buttonsCount; i < buttons.Length; i++)
             {
-                _buttons[i].transform.parent.gameObject.SetActive(false);
+                buttons[i].transform.parent.SetGameObjectActive(false);
             }
             return this;
         }
 
         public AlertPopup SetText(string text)
         {
-            //_popupText.text = string.Concat("\n", text, "\n");
             bool textIsNullOrEmpty = string.IsNullOrEmpty(text);
-            _popupText.gameObject.SetActive(!textIsNullOrEmpty);
-            if (_emptyLineText)
-                _emptyLineText.gameObject.SetActive(!textIsNullOrEmpty);
-            _popupText.text = text;
+            popupText.SetGameObjectActive(!textIsNullOrEmpty);
+            if (emptyLineText)
+                emptyLineText.SetGameObjectActive(!textIsNullOrEmpty);
+            popupText.text = text;
             return this;
         }
 
@@ -107,91 +103,85 @@ namespace MustHave.UI
             SetButtons(AlertButtonData.Create(BUTTON_OK, action));
             SetText(text);
             Show();
-            _dismissButtonAction = invokeActionOnHide ? action : null;
+            dismissButtonAction = invokeActionOnHide ? action : null;
+        }
+
+        public void ShowWithYesNoButtons(string text, Action onAccept, Action onReject = null, bool invokeRejectActionOnHide = true)
+        {
+            SetButtons(AlertButtonData.Create(BUTTON_YES, onAccept), AlertButtonData.Create(BUTTON_NO, onReject));
+            SetText(text);
+            Show();
+            dismissButtonAction = invokeRejectActionOnHide ? onReject : null;
         }
 
         public void ShowQuitWarning()
         {
-            _onShowQuitWarning?.Invoke();
+            onShowQuitWarning?.Invoke();
             SetButtons(
-                AlertButtonData.Create(BUTTON_NO, _onDismissQuitWarning),
+                AlertButtonData.Create(BUTTON_NO, onDismissQuitWarning),
                 AlertButtonData.Create(BUTTON_YES, () => {
 #if UNITY_EDITOR
-                    EditorApplication.isPlaying = false;
+                    UnityEditor.EditorApplication.isPlaying = false;
 #else
-                    Application.Quit();
+                Application.Quit();
 #endif
                 })).SetText(WARNING_QUIT_CONFIRM).Show();
         }
 
         public void OnDismissButtonClick()
         {
-            if (_dismissButton.interactable)
+            if (dismissButton.interactable)
             {
                 HideWithAnimator(() => {
-                    _dismissButtonAction?.Invoke();
-                    _dismissButtonAction = null;
+                    dismissButtonAction?.Invoke();
+                    dismissButtonAction = null;
                 });
-                _onButtonClickActions = null;
             }
         }
 
         private void OnButtonClick(int i)
         {
-            AlertButtonData buttonAction = null;
-            if (_onButtonClickActions != null && i >= 0 && i < _onButtonClickActions.Length
-                && (buttonAction = _onButtonClickActions[i]) != null)
+            AlertButtonData buttonData;
+            Action onHide = null;
+            if (i >= 0 && i < buttonsData.Length && (buttonData = buttonsData[i]).Action != null)
             {
-                if (buttonAction.dismiss)
+                if (buttonData.ActionInstant)
                 {
-                    if (buttonAction.DismissWithAnimator)
-                    {
-                        HideWithAnimator(() => { buttonAction.action?.Invoke(); });
-                    }
-                    else
-                    {
-                        Hide();
-                        buttonAction.action?.Invoke();
-                    }
+                    buttonData.Action.Invoke();
                 }
                 else
                 {
-                    _onButtonClickActions[i].action?.Invoke();
+                    onHide = buttonData.Action;
                 }
             }
-            else
-            {
-                Hide();
-            }
+            HideWithAnimator(onHide);
         }
 
         public override void Show()
         {
-            ShowWithAnimator();
-        }
-
-        private void ShowWithAnimator()
-        {
             base.Show();
-            Animator.SetTrigger(ANIMATOR_TRIGGER_SHOW);
+            animator.SetTrigger(ANIMATOR_TRIGGER_SHOW);
         }
 
         public override void Hide()
         {
-            _popupText.fontSize = _initialFontSize;
+            for (int i = 0; i < buttonsData.Length; i++)
+            {
+                buttonsData[i] = default;
+            }
+            popupText.fontSize = initialFontSize;
             base.Hide();
-            OnHide();
         }
 
         private void HideWithAnimator(Action onHide)
         {
             if (gameObject.activeSelf)
             {
-                Animator.SetTrigger(ANIMATOR_TRIGGER_HIDE);
-                _context?.StartCoroutineActionAfterPredicate(() => {
-                    Hide();
+                animator.SetTrigger(ANIMATOR_TRIGGER_HIDE);
+                context.StartCoroutineActionAfterPredicate(() => {
                     onHide?.Invoke();
-                }, () => gameObject.activeSelf);
+                    Hide();
+                }, () => canvasGroup.alpha > 0f);
             }
         }
     }

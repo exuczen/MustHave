@@ -2,37 +2,29 @@
 
 namespace MustHave.UI
 {
-    public class AlertButtonData
+    public struct AlertButtonData
     {
-        public string text = default;
-        public Action action = default;
-        public bool dismiss = default;
-        private bool _dismissWithAnimator = default;
+        public string Text;
+        public Action Action;
+        public bool ActionInstant;
 
-        public bool DismissWithAnimator
+        public AlertButtonData(string text, Action action, bool actionInstant = true)
         {
-            set { dismiss = _dismissWithAnimator = value; }
-            get { return dismiss && _dismissWithAnimator; }
+            Text = text;
+            Action = action;
+            ActionInstant = actionInstant;
         }
 
-        public AlertButtonData(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
-        {
-            this.text = text;
-            this.action = action;
-            this.dismiss = dismiss;
-            _dismissWithAnimator = dismiss && dismissWithAnimator;
-        }
-
-        public AlertButtonData(AlertButtonData src) : this(src.text, src.action, src.dismiss, src._dismissWithAnimator) { }
+        public AlertButtonData(AlertButtonData src) : this(src.Text, src.Action, src.ActionInstant) { }
 
         public static AlertButtonData CreateCopy(AlertButtonData src)
         {
-            return Create(src.text, src.action, src.dismiss, src._dismissWithAnimator);
+            return Create(src.Text, src.Action, src.ActionInstant);
         }
 
-        public static AlertButtonData Create(string text, Action action, bool dismiss = true, bool dismissWithAnimator = true)
+        public static AlertButtonData Create(string text, Action action, bool actionInstant = true)
         {
-            return new AlertButtonData(text, action, dismiss, dismissWithAnimator);
+            return new AlertButtonData(text, action, actionInstant);
         }
-    }
+    } 
 }
