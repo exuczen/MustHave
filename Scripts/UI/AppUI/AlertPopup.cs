@@ -95,23 +95,23 @@ namespace MustHave.UI
 
         public void ShowNotImplementedWarning(Action action = null)
         {
-            ShowWithConfirmButton(WARNING_NOT_IMPLEMENTED, action, false);
+            ShowWithConfirmButton(WARNING_NOT_IMPLEMENTED, action, true, false);
         }
 
-        public void ShowWithConfirmButton(string text, Action action = null, bool invokeActionOnHide = true)
+        public void ShowWithConfirmButton(string text, Action action, bool instantAction = true, bool invokeActionOnDismiss = true)
         {
-            SetButtons(AlertButtonData.Create(BUTTON_OK, action));
+            SetButtons(AlertButtonData.Create(BUTTON_OK, action, instantAction));
             SetText(text);
             Show();
-            dismissButtonAction = invokeActionOnHide ? action : null;
+            dismissButtonAction = invokeActionOnDismiss ? action : null;
         }
 
-        public void ShowWithYesNoButtons(string text, Action onAccept, Action onReject = null, bool invokeRejectActionOnHide = true)
+        public void ShowWithYesNoButtons(string text, Action onAccept, Action onReject, bool instantAction, bool invokeRejectActionOnDismiss)
         {
-            SetButtons(AlertButtonData.Create(BUTTON_YES, onAccept), AlertButtonData.Create(BUTTON_NO, onReject));
+            SetButtons(AlertButtonData.Create(BUTTON_YES, onAccept, instantAction), AlertButtonData.Create(BUTTON_NO, onReject, instantAction));
             SetText(text);
             Show();
-            dismissButtonAction = invokeRejectActionOnHide ? onReject : null;
+            dismissButtonAction = invokeRejectActionOnDismiss ? onReject : null;
         }
 
         public void ShowQuitWarning()
@@ -181,7 +181,7 @@ namespace MustHave.UI
                 context.StartCoroutineActionAfterPredicate(() => {
                     onHide?.Invoke();
                     Hide();
-                }, () => canvasGroup.alpha > 0f);
+                }, () => gameObject.activeSelf);
             }
         }
     }

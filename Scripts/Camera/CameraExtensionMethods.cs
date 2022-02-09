@@ -98,5 +98,14 @@ namespace MustHave
             Ray ray = new Ray(camera.transform.position, camera.transform.forward);
             return Maths.GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out distance);
         }
+
+        public static Vector3 WorldToScreenPointWithYOffset(this Camera camera, Vector3 worldPoint, float worldOffsetY, float distanceScale)
+        {
+            var cameraTransform = camera.transform;
+            float tanHalfFOV = camera.GetTanHalfFovFromProjectionMatrix();
+            float distance = Vector3.Dot(worldPoint - cameraTransform.position, cameraTransform.forward);
+            float translationY = worldOffsetY + distanceScale * distance * tanHalfFOV;
+            return camera.WorldToScreenPoint(worldPoint + cameraTransform.up * translationY);
+        }
     }
 }
