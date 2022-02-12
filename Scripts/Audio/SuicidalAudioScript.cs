@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MustHave.Audio
@@ -9,7 +8,7 @@ namespace MustHave.Audio
     {
         private IEnumerator Start()
         {
-            AudioSource audioSource = GetComponent<AudioSource>();
+            var audioSource = GetComponent<AudioSource>();
             audioSource.Play();
             yield return new WaitWhile(() => audioSource.isPlaying);
             Destroy(gameObject);

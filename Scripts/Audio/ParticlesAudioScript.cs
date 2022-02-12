@@ -1,52 +1,50 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MustHave.Audio
 {
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticlesAudioScript : MonoBehaviour
     {
-        [SerializeField] private AudioSource _suicidalAudioPrefab = default;
-        [SerializeField] private AudioClip _birthClip = default;
-        [SerializeField] private AudioClip _deathClip = default;
-        [SerializeField, Range(0f, 1f)] private float _birthClipVolume = 1f;
-        [SerializeField, Range(0f, 1f)] private float _deathClipVolume = 1f;
+        [SerializeField] private AudioSource suicidalAudioPrefab = default;
+        [SerializeField] private AudioClip birthClip = default;
+        [SerializeField] private AudioClip deathClip = default;
+        [SerializeField, Range(0f, 1f)] private float birthClipVolume = 1f;
+        [SerializeField, Range(0f, 1f)] private float deathClipVolume = 1f;
 
-        private ParticleSystem _particleSystem = default;
-        private int _particlesCount = default;
-        private bool _running = default;
+        private new ParticleSystem particleSystem = default;
+        private int particlesCount = 0;
+        private bool running = false;
 
         private void Awake()
         {
-            _particleSystem = GetComponent<ParticleSystem>();
+            particleSystem = GetComponent<ParticleSystem>();
         }
 
         private void Start()
         {
-            _running = true;
+            running = true;
         }
 
         private void Update()
         {
-            if (_running)
+            if (running)
             {
-                if (_birthClip && _particleSystem.particleCount > _particlesCount)
+                if (birthClip && particleSystem.particleCount > particlesCount)
                 {
-                    CreateAudioSource(_birthClip, _birthClipVolume).Play();
+                    CreateAudioSource(birthClip, birthClipVolume).Play();
                 }
-                else if (_deathClip && _particleSystem.particleCount < _particlesCount)
+                else if (deathClip && particleSystem.particleCount < particlesCount)
                 {
-                    CreateAudioSource(_deathClip, _deathClipVolume).Play();
+                    CreateAudioSource(deathClip, deathClipVolume).Play();
                 }
-                _particlesCount = _particleSystem.particleCount;
+                particlesCount = particleSystem.particleCount;
             }
         }
 
         private AudioSource CreateAudioSource(AudioClip audioClip, float volume)
         {
             //Debug.Log(GetType() + ".CreateAudioSource: " + audioClip);
-            AudioSource audioSource = AudioSource.Instantiate(_suicidalAudioPrefab, transform, false);
+            var audioSource = Instantiate(suicidalAudioPrefab, transform, false);
             audioSource.transform.localPosition = Vector2.zero;
             audioSource.clip = audioClip;
             audioSource.volume = volume;
