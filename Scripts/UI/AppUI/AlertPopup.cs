@@ -23,7 +23,7 @@ namespace MustHave.UI
         [SerializeField] private Button[] buttons = default;
         [SerializeField] protected Text popupText = default;
         [SerializeField] protected Text emptyLineText = default;
-        [SerializeField] private CanvasGroup canvasGroup = null;
+        //[SerializeField] private CanvasGroup canvasGroup = null;
 
         private AlertButtonData[] buttonsData = default;
         private Action dismissButtonAction = default;

@@ -1,22 +1,17 @@
-﻿using MustHave.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
     public class TouchNavCameraScript : MonoBehaviour
     {
-        [SerializeField] private float _translationSpeed = default;
+        [SerializeField] private float translationSpeed = default;
 
-        private Camera _camera = default;
+        private new Camera camera = default;
 
         private void Awake()
         {
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            _camera = GetComponent<Camera>();
-#else
-            Destroy(this);
-#endif
+            camera = GetComponent<Camera>();
         }
 
         private void Update()
@@ -42,7 +37,7 @@ namespace MustHave
                 deltaPosition.y = absDeltaSum.y > 0f ? deltaPosition.y / absDeltaSum.y : 0f;
                 if (deltaPosition != Vector2.zero)
                 {
-                    Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(deltaPosition);
+                    Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(deltaPosition);
                     transform.Translate(translation, Space.Self);
                 }
             }

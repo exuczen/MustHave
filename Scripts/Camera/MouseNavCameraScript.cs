@@ -1,42 +1,37 @@
-﻿using MustHave.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
     public class MouseNavCameraScript : MonoBehaviour
     {
-        [SerializeField] private float _translationSpeed = default;
-        [SerializeField] private float _zoomSpeed = default;
+        [SerializeField] private float translationSpeed = default;
+        [SerializeField] private float zoomSpeed = default;
 
         private const float ROTATION_RATE = 240f;
 
-        private Camera _camera = default;
-        private Vector3 _mousePositionPrev = default;
+        private new Camera camera = default;
+        private Vector3 mousePositionPrev = default;
 
         private void Awake()
         {
-#if UNITY_EDITOR || UNITY_STANDALONE
-            _camera = GetComponent<Camera>();
-#else
-            Destroy(this);
-#endif
+            camera = GetComponent<Camera>();
         }
 
         private void OnEnable()
         {
-            _mousePositionPrev = Input.mousePosition;
+            mousePositionPrev = Input.mousePosition;
         }
 
         private void Update()
         {
             Vector3 mousePosition = Input.mousePosition;
-            Vector3 mouseDeltaPos = mousePosition - _mousePositionPrev;
-            _mousePositionPrev = mousePosition;
+            Vector3 mouseDeltaPos = mousePosition - mousePositionPrev;
+            mousePositionPrev = mousePosition;
 
             if (Input.GetMouseButton(2) || Input.GetMouseButton(1))
             {
-                Vector3 translation = -_translationSpeed * _camera.ScreenToWorldTranslation(mouseDeltaPos);
+                Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDeltaPos);
                 transform.Translate(translation, Space.Self);
             }
             else if (Input.GetMouseButton(0))
@@ -54,13 +49,13 @@ namespace MustHave
             Vector2 mouseScrollDelta = Input.mouseScrollDelta;
             if (mouseScrollDelta.y != 0f)
             {
-                if (_camera.orthographic)
+                if (camera.orthographic)
                 {
-                    _camera.orthographicSize -= _zoomSpeed * Time.deltaTime * mouseScrollDelta.y;
+                    camera.orthographicSize -= zoomSpeed * Time.deltaTime * mouseScrollDelta.y;
                 }
                 else
                 {
-                    transform.Translate(0f, 0f, _zoomSpeed * Time.deltaTime * mouseScrollDelta.y);
+                    transform.Translate(0f, 0f, zoomSpeed * Time.deltaTime * mouseScrollDelta.y);
                 }
             }
         }
