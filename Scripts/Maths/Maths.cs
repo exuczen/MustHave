@@ -175,16 +175,19 @@ namespace MustHave
                 );
         }
 
-        public static bool Between(float value, float left, float right)
+        public static bool IsAngleInRange(float angle, float min, float max, bool midZeroRange = false)
         {
-            left = AngleModulo360(left);
-            right = AngleModulo360(right);
-            if (left > right)
+            angle = AngleModulo360(angle, midZeroRange);
+            min = AngleModulo360(min, midZeroRange);
+            max = AngleModulo360(max, midZeroRange);
+            if (min > max)
             {
-                return !Between(value, right, left);
+                return angle >= min || angle <= max;
             }
-            value = AngleModulo360(value);
-            return left <= value && value <= right;
+            else
+            {
+                return angle >= min && angle <= max;
+            }
         }
 
         public static float PowF(float a, int n)
