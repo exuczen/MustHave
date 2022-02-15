@@ -9,10 +9,10 @@ namespace MustHave.UI
     [System.Serializable]
     public class UDateTime : ISerializationCallbackReceiver
     {
-        [HideInInspector] [SerializeField] private DateTime dateTime;
+        [SerializeField, HideInInspector] private DateTime dateTime;
 
         // if you don't want to use the PropertyDrawer then remove HideInInspector here
-        [HideInInspector] [SerializeField] private string _dateTime;
+        [SerializeField, HideInInspector] private string _dateTime;
 
         public static implicit operator DateTime(UDateTime udt)
         {
@@ -28,8 +28,7 @@ namespace MustHave.UI
 
         public bool TryParseDateTime()
         {
-            DateTime parsedDateTime;
-            if (TryParseDateTime(out parsedDateTime))
+            if (TryParseDateTime(out DateTime parsedDateTime))
             {
                 dateTime = parsedDateTime;
                 return true;
