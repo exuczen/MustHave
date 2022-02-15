@@ -1,8 +1,7 @@
 ﻿using System;
-using UnityEngine;
 
 namespace MustHave
 {
-    public class TypeMessageEvent : DataMessageEvent<Type> { } 
+    public class TypeMessageEvent : DataMessageEvent<Type> { }
 }
 

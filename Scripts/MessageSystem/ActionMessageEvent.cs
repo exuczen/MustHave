@@ -1,30 +1,29 @@
 ﻿using System;
-using UnityEngine;
 
 namespace MustHave
 {
     public class ActionMessageEvent : MessageEvent
     {
-        private event Action _event = default;
+        private event Action Event = default;
 
         public void AddListener(Action listener)
         {
-            _event += listener;
+            Event += listener;
         }
 
         public void RemoveListener(Action listener)
         {
-            _event -= listener;
+            Event -= listener;
         }
 
         public override void Invoke()
         {
-            _event?.Invoke();
+            Event?.Invoke();
         }
 
         public override void RemoveAllListeners()
         {
-            _event = null;
+            Event = null;
         }
     }
 }

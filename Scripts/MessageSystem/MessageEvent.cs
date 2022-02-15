@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace MustHave
+﻿namespace MustHave
 {
     public abstract class MessageEvent
     {

@@ -1,39 +1,38 @@
 ﻿using System;
-using UnityEngine;
 
 namespace MustHave
 {
     public class DataMessageEvent<T> : MessageEvent
     {
-        private event Action<T> _event = default;
+        private event Action<T> Event = default;
 
-        protected T _data = default;
+        protected T data = default;
 
-        public T Data { get => _data; set => _data = value; }
+        public T Data { get => data; set => data = value; }
 
         public void AddListener(Action<T> listener)
         {
-            _event += listener;
+            Event += listener;
         }
 
         public void RemoveListener(Action<T> listener)
         {
-            _event -= listener;
+            Event -= listener;
         }
 
         public void Invoke(T data, bool setData = true)
         {
-            _event?.Invoke(setData ? (_data = data) : data);
+            Event?.Invoke(setData ? (this.data = data) : data);
         }
 
         public override void Invoke()
         {
-            _event?.Invoke(_data);
+            Event?.Invoke(data);
         }
 
         public override void RemoveAllListeners()
         {
-            _event = null;
+            Event = null;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using MustHave.UI;
+﻿using MustHave.UI;
 
 namespace MustHave
 {
