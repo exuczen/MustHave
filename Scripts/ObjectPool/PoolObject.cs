@@ -4,22 +4,22 @@ namespace MustHave
 {
     public abstract class PoolObject : MonoBehaviour
     {
-        protected Transform _pool = default;
+        protected Transform pool = default;
 
-        protected abstract void OnMoveToPool();
+        protected abstract void OnReturnToPool();
 
-        public void MoveToPool()
+        public void ReturnToPool()
         {
-            MoveToPool(_pool);
+            ReturnToPool(pool);
         }
 
-        public void MoveToPool(Transform pool)
+        public void ReturnToPool(Transform pool)
         {
-            OnMoveToPool();
+            OnReturnToPool();
             transform.SetParent(pool, false);
             transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
-            _pool = pool;
+            this.pool = pool;
         }
     }
 }
