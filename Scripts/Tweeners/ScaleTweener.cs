@@ -5,7 +5,7 @@ using MustHave.Utils;
 
 namespace MustHave.Tweeners
 {
-    public class ScaleTweener : TweenerScript
+    public class ScaleTweener : Tweener
     {
         [SerializeField] private Vector3 _deltaScale = default;
         [SerializeField] private bool _absolute = false;

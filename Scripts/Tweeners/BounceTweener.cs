@@ -2,7 +2,7 @@
 
 namespace MustHave.Tweeners
 {
-    public class BounceTweener : TweenerScript
+    public class BounceTweener : Tweener
     {
         [SerializeField] private Vector3 translation = default;
 

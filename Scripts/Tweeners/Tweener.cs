@@ -6,7 +6,7 @@ using MustHave.UI;
 
 namespace MustHave.Tweeners
 {
-    public abstract class TweenerScript : MonoBehaviour
+    public abstract class Tweener : MonoBehaviour
     {
         [SerializeField] private bool randomDelay = default;
         [SerializeField, ConditionalHide("randomDelay", true)] private float randomDelayMin = default;
