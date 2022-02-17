@@ -6,13 +6,13 @@ namespace MustHave.StateMachine
 {
     public class ActiveOnEnterBehaviour : StateMachineBehaviour
     {
-        [SerializeField] private bool _activeOnEnter = default;
-        [SerializeField] private bool _activeOnExit = default;
+        [SerializeField] private bool activeOnEnter = default;
+        [SerializeField] private bool activeOnExit = default;
 
         // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
         override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            animator.gameObject.SetActive(_activeOnEnter);
+            animator.gameObject.SetActive(activeOnEnter);
         }
 
         // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -24,7 +24,7 @@ namespace MustHave.StateMachine
         // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
         override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            animator.gameObject.SetActive(_activeOnExit);
+            animator.gameObject.SetActive(activeOnExit);
         }
 
         // OnStateMove is called right after Animator.OnAnimatorMove()
