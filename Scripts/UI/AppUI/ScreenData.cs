@@ -6,14 +6,14 @@ namespace MustHave.UI
 {
     public class ScreenData
     {
-        private ScreenScript _screen = default;
+        private UIScreen _screen = default;
         private Type _screenType = default;
         private Type _canvasType = default;
         private string _sceneName = default;
         private bool _keepOnStack = true;
         private bool _clearStack = true;
 
-        public ScreenScript Screen { get => _screen; set => _screen = value; }
+        public UIScreen Screen { get => _screen; set => _screen = value; }
         public Type ScreenType { get => _screenType; }
         public Type CanvasType { get => _canvasType; }
         public string SceneName { get => _sceneName; }
@@ -30,7 +30,7 @@ namespace MustHave.UI
             _clearStack = clearStack;
         }
 
-        public ScreenData(ScreenScript screen, bool keepOnStack = true, bool clearStack = false)
+        public ScreenData(UIScreen screen, bool keepOnStack = true, bool clearStack = false)
         {
             //Debug.Log(GetType() + ".ScreenData" + screen + " " + screen.Canvas);
             _screen = screen;

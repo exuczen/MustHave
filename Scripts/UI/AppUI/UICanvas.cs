@@ -10,25 +10,25 @@ using MustHave.Utils;
 namespace MustHave.UI
 {
     [RequireComponent(typeof(Canvas))]
-    public class CanvasScript : UIBehaviour
+    public class UICanvas : UIBehaviour
     {
         [SerializeField] private bool _activeOnAppAwake = false;
         [SerializeField] private AppMessageEvents _appMessages = default;
 
         [SerializeField] private RectTransform _topLayer = default;
 
-        private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
+        private Dictionary<Type, UIScreen> _screensDict = new Dictionary<Type, UIScreen>();
         private string _sceneName = default;
         private AlertPopup _alertPopup = default;
         private ProgressSpinnerPanel _progressSpinnerPanel = default;
         private Canvas _canvas = default;
-        private ScreenScript _activeScreen = default;
+        private UIScreen _activeScreen = default;
 
         public string SceneName { get => string.IsNullOrEmpty(_sceneName) ? (_sceneName = SceneUtils.ActiveSceneName) : _sceneName; }
         public AlertPopup AlertPopup { get => _alertPopup; }
         public ProgressSpinnerPanel ProgressSpinnerPanel { get => _progressSpinnerPanel; }
         public Canvas Canvas { get => _canvas ?? (_canvas = GetComponent<Canvas>()); }
-        public ScreenScript ActiveScreen { get => _activeScreen; set => _activeScreen = value; }
+        public UIScreen ActiveScreen { get => _activeScreen; set => _activeScreen = value; }
         public RectTransform TopLayer { get => _topLayer; }
         public bool ActiveOnAppAwake { get => _activeOnAppAwake; }
 
@@ -79,7 +79,7 @@ namespace MustHave.UI
             //}
             foreach (Transform child in transform)
             {
-                ScreenScript screen = child.GetComponent<ScreenScript>();
+                UIScreen screen = child.GetComponent<UIScreen>();
                 if (screen)
                 {
                     _screensDict.Add(screen.GetType(), screen);
@@ -107,7 +107,7 @@ namespace MustHave.UI
         /// <typeparam name="T1">screen type</typeparam>
         /// <typeparam name="T2">canvas type</typeparam>
         /// <param name="keepOnStack"></param>
-        public void ShowScreen<T1, T2>(bool keepOnStack = true, bool clearStack = false) where T1 : ScreenScript where T2 : CanvasScript
+        public void ShowScreen<T1, T2>(bool keepOnStack = true, bool clearStack = false) where T1 : UIScreen where T2 : UICanvas
         {
             if (typeof(T2) == GetType())
             {
@@ -126,14 +126,14 @@ namespace MustHave.UI
         /// <typeparam name="T2">canvas type</typeparam>
         /// <param name="sceneName"></param>
         /// <param name="keepOnStack"></param>
-        public void ShowScreenFromOtherScene<T1, T2>(Enum sceneName, bool keepOnStack = true, bool clearStack = false) where T1 : ScreenScript where T2 : CanvasScript
+        public void ShowScreenFromOtherScene<T1, T2>(Enum sceneName, bool keepOnStack = true, bool clearStack = false) where T1 : UIScreen where T2 : UICanvas
         {
             ShowScreen(new ScreenData(typeof(T1), typeof(T2), sceneName.ToString(), keepOnStack, clearStack));
         }
 
-        public void ShowScreenFromAppUI<T>() where T : ScreenScript
+        public void ShowScreenFromAppUI<T>() where T : UIScreen
         {
-            ShowScreen(new ScreenData(typeof(T), typeof(AppUIScript), SceneUtils.ActiveSceneName, false, false));
+            ShowScreen(new ScreenData(typeof(T), typeof(AppUI), SceneUtils.ActiveSceneName, false, false));
         }
 
         public void ShowScreen<T>(bool keepOnStack = true, bool clearStack = false)
@@ -144,13 +144,13 @@ namespace MustHave.UI
             //    Debug.Log(GetType() + ".ShowScreen: " + kvp.Key);
             //}
             Type screenType = typeof(T);
-            if (_screensDict.TryGetValue(screenType, out ScreenScript screen) && screen)
+            if (_screensDict.TryGetValue(screenType, out UIScreen screen) && screen)
             {
                 ShowScreen(screen, keepOnStack, clearStack);
             }
         }
 
-        public void ShowScreen(ScreenScript screen, bool keepOnStack = true, bool clearStack = false)
+        public void ShowScreen(UIScreen screen, bool keepOnStack = true, bool clearStack = false)
         {
             ShowScreen(new ScreenData(screen, keepOnStack, clearStack));
         }
@@ -160,23 +160,23 @@ namespace MustHave.UI
             _appMessages.ShowScreenMessage.Invoke(screenData);
         }
 
-        public ScreenScript GetScreen(Type screenType)
+        public UIScreen GetScreen(Type screenType)
         {
             //Debug.Log(GetType() + ".GetScreen: " + screenType);
             //foreach (var item in _screensDict)
             //{
             //    Debug.Log(GetType() + ".GetScreen: _screensDict:" + item.Value);
             //}
-            if (_screensDict.TryGetValue(screenType, out ScreenScript screen))
+            if (_screensDict.TryGetValue(screenType, out UIScreen screen))
             {
                 return screen;
             }
             return null;
         }
 
-        public T GetScreen<T>() where T : ScreenScript
+        public T GetScreen<T>() where T : UIScreen
         {
-            ScreenScript screen = GetScreen(typeof(T));
+            UIScreen screen = GetScreen(typeof(T));
             return screen ? screen as T : null;
         }
 

@@ -12,7 +12,7 @@ using MustHave.UI;
 namespace MustHave.UI
 {
     [ExecuteInEditMode]
-    public class ScreenScript : UIBehaviour
+    public class UIScreen : UIBehaviour
     {
         const float IOS_STATUS_BAR_HEIGHT_IN_INCHES = 0.1575f; // = 0.4[cm]/2.54[cm/inch]
 
@@ -23,12 +23,12 @@ namespace MustHave.UI
         [SerializeField, ConditionalHide("_setHeaderBackground", true)]
         private Image _headerBackground = default;
 
-        private CanvasScript _canvas = default;
+        private UICanvas _canvas = default;
         private CanvasScaler _canvasScaler = default;
         private Canvas _parentCanvas = default;
         private RectTransform _rectTransform = default;
 
-        public CanvasScript Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<CanvasScript>());
+        public UICanvas Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<UICanvas>());
         public CanvasScaler CanvasScaler { get => _canvasScaler ?? (_canvasScaler = transform.GetComponentInParents<CanvasScaler>()); }
         public Canvas ParentCanvas => _parentCanvas ?? (_parentCanvas = transform.GetComponentInParents<Canvas>());
         public RectTransform RectTransform { get => _rectTransform ?? (_rectTransform = transform as RectTransform); }
@@ -61,7 +61,7 @@ namespace MustHave.UI
 
         protected virtual void OnShow() { }
 
-        protected virtual void OnShowInParentCanvas(Canvas parentCanvas, CanvasScript activeSceneCanvas) { }
+        protected virtual void OnShowInParentCanvas(Canvas parentCanvas, UICanvas activeSceneCanvas) { }
 
         protected virtual void OnHide() { }
 
@@ -77,7 +77,7 @@ namespace MustHave.UI
             }
         }
 
-        public void ShowInParentCanvas(Canvas parentCanvas, CanvasScript activeSceneCanvas)
+        public void ShowInParentCanvas(Canvas parentCanvas, UICanvas activeSceneCanvas)
         {
             _parentCanvas = parentCanvas;
             _parentCanvas.gameObject.SetActive(true);
@@ -109,7 +109,7 @@ namespace MustHave.UI
             gameObject.SetActive(false);
         }
 
-        public T GetCanvasScript<T>() where T : CanvasScript
+        public T GetCanvasScript<T>() where T : UICanvas
         {
             return Canvas is T ? Canvas as T : null;
         }

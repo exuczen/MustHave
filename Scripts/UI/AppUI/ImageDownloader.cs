@@ -22,15 +22,15 @@ namespace MustHave.UI
     }
 
     [RequireComponent(typeof(Image))]
-    public class ImageDownloadScript : MonoBehaviour
+    public class ImageDownloader : MonoBehaviour
     {
         [SerializeField] private Animator _progressSpinner = default;
 
         private Image _image = default;
-        private CanvasScript _canvas = default;
+        private UICanvas _canvas = default;
 
         public Image Image => _image ?? (_image = GetComponent<Image>());
-        private CanvasScript Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<CanvasScript>());
+        private UICanvas Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<UICanvas>());
         public RectTransform RectTransform => transform as RectTransform;
 
         public void DownloadOrLoadImage(ImageDownloadFormat format, string imageURL, string appDataFolderName, float loadingColorAlpha, Action onSuccess = null)
@@ -50,7 +50,7 @@ namespace MustHave.UI
                 switch (format)
                 {
                     case ImageDownloadFormat.PNG_JPG:
-                        ImageDownloader.DownloadIntoOrLoadFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
+                        Utils.ImageDownloader.DownloadIntoOrLoadFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
                         break;
 #if WEBP
                     case ImageDownloadFormat.WebP:
@@ -73,7 +73,7 @@ namespace MustHave.UI
         {
             yield return new WaitForEndOfFrame();
 
-            string filePath = ImageDownloader.GetImageFilePathFromUrl(url, folderPath);
+            string filePath = Utils.ImageDownloader.GetImageFilePathFromUrl(url, folderPath);
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
             if (File.Exists(filePath))

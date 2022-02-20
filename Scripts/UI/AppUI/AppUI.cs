@@ -10,7 +10,7 @@ using MustHave.Utils;
 namespace MustHave.UI
 {
     [RequireComponent(typeof(Canvas))]
-    public class AppUIScript : PersistentCanvas<AppUIScript>
+    public class AppUI : PersistentCanvas<AppUI>
     {
         [SerializeField] private List<MessageEventGroup> _sceneMessageGroups = default;
         [SerializeField] private AppMessageEvents _appMessages = default;
@@ -20,12 +20,12 @@ namespace MustHave.UI
 
         private List<ScreenData> _screenDataStack = new List<ScreenData>();
         private string _activeSceneName = default;
-        private CanvasScript _activeCanvas = default;
+        private UICanvas _activeCanvas = default;
         private ScreenData _activeScreenData = default;
         private ScreenData _loadingSceneScreenData = default;
         private ISceneChangeListener _sceneChangeListener = default;
         private float _sceneLoadingStartTime = -1f;
-        private Dictionary<Type, ScreenScript> _screensDict = new Dictionary<Type, ScreenScript>();
+        private Dictionary<Type, UIScreen> _screensDict = new Dictionary<Type, UIScreen>();
         private AlertPopup _activeAlertPopup = default;
 
         public AlertPopup ActiveAlertPopup { get => _activeAlertPopup; }
@@ -57,7 +57,7 @@ namespace MustHave.UI
 
             foreach (Transform child in transform)
             {
-                ScreenScript screen = child.GetComponent<ScreenScript>();
+                UIScreen screen = child.GetComponent<UIScreen>();
                 if (screen)
                 {
                     _screensDict.Add(screen.GetType(), screen);
@@ -65,7 +65,7 @@ namespace MustHave.UI
                 }
             }
 
-            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
+            List<UICanvas> canvasList = SceneUtils.FindObjectsOfType<UICanvas>(true);
             _activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
             if (_activeCanvas)
             {
@@ -116,7 +116,7 @@ namespace MustHave.UI
                 SceneManager.SetActiveScene(scene);
                 _activeSceneName = scene.name;
                 _loadingSceneScreenData = null;
-                List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
+                List<UICanvas> canvasList = SceneUtils.FindObjectsOfType<UICanvas>(true);
                 foreach (var canvas in canvasList)
                 {
                     canvas.Init();
@@ -229,7 +229,7 @@ namespace MustHave.UI
 
                 if (screenData.CanvasType == this.GetType())
                 {
-                    ScreenScript screen = screenData.Screen ?? GetScreen(screenData.ScreenType);
+                    UIScreen screen = screenData.Screen ?? GetScreen(screenData.ScreenType);
                     if (screen)
                     {
                         _sceneChangeListener = screen.GetComponent<ISceneChangeListener>();
@@ -239,7 +239,7 @@ namespace MustHave.UI
                 }
                 else
                 {
-                    ScreenScript screen = screenData.Screen;
+                    UIScreen screen = screenData.Screen;
                     //Debug.Log(GetType() + ".ShowScreen: " + screenData.CanvasType + "." + screenData.ScreenType + " " + screen);
 
                     _progressSpinnerPanel.transform.SetParent(transform, false);
@@ -284,18 +284,18 @@ namespace MustHave.UI
             }
         }
 
-        public ScreenScript GetScreen(Type screenType)
+        public UIScreen GetScreen(Type screenType)
         {
-            if (_screensDict.TryGetValue(screenType, out ScreenScript screen))
+            if (_screensDict.TryGetValue(screenType, out UIScreen screen))
             {
                 return screen;
             }
             return null;
         }
 
-        private CanvasScript FindCanvasInActiveScene(Type canvasType)
+        private UICanvas FindCanvasInActiveScene(Type canvasType)
         {
-            List<CanvasScript> canvasList = SceneUtils.FindObjectsOfType<CanvasScript>(true);
+            List<UICanvas> canvasList = SceneUtils.FindObjectsOfType<UICanvas>(true);
             return canvasList.Find(c => c.GetType() == canvasType);
         }
 
@@ -333,7 +333,7 @@ namespace MustHave.UI
             }
         }
 
-        public void HACKAddScreenDataToScreenStack<T1, T2>(string sceneName) where T1 : ScreenScript where T2 : CanvasScript
+        public void HACKAddScreenDataToScreenStack<T1, T2>(string sceneName) where T1 : UIScreen where T2 : UICanvas
         {
             _screenDataStack.Add(new ScreenData(typeof(T1), typeof(T2), sceneName));
         }

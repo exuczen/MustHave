@@ -9,7 +9,7 @@ using MustHave.Utils;
 namespace MustHave.UI
 {
     [ExecuteInEditMode]
-    public class ViewPagerScript : ScrollRect, IPointerDownHandler, IPointerUpHandler
+    public class ViewPager : ScrollRect, IPointerDownHandler, IPointerUpHandler
     {
         private HorizontalLayoutGroup _layoutGroup = default;
         private Coroutine _swipeRoutine = default;

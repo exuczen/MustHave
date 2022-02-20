@@ -5,13 +5,13 @@ using UnityEngine.EventSystems;
 
 namespace MustHave.UI
 {
-    public class ViewPageScript : UIScript
+    public class ViewPage : UIScript
     {
-        private ViewPagerScript _viewPager = default;
+        private ViewPager _viewPager = default;
 
-        public ViewPagerScript ViewPager { get => _viewPager; set => _viewPager = value; }
+        public ViewPager ViewPager { get => _viewPager; set => _viewPager = value; }
 
-        public T CreateInstance<T>(ViewPagerScript viewPager) where T : ViewPageScript
+        public T CreateInstance<T>(ViewPager viewPager) where T : ViewPage
         {
             _viewPager = viewPager;
             T viewPage = Instantiate(this, _viewPager.content, false) as T;
