@@ -90,14 +90,14 @@ namespace MustHave.Utils
             {
                 www.timeout = NETWORK_CONNECTION_DOWNLOAD_TIMEOUT;
                 yield return www.SendWebRequest();
-                if (www.isHttpError || www.isNetworkError)
+                if (www.result == UnityWebRequest.Result.Success)
                 {
-                    Debug.LogWarning("ImageUtils.DownloadIntoRoutine: " + www.error);
-                    onError?.Invoke(www.error);
+                    onSuccess(DownloadHandlerTexture.GetContent(www));
                 }
                 else
                 {
-                    onSuccess(DownloadHandlerTexture.GetContent(www));
+                    Debug.LogWarning("ImageUtils.DownloadIntoRoutine: " + www.error);
+                    onError?.Invoke(www.error);
                 }
             }
         }
