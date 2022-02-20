@@ -12,15 +12,15 @@ namespace MustHave.UI
     public class CanvasScalerMatchFitter : UIBehaviour
     {
         [SerializeField]
-        private CanvasScaler _canvasScaler = default;
+        private CanvasScaler canvasScaler = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMin = default;
+        private float aspectRatioMin = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMax = default;
+        private float aspectRatioMax = default;
         [SerializeField, Range(0f, 1f), Tooltip("Match for MIN aspect ratio height / width")]
-        private float _aspectRatioMinMatch = 0f;
+        private float aspectRatioMinMatch = 0f;
         [SerializeField, Range(0f, 1f), Tooltip("Match for MAX aspect ratio height / width")]
-        private float _aspectRatioMaxMatch = 1f;
+        private float aspectRatioMaxMatch = 1f;
 
         protected override void OnEnable()
         {
@@ -37,12 +37,12 @@ namespace MustHave.UI
         protected override void OnRectTransformDimensionsChange()
         {
             if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled
-                && _canvasScaler && _canvasScaler.screenMatchMode == CanvasScaler.ScreenMatchMode.MatchWidthOrHeight)
+                && canvasScaler && canvasScaler.screenMatchMode == CanvasScaler.ScreenMatchMode.MatchWidthOrHeight)
             {
                 float aspectRatio = 1f * Screen.height / Screen.width;
-                float anchorTransition = Mathf.InverseLerp(_aspectRatioMin, _aspectRatioMax, aspectRatio);
-                float match = Mathf.Lerp(_aspectRatioMinMatch, _aspectRatioMaxMatch, anchorTransition);
-                _canvasScaler.matchWidthOrHeight = match;
+                float anchorTransition = Mathf.InverseLerp(aspectRatioMin, aspectRatioMax, aspectRatio);
+                float match = Mathf.Lerp(aspectRatioMinMatch, aspectRatioMaxMatch, anchorTransition);
+                canvasScaler.matchWidthOrHeight = match;
             }
         }
     }

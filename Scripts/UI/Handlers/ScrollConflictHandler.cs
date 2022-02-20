@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using MustHave.Utils;
@@ -13,29 +8,33 @@ namespace MustHave.UI
     [RequireComponent(typeof(ScrollRect))]
     public class ScrollConflictHandler : UIBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
-        private ScrollRect _parentScrollRect = default;
-        private ScrollRect _scrollRect = default;
-        private ScrollRect _activeScrollRect = default;
+        private ScrollRect parentScrollRect = default;
+        private ScrollRect scrollRect = default;
+        private ScrollRect activeScrollRect = default;
 
-        private bool ParentScrollRectVertical => _parentScrollRect ? _parentScrollRect.vertical && !_parentScrollRect.horizontal : false;
-        private bool ParentScrollRectHorizontal => _parentScrollRect ? _parentScrollRect.horizontal && !_parentScrollRect.vertical : false;
-        private bool ScrollRectVertical => _scrollRect ? _scrollRect.vertical && !_scrollRect.horizontal : false;
-        private bool ScrollRectHorizontal => _scrollRect ? _scrollRect.horizontal && !_scrollRect.vertical : false;
+        private bool ParentScrollRectVertical => parentScrollRect ? parentScrollRect.vertical && !parentScrollRect.horizontal : false;
+        private bool ParentScrollRectHorizontal => parentScrollRect ? parentScrollRect.horizontal && !parentScrollRect.vertical : false;
+        private bool ScrollRectVertical => scrollRect ? scrollRect.vertical && !scrollRect.horizontal : false;
+        private bool ScrollRectHorizontal => scrollRect ? scrollRect.horizontal && !scrollRect.vertical : false;
 
         protected override void Awake()
         {
-            _parentScrollRect = transform.GetComponentInParents<ScrollRect>();
-            _activeScrollRect = _scrollRect = GetComponent<ScrollRect>();
-            //Debug.Log(GetType() + ".Awake: _scrollRect=" + _scrollRect);
-            //Debug.Log(GetType() + ".Awake: _parentScrollRect=" + _parentScrollRect);
+            parentScrollRect = transform.GetComponentInParents<ScrollRect>();
+            activeScrollRect = scrollRect = GetComponent<ScrollRect>();
+            //Debug.Log(GetType() + ".Awake: scrollRect=" + scrollRect);
+            //Debug.Log(GetType() + ".Awake: parentScrollRect=" + parentScrollRect);
         }
 
         private void SetScrollRectsEnabled(bool enabled)
         {
-            if (_parentScrollRect)
-                _parentScrollRect.enabled = enabled;
-            if (_scrollRect)
-                _scrollRect.enabled = enabled;
+            if (parentScrollRect)
+            {
+                parentScrollRect.enabled = enabled;
+            }
+            if (scrollRect)
+            {
+                scrollRect.enabled = enabled;
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -49,48 +48,52 @@ namespace MustHave.UI
             {
                 if (ScrollRectVertical && ParentScrollRectHorizontal)
                 {
-                    _activeScrollRect = _parentScrollRect;
+                    activeScrollRect = parentScrollRect;
                 }
                 else if (ScrollRectHorizontal && ParentScrollRectVertical)
                 {
-                    _activeScrollRect = _scrollRect;
+                    activeScrollRect = scrollRect;
                 }
             }
             else //if (absHorizontal <= absVertical)
             {
                 if (ScrollRectVertical && ParentScrollRectHorizontal)
                 {
-                    _activeScrollRect = _scrollRect;
+                    activeScrollRect = scrollRect;
                 }
                 else if (ScrollRectHorizontal && ParentScrollRectVertical)
                 {
-                    _activeScrollRect = _parentScrollRect;
+                    activeScrollRect = parentScrollRect;
                 }
             }
             SetScrollRectsEnabled(false);
-            if (_activeScrollRect)
+            if (activeScrollRect)
             {
-                _activeScrollRect.enabled = true;
-                _activeScrollRect.OnBeginDrag(eventData);
+                activeScrollRect.enabled = true;
+                activeScrollRect.OnBeginDrag(eventData);
             }
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (_activeScrollRect)
+            if (activeScrollRect)
             {
-                _activeScrollRect.OnDrag(eventData);
+                activeScrollRect.OnDrag(eventData);
             }
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (_parentScrollRect)
-                _parentScrollRect.OnEndDrag(eventData);
-            if (_scrollRect)
-                _scrollRect.OnEndDrag(eventData);
+            if (parentScrollRect)
+            {
+                parentScrollRect.OnEndDrag(eventData);
+            }
+            if (scrollRect)
+            {
+                scrollRect.OnEndDrag(eventData);
+            }
 
-            _activeScrollRect = _scrollRect;
+            activeScrollRect = scrollRect;
             this.StartCoroutineActionAfterFrames(() => {
                 SetScrollRectsEnabled(true);
             }, 1);

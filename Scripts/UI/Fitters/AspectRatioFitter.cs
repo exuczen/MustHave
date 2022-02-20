@@ -14,9 +14,9 @@ namespace MustHave.UI
     public class AspectRatioFitter : UIBehaviour
     {
         [SerializeField]
-        private AspectMode _aspectMode = default;
+        private AspectMode aspectMode = default;
         [SerializeField, Tooltip("width / height")]
-        private float _aspectRatio = 1f;
+        private float aspectRatio = 1f;
 
         protected override void OnEnable()
         {
@@ -32,18 +32,18 @@ namespace MustHave.UI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _aspectRatio > float.MinValue)
+            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && aspectRatio > float.MinValue)
             {
                 RectTransform rectTransform = transform as RectTransform;
-                switch (_aspectMode)
+                switch (aspectMode)
                 {
                     case AspectMode.None:
                         break;
                     case AspectMode.WidthControlsHeight:
-                        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, rectTransform.sizeDelta.x / _aspectRatio);
+                        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, rectTransform.sizeDelta.x / aspectRatio);
                         break;
                     case AspectMode.HeightControlsWidth:
-                        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.y * _aspectRatio, rectTransform.sizeDelta.y);
+                        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.y * aspectRatio, rectTransform.sizeDelta.y);
                         break;
                     case AspectMode.FitInParent:
                         throw new NotImplementedException();

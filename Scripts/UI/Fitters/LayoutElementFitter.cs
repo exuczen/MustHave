@@ -9,15 +9,15 @@ namespace MustHave.UI
     public class LayoutElementFitter : UIBehaviour
     {
         [SerializeField]
-        private LayoutElement _layoutElement = default;
+        private LayoutElement layoutElement = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMin = default;
+        private float aspectRatioMin = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMax = default;
+        private float aspectRatioMax = default;
         [SerializeField]
-        private float _prefferedWidthMin = default;
+        private float prefferedWidthMin = default;
         [SerializeField]
-        private float _prefferedWidthMax = default;
+        private float prefferedWidthMax = default;
 
         protected override void OnEnable()
         {
@@ -33,13 +33,13 @@ namespace MustHave.UI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _layoutElement)
+            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && layoutElement)
             {
                 float aspectRatio = 1f * Screen.height / Screen.width;
-                float aspectTransition = Mathf.InverseLerp(_aspectRatioMin, _aspectRatioMax, aspectRatio);
+                float aspectTransition = Mathf.InverseLerp(aspectRatioMin, aspectRatioMax, aspectRatio);
                 //Debug.Log(GetType() + "." + aspectTransition + " " + Maths.LerpInverse(_aspectRatioMin, _aspectRatioMax, aspectRatio));
-                float prefferedWidth = Mathf.Lerp(_prefferedWidthMin, _prefferedWidthMax, aspectTransition);
-                _layoutElement.preferredWidth = prefferedWidth;
+                float prefferedWidth = Mathf.Lerp(prefferedWidthMin, prefferedWidthMax, aspectTransition);
+                layoutElement.preferredWidth = prefferedWidth;
             }
         }
     }

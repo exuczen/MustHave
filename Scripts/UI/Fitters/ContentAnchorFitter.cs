@@ -8,19 +8,19 @@ namespace MustHave.UI
     public class ContentAnchorFitter : UIBehaviour
     {
         [SerializeField]
-        private RectTransform _content = default;
+        private RectTransform content = default;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMin = 1f;
+        private float aspectRatioMin = 1f;
         [SerializeField, Tooltip("height / width")]
-        private float _aspectRatioMax = 2f;
+        private float aspectRatioMax = 2f;
         [SerializeField, Tooltip("MIN anchor for MIN aspect ratio height / width")]
-        private Vector2 _aspectRatioMinAnchorMin = Vector2.zero;
+        private Vector2 aspectRatioMinAnchorMin = Vector2.zero;
         [SerializeField, Tooltip("MAX anchor for MIN aspect ratio height / width")]
-        private Vector2 _aspectRatioMinAnchorMax = Vector2.one;
+        private Vector2 aspectRatioMinAnchorMax = Vector2.one;
         [SerializeField, Tooltip("MIN anchor for MAX aspect ratio height / width")]
-        private Vector2 _aspectRatioMaxAnchorMin = Vector2.zero;
+        private Vector2 aspectRatioMaxAnchorMin = Vector2.zero;
         [SerializeField, Tooltip("MAX anchor for MAX aspect ratio height / width")]
-        private Vector2 _aspectRatioMaxAnchorMax = Vector2.one;
+        private Vector2 aspectRatioMaxAnchorMax = Vector2.one;
 
         protected override void OnEnable()
         {
@@ -36,15 +36,15 @@ namespace MustHave.UI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _content && Screen.width > 0)
+            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && content && Screen.width > 0)
             {
                 float aspectRatio = 1f * Screen.height / Screen.width;
-                float anchorTransition = Mathf.InverseLerp(_aspectRatioMin, _aspectRatioMax, aspectRatio);
-                Vector2 minAnchor = Vector2.Lerp(_aspectRatioMinAnchorMin, _aspectRatioMaxAnchorMin, anchorTransition);
-                Vector2 maxAnchor = Vector2.Lerp(_aspectRatioMinAnchorMax, _aspectRatioMaxAnchorMax, anchorTransition);
-                _content.anchorMin = minAnchor;
-                _content.anchorMax = maxAnchor;
-                _content.anchoredPosition = Vector2.zero;
+                float anchorTransition = Mathf.InverseLerp(aspectRatioMin, aspectRatioMax, aspectRatio);
+                Vector2 minAnchor = Vector2.Lerp(aspectRatioMinAnchorMin, aspectRatioMaxAnchorMin, anchorTransition);
+                Vector2 maxAnchor = Vector2.Lerp(aspectRatioMinAnchorMax, aspectRatioMaxAnchorMax, anchorTransition);
+                content.anchorMin = minAnchor;
+                content.anchorMax = maxAnchor;
+                content.anchoredPosition = Vector2.zero;
             }
         }
     }

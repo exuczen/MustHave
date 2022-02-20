@@ -10,23 +10,23 @@ namespace MustHave.UI
     public class ContentGridLayoutGroupFitter : UIBehaviour
     {
         [SerializeField]
-        private RectTransform _content = default;
+        private RectTransform content = default;
         [SerializeField]
-        private GridLayoutGroup _gridLayout = default;
+        private GridLayoutGroup gridLayout = default;
         [SerializeField, Range(0f, 1f)]
-        private float _spacingNormalizedX = default;
+        private float spacingNormalizedX = default;
         [SerializeField, Range(0f, 1f)]
-        private float _spacingNormalizedY = default;
+        private float spacingNormalizedY = default;
         [SerializeField, Range(0f, 1f)]
-        private float _paddingNormalizedLeft = default;
+        private float paddingNormalizedLeft = default;
         [SerializeField, Range(0f, 1f)]
-        private float _paddingNormalizedRight = default;
+        private float paddingNormalizedRight = default;
         [SerializeField, Range(0f, 1f)]
-        private float _paddingNormalizedTop = default;
+        private float paddingNormalizedTop = default;
         [SerializeField, Range(0f, 1f)]
-        private float _paddingNormalizedBottom = default;
+        private float paddingNormalizedBottom = default;
         [SerializeField, Range(0f, 5f), Tooltip("height / width")]
-        private float _cellSizeAspectRatio = 1f;
+        private float cellSizeAspectRatio = 1f;
 
         protected override void OnEnable()
         {
@@ -42,26 +42,26 @@ namespace MustHave.UI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && _gridLayout)
+            if (!EditorApplicationUtils.IsCompilingOrUpdating && enabled && gridLayout)
             {
-                RectTransform gridRectTransform = _gridLayout.transform as RectTransform;
-                switch (_gridLayout.constraint)
+                RectTransform gridRectTransform = gridLayout.transform as RectTransform;
+                switch (gridLayout.constraint)
                 {
                     case GridLayoutGroup.Constraint.Flexible:
                         throw new NotImplementedException();
                     case GridLayoutGroup.Constraint.FixedColumnCount:
-                        int colCount = _gridLayout.constraintCount;
-                        int rowCount = _gridLayout.transform.childCount / colCount;
-                        float cellWidth = _content.rect.width / (colCount + _paddingNormalizedLeft + _paddingNormalizedRight + _spacingNormalizedX * (colCount - 1));
-                        float cellHeight = cellWidth * _cellSizeAspectRatio;
+                        int colCount = gridLayout.constraintCount;
+                        int rowCount = gridLayout.transform.childCount / colCount;
+                        float cellWidth = content.rect.width / (colCount + paddingNormalizedLeft + paddingNormalizedRight + spacingNormalizedX * (colCount - 1));
+                        float cellHeight = cellWidth * cellSizeAspectRatio;
                         float gridHeightTrimmed = cellHeight * rowCount;
-                        _gridLayout.cellSize = new Vector2(cellWidth, cellHeight);
-                        _gridLayout.spacing = new Vector2(_spacingNormalizedX * cellWidth, _spacingNormalizedY * cellHeight);
-                        _gridLayout.padding.left = (int)(_paddingNormalizedLeft * cellWidth);
-                        _gridLayout.padding.right = (int)(_paddingNormalizedRight * cellWidth);
-                        _gridLayout.padding.top = (int)(_paddingNormalizedTop * cellHeight);
-                        _gridLayout.padding.bottom = (int)(_paddingNormalizedBottom * cellHeight);
-                        float gridHeight = rowCount * cellHeight + _gridLayout.padding.top + _gridLayout.padding.bottom + _gridLayout.spacing.y * (rowCount - 1);
+                        gridLayout.cellSize = new Vector2(cellWidth, cellHeight);
+                        gridLayout.spacing = new Vector2(spacingNormalizedX * cellWidth, spacingNormalizedY * cellHeight);
+                        gridLayout.padding.left = (int)(paddingNormalizedLeft * cellWidth);
+                        gridLayout.padding.right = (int)(paddingNormalizedRight * cellWidth);
+                        gridLayout.padding.top = (int)(paddingNormalizedTop * cellHeight);
+                        gridLayout.padding.bottom = (int)(paddingNormalizedBottom * cellHeight);
+                        float gridHeight = rowCount * cellHeight + gridLayout.padding.top + gridLayout.padding.bottom + gridLayout.spacing.y * (rowCount - 1);
                         gridRectTransform.sizeDelta = new Vector2(gridRectTransform.sizeDelta.x, gridHeight);
                         break;
                     case GridLayoutGroup.Constraint.FixedRowCount:
