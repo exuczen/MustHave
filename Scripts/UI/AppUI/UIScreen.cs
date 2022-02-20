@@ -1,38 +1,34 @@
 ﻿//#define DEBUG_OFFSETS
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using MustHave.Utils;
-using MustHave.UI;
 
 namespace MustHave.UI
 {
     [ExecuteInEditMode]
     public class UIScreen : UIBehaviour
     {
-        const float IOS_STATUS_BAR_HEIGHT_IN_INCHES = 0.1575f; // = 0.4[cm]/2.54[cm/inch]
+        public const float IOS_STATUS_BAR_HEIGHT_IN_INCHES = 0.1575f; // = 0.4[cm]/2.54[cm/inch]
 
         [SerializeField, Range(0f, 1f)]
-        private float _canvasMatchAspectRatio = 1f;
+        private float canvasMatchAspectRatio = 1f;
         [SerializeField]
-        private bool _setHeaderBackground = default;
-        [SerializeField, ConditionalHide("_setHeaderBackground", true)]
-        private Image _headerBackground = default;
+        private bool setHeaderBackground = default;
+        [SerializeField, ConditionalHide("setHeaderBackground", true)]
+        private Image headerBackground = default;
 
-        private UICanvas _canvas = default;
-        private CanvasScaler _canvasScaler = default;
-        private Canvas _parentCanvas = default;
-        private RectTransform _rectTransform = default;
+        private UICanvas canvas = default;
+        private CanvasScaler canvasScaler = default;
+        private Canvas parentCanvas = default;
+        private RectTransform rectTransform = default;
 
-        public UICanvas Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<UICanvas>());
-        public CanvasScaler CanvasScaler { get => _canvasScaler ?? (_canvasScaler = transform.GetComponentInParents<CanvasScaler>()); }
-        public Canvas ParentCanvas => _parentCanvas ?? (_parentCanvas = transform.GetComponentInParents<Canvas>());
-        public RectTransform RectTransform { get => _rectTransform ?? (_rectTransform = transform as RectTransform); }
-        public bool SetHeaderBackground { get => _setHeaderBackground; }
+        public UICanvas Canvas => canvas != null ? canvas : (canvas = transform.GetComponentInParents<UICanvas>());
+        public CanvasScaler CanvasScaler => canvasScaler != null ? canvasScaler : (canvasScaler = transform.GetComponentInParents<CanvasScaler>());
+        public Canvas ParentCanvas => parentCanvas != null ? parentCanvas : (parentCanvas = transform.GetComponentInParents<Canvas>());
+        public RectTransform RectTransform => rectTransform != null ? rectTransform : (rectTransform = transform as RectTransform);
+        public bool SetHeaderBackground => setHeaderBackground;
 
         protected override void Awake()
         {
@@ -43,7 +39,7 @@ namespace MustHave.UI
         {
             if (EditorApplicationUtils.IsInEditMode && CanvasScaler)
             {
-                CanvasScaler.matchWidthOrHeight = _canvasMatchAspectRatio;
+                CanvasScaler.matchWidthOrHeight = canvasMatchAspectRatio;
             }
         }
 
@@ -53,8 +49,8 @@ namespace MustHave.UI
 
         public void ClearCanvasData()
         {
-            _canvas = null;
-            _canvasScaler = null;
+            canvas = null;
+            canvasScaler = null;
         }
 
         protected virtual void OnAwake() { }
@@ -79,10 +75,10 @@ namespace MustHave.UI
 
         public void ShowInParentCanvas(Canvas parentCanvas, UICanvas activeSceneCanvas)
         {
-            _parentCanvas = parentCanvas;
-            _parentCanvas.gameObject.SetActive(true);
-            _canvasScaler = parentCanvas.GetComponent<CanvasScaler>();
-            _canvasScaler.matchWidthOrHeight = _canvasMatchAspectRatio;
+            this.parentCanvas = parentCanvas;
+            this.parentCanvas.gameObject.SetActive(true);
+            canvasScaler = parentCanvas.GetComponent<CanvasScaler>();
+            canvasScaler.matchWidthOrHeight = canvasMatchAspectRatio;
             SetOffsetsInCanvas(parentCanvas);
             transform.SetParent(parentCanvas.transform, false);
             gameObject.SetActive(true);
@@ -95,7 +91,7 @@ namespace MustHave.UI
             {
                 SetOffsetsInCanvas(Canvas.Canvas);
                 Canvas.ActiveScreen = this;
-                CanvasScaler.matchWidthOrHeight = _canvasMatchAspectRatio;
+                CanvasScaler.matchWidthOrHeight = canvasMatchAspectRatio;
             }
             gameObject.SetActive(true);
             OnShow();
@@ -116,7 +112,7 @@ namespace MustHave.UI
 
         public void SetOffsetsInCanvas(Canvas canvas)
         {
-            if (_headerBackground)
+            if (headerBackground)
             {
 #if UNITY_IOS
             float topOffsetInInches = IOS_STATUS_BAR_HEIGHT_IN_INCHES;
@@ -139,7 +135,7 @@ namespace MustHave.UI
                     topOffest /= canvas.scaleFactor;
                     //Debug.Log(GetType() + ".SetOffsets: " + Screen.height + " " + Screen.currentResolution.height + " " + " " + CanvasScaler.scaleFactor.ToString("n2") + " " + canvas.scaleFactor.ToString("n2") + " " + Screen.dpi);
                     RectTransform.offsetMax = new Vector2(0f, -topOffest);
-                    _headerBackground.rectTransform.offsetMax = new Vector2(0f, topOffest);
+                    headerBackground.rectTransform.offsetMax = new Vector2(0f, topOffest);
                 }
             }
         }

@@ -1,20 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-namespace MustHave.UI
+﻿namespace MustHave.UI
 {
     public class ViewPage : UIScript
     {
-        private ViewPager _viewPager = default;
-
-        public ViewPager ViewPager { get => _viewPager; set => _viewPager = value; }
+        public ViewPager ViewPager { get; set; } = default;
 
         public T CreateInstance<T>(ViewPager viewPager) where T : ViewPage
         {
-            _viewPager = viewPager;
-            T viewPage = Instantiate(this, _viewPager.content, false) as T;
+            ViewPager = viewPager;
+            T viewPage = Instantiate(this, this.ViewPager.content, false) as T;
             return viewPage;
         }
     }

@@ -5,7 +5,7 @@ namespace MustHave.UI
 {
     public class UIScript : UIBehaviour
     {
-        public bool IsShown { get { return gameObject.activeSelf; } }
+        public bool IsShown => gameObject.activeSelf;
 
         public RectTransform RectTransform => transform as RectTransform;
 

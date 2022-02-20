@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using MustHave.Utils;
 
 namespace MustHave.UI
@@ -12,25 +9,24 @@ namespace MustHave.UI
     [RequireComponent(typeof(Canvas))]
     public class UICanvas : UIBehaviour
     {
-        [SerializeField] private bool _activeOnAppAwake = false;
-        [SerializeField] private AppMessageEvents _appMessages = default;
+        [SerializeField] private bool activeOnAppAwake = false;
+        [SerializeField] private AppMessageEvents appMessages = default;
 
-        [SerializeField] private RectTransform _topLayer = default;
+        [SerializeField] private RectTransform topLayer = default;
 
-        private Dictionary<Type, UIScreen> _screensDict = new Dictionary<Type, UIScreen>();
-        private string _sceneName = default;
-        private AlertPopup _alertPopup = default;
-        private ProgressSpinnerPanel _progressSpinnerPanel = default;
-        private Canvas _canvas = default;
-        private UIScreen _activeScreen = default;
+        private readonly Dictionary<Type, UIScreen> screensDict = new Dictionary<Type, UIScreen>();
+        private string sceneName = default;
+        private AlertPopup alertPopup = default;
+        private ProgressSpinnerPanel progressSpinnerPanel = default;
+        private Canvas canvas = default;
 
-        public string SceneName { get => string.IsNullOrEmpty(_sceneName) ? (_sceneName = SceneUtils.ActiveSceneName) : _sceneName; }
-        public AlertPopup AlertPopup { get => _alertPopup; }
-        public ProgressSpinnerPanel ProgressSpinnerPanel { get => _progressSpinnerPanel; }
-        public Canvas Canvas { get => _canvas ?? (_canvas = GetComponent<Canvas>()); }
-        public UIScreen ActiveScreen { get => _activeScreen; set => _activeScreen = value; }
-        public RectTransform TopLayer { get => _topLayer; }
-        public bool ActiveOnAppAwake { get => _activeOnAppAwake; }
+        public string SceneName => string.IsNullOrEmpty(sceneName) ? (sceneName = SceneUtils.ActiveSceneName) : sceneName;
+        public AlertPopup AlertPopup => alertPopup;
+        public ProgressSpinnerPanel ProgressSpinnerPanel => progressSpinnerPanel;
+        public Canvas Canvas => canvas != null ? canvas : (canvas = GetComponent<Canvas>());
+        public UIScreen ActiveScreen { get; set; } = default;
+        public RectTransform TopLayer => topLayer;
+        public bool ActiveOnAppAwake => activeOnAppAwake;
 
         protected override void Awake()
         {
@@ -49,29 +45,29 @@ namespace MustHave.UI
 
         public void OnAppAwake()
         {
-            if (_activeOnAppAwake)
+            if (activeOnAppAwake)
             {
                 Show();
             }
-            OnAppAwake(_activeOnAppAwake);
+            OnAppAwake(activeOnAppAwake);
         }
 
         protected override void OnRectTransformDimensionsChange()
         {
             //List<ScreenScript> screens = _screensDict.Values.ToList();
             //ScreenScript activeScreen = screens.Find(screen => screen.gameObject.activeSelf);
-            if (_activeScreen)
+            if (ActiveScreen)
             {
-                _activeScreen.SetOffsetsInCanvas(Canvas);
-                _activeScreen.OnCanvasRectTransformDimensionsChange(Canvas);
+                ActiveScreen.SetOffsetsInCanvas(Canvas);
+                ActiveScreen.OnCanvasRectTransformDimensionsChange(Canvas);
             }
         }
 
         public void Init()
         {
-            _canvas = Canvas;
-            _sceneName = SceneName;
-            _screensDict.Clear();
+            canvas = Canvas;
+            sceneName = SceneName;
+            screensDict.Clear();
             //ScreenScript[] screens = GetComponentsInChildren<ScreenScript>();
             //foreach (var screen in screens)
             //{
@@ -82,7 +78,7 @@ namespace MustHave.UI
                 UIScreen screen = child.GetComponent<UIScreen>();
                 if (screen)
                 {
-                    _screensDict.Add(screen.GetType(), screen);
+                    screensDict.Add(screen.GetType(), screen);
                     screen.gameObject.SetActive(false);
                 }
             }
@@ -144,7 +140,7 @@ namespace MustHave.UI
             //    Debug.Log(GetType() + ".ShowScreen: " + kvp.Key);
             //}
             Type screenType = typeof(T);
-            if (_screensDict.TryGetValue(screenType, out UIScreen screen) && screen)
+            if (screensDict.TryGetValue(screenType, out UIScreen screen) && screen)
             {
                 ShowScreen(screen, keepOnStack, clearStack);
             }
@@ -157,7 +153,7 @@ namespace MustHave.UI
 
         public void ShowScreen(ScreenData screenData)
         {
-            _appMessages.ShowScreenMessage.Invoke(screenData);
+            appMessages.ShowScreenMessage.Invoke(screenData);
         }
 
         public UIScreen GetScreen(Type screenType)
@@ -167,7 +163,7 @@ namespace MustHave.UI
             //{
             //    Debug.Log(GetType() + ".GetScreen: _screensDict:" + item.Value);
             //}
-            if (_screensDict.TryGetValue(screenType, out UIScreen screen))
+            if (screensDict.TryGetValue(screenType, out UIScreen screen))
             {
                 return screen;
             }
@@ -182,26 +178,26 @@ namespace MustHave.UI
 
         public void BackToPrevScreen()
         {
-            _appMessages.BackToPrevScreenMessage.Invoke();
+            appMessages.BackToPrevScreenMessage.Invoke();
         }
 
         public void SetProgressSpinnerPanel(ProgressSpinnerPanel progressSpinnerPanel)
         {
-            _progressSpinnerPanel = progressSpinnerPanel;
-            if (_progressSpinnerPanel)
-                _progressSpinnerPanel.transform.SetParent(_topLayer, false);
+            this.progressSpinnerPanel = progressSpinnerPanel;
+            if (this.progressSpinnerPanel)
+                this.progressSpinnerPanel.transform.SetParent(topLayer, false);
         }
 
         public void SetAlertPopup(AlertPopup alertPopup)
         {
-            _alertPopup = alertPopup;
-            if (_alertPopup)
-                _alertPopup.transform.SetParent(_topLayer, false);
+            this.alertPopup = alertPopup;
+            if (this.alertPopup)
+                this.alertPopup.transform.SetParent(topLayer, false);
         }
 
         public void SetAlertPopup<T>()
         {
-            _appMessages.SetAlertPopupMessage.Invoke(typeof(T));
+            appMessages.SetAlertPopupMessage.Invoke(typeof(T));
         }
     }
 }

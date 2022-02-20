@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,24 +11,24 @@ namespace MustHave.UI
     [RequireComponent(typeof(Canvas))]
     public class AppUI : PersistentCanvas<AppUI>
     {
-        [SerializeField] private List<MessageEventGroup> _sceneMessageGroups = default;
-        [SerializeField] private AppMessageEvents _appMessages = default;
-        [SerializeField] private Image _screenshotImage = default;
-        [SerializeField] private AlertPopup _alertPopup = default;
-        [SerializeField] private ProgressSpinnerPanel _progressSpinnerPanel = default;
+        [SerializeField] private List<MessageEventGroup> sceneMessageGroups = default;
+        [SerializeField] private AppMessageEvents appMessages = default;
+        [SerializeField] private Image screenshotImage = default;
+        [SerializeField] private AlertPopup alertPopup = default;
+        [SerializeField] private ProgressSpinnerPanel progressSpinnerPanel = default;
 
-        private List<ScreenData> _screenDataStack = new List<ScreenData>();
-        private string _activeSceneName = default;
-        private UICanvas _activeCanvas = default;
-        private ScreenData _activeScreenData = default;
-        private ScreenData _loadingSceneScreenData = default;
-        private ISceneChangeListener _sceneChangeListener = default;
-        private float _sceneLoadingStartTime = -1f;
-        private Dictionary<Type, UIScreen> _screensDict = new Dictionary<Type, UIScreen>();
-        private AlertPopup _activeAlertPopup = default;
+        private readonly List<ScreenData> screenDataStack = new List<ScreenData>();
+        private readonly Dictionary<Type, UIScreen> screensDict = new Dictionary<Type, UIScreen>();
+        private string activeSceneName = default;
+        private UICanvas activeCanvas = default;
+        private ScreenData activeScreenData = default;
+        private ScreenData loadingSceneScreenData = default;
+        private ISceneChangeListener sceneChangeListener = default;
+        private float sceneLoadingStartTime = -1f;
+        private AlertPopup activeAlertPopup = default;
 
-        public AlertPopup ActiveAlertPopup { get => _activeAlertPopup; }
-        public ProgressSpinnerPanel ProgressSpinnerPanel { get => _progressSpinnerPanel; }
+        public AlertPopup ActiveAlertPopup => activeAlertPopup;
+        public ProgressSpinnerPanel ProgressSpinnerPanel => progressSpinnerPanel;
 
         protected override void OnAwake()
         {
@@ -40,12 +39,12 @@ namespace MustHave.UI
             //SceneManager.sceneUnloaded += OnSceneUnloaded;
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
-            _appMessages.Initialize();
-            _appMessages.ShowScreenMessage.AddListener(ShowScreen);
-            _appMessages.BackToPrevScreenMessage.AddListener(BackToPrevScreen);
-            _appMessages.SetAlertPopupMessage.AddListener(SetActiveAlertPopup);
+            appMessages.Initialize();
+            appMessages.ShowScreenMessage.AddListener(ShowScreen);
+            appMessages.BackToPrevScreenMessage.AddListener(BackToPrevScreen);
+            appMessages.SetAlertPopupMessage.AddListener(SetActiveAlertPopup);
 
-            _activeSceneName = activeScene.name;
+            activeSceneName = activeScene.name;
 
             AlertPopup[] alertPopups = GetComponentsInChildren<AlertPopup>(true);
             foreach (var popup in alertPopups)
@@ -53,24 +52,24 @@ namespace MustHave.UI
                 popup.Init(this);
                 popup.Hide();
             }
-            _activeAlertPopup = _alertPopup;
+            activeAlertPopup = alertPopup;
 
             foreach (Transform child in transform)
             {
                 UIScreen screen = child.GetComponent<UIScreen>();
                 if (screen)
                 {
-                    _screensDict.Add(screen.GetType(), screen);
+                    screensDict.Add(screen.GetType(), screen);
                     screen.gameObject.SetActive(false);
                 }
             }
 
             List<UICanvas> canvasList = SceneUtils.FindObjectsOfType<UICanvas>(true);
-            _activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
-            if (_activeCanvas)
+            activeCanvas = canvasList.Find(canvas => canvas.ActiveOnAppAwake);
+            if (activeCanvas)
             {
-                _activeCanvas.SetAlertPopup(_activeAlertPopup);
-                SetPersistentComponentsParent(_activeCanvas.TopLayer);
+                activeCanvas.SetAlertPopup(activeAlertPopup);
+                SetPersistentComponentsParent(activeCanvas.TopLayer);
             }
 
             foreach (var canvas in canvasList)
@@ -91,17 +90,17 @@ namespace MustHave.UI
 
         private void OnScenePreload(string sceneName)
         {
-            _sceneMessageGroups.ForEach(group => group.RemoveAllListeners());
+            sceneMessageGroups.ForEach(group => group.RemoveAllListeners());
 
             // Clear screen objects in stack
-            foreach (var screenData in _screenDataStack)
+            foreach (var screenData in screenDataStack)
             {
                 if (screenData.Screen)
                     screenData.Screen.ClearCanvasData();
                 screenData.Screen = null;
             }
-            _sceneChangeListener?.OnScenePreload(sceneName);
-            _sceneLoadingStartTime = Time.time;
+            sceneChangeListener?.OnScenePreload(sceneName);
+            sceneLoadingStartTime = Time.time;
         }
 
         private void OnSceneLoadingProgress(float progress)
@@ -110,12 +109,12 @@ namespace MustHave.UI
 
         private IEnumerator OnSceneLoadedRoutine(Scene scene)
         {
-            if (_loadingSceneScreenData != null)
+            if (loadingSceneScreenData != null)
             {
-                ScreenData loadedScreenData = _loadingSceneScreenData;
+                ScreenData loadedScreenData = loadingSceneScreenData;
                 SceneManager.SetActiveScene(scene);
-                _activeSceneName = scene.name;
-                _loadingSceneScreenData = null;
+                activeSceneName = scene.name;
+                loadingSceneScreenData = null;
                 List<UICanvas> canvasList = SceneUtils.FindObjectsOfType<UICanvas>(true);
                 foreach (var canvas in canvasList)
                 {
@@ -125,15 +124,15 @@ namespace MustHave.UI
                 void onEnd()
                 {
                     ShowScreen(loadedScreenData);
-                    _screenshotImage.gameObject.SetActive(false);
-                    _progressSpinnerPanel.Hide();
-                    _sceneLoadingStartTime = -1f;
+                    screenshotImage.gameObject.SetActive(false);
+                    progressSpinnerPanel.Hide();
+                    sceneLoadingStartTime = -1f;
                 }
-                if (_sceneChangeListener != null)
+                if (sceneChangeListener != null)
                 {
-                    float sceneLoadingDuration = _sceneLoadingStartTime > 0f ? Time.time - _sceneLoadingStartTime : 0f;
-                    yield return _sceneChangeListener?.OnSceneLoadedRoutine(scene, sceneLoadingDuration, onEnd);
-                    _sceneChangeListener = null;
+                    float sceneLoadingDuration = sceneLoadingStartTime > 0f ? Time.time - sceneLoadingStartTime : 0f;
+                    yield return sceneChangeListener?.OnSceneLoadedRoutine(scene, sceneLoadingDuration, onEnd);
+                    sceneChangeListener = null;
                 }
                 else
                 {
@@ -151,35 +150,39 @@ namespace MustHave.UI
         private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
         {
             //Debug.Log(GetType() + ".OnActiveSceneChanged: from " + oldScene.name + " to " + newScene.name);
-            _activeSceneName = newScene.name;
+            activeSceneName = newScene.name;
         }
 
         private IEnumerator OnSceneCloseRoutine(Action onSuccess)
         {
             SetPersistentComponentsParent(transform);
-            if (_activeCanvas && _activeScreenData != null && _activeScreenData.Screen)
+            if (activeCanvas && activeScreenData != null && activeScreenData.Screen)
             {
-                _activeAlertPopup = _alertPopup;
+                activeAlertPopup = alertPopup;
                 bool showProgressSpinner = true;
-                _sceneChangeListener?.OnSceneClose(_activeSceneName, out showProgressSpinner);
-                _activeCanvas.StopAllCoroutines();
-                _activeScreenData.Screen.gameObject.SetActive(true);
+                sceneChangeListener?.OnSceneClose(activeSceneName, out showProgressSpinner);
+                activeCanvas.StopAllCoroutines();
+                activeScreenData.Screen.gameObject.SetActive(true);
                 // Take and show screenshot
                 yield return new WaitForEndOfFrame();
                 Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture();
-                _screenshotImage.sprite = TextureUtils.CreateSpriteFromTexture(texture);
-                _screenshotImage.gameObject.SetActive(true);
+                screenshotImage.sprite = TextureUtils.CreateSpriteFromTexture(texture);
+                screenshotImage.gameObject.SetActive(true);
                 if (showProgressSpinner)
-                    _progressSpinnerPanel.Show();
-                _activeScreenData.Screen.Hide();
-                _activeCanvas.Hide();
+                {
+                    progressSpinnerPanel.Show();
+                }
+                activeScreenData.Screen.Hide();
+                activeCanvas.Hide();
                 // Clear data
-                _activeSceneName = null;
-                _activeCanvas = null;
-                _activeScreenData = null;
+                activeSceneName = null;
+                activeCanvas = null;
+                activeScreenData = null;
                 // Invoke callback
                 if (onSuccess != null)
+                {
                     onSuccess.Invoke();
+                }
             }
         }
 
@@ -190,24 +193,24 @@ namespace MustHave.UI
 
         private void ShowScreen(ScreenData screenData)
         {
-            if (/*SceneUtils.IsLoadingScene || */string.IsNullOrEmpty(_activeSceneName))
+            if (/*SceneUtils.IsLoadingScene || */string.IsNullOrEmpty(activeSceneName))
             {
                 return;
             }
 
-            if (_activeScreenData != null)
+            if (activeScreenData != null)
             {
-                if (_activeScreenData.Screen == screenData.Screen)
+                if (activeScreenData.Screen == screenData.Screen)
                 {
                     return;
                 }
-                else if (_activeScreenData.KeepOnStack)
+                else if (activeScreenData.KeepOnStack)
                 {
-                    _screenDataStack.Add(_activeScreenData);
+                    screenDataStack.Add(activeScreenData);
                 }
-                if (_activeScreenData.Screen && _activeSceneName.Equals(screenData.SceneName))
+                if (activeScreenData.Screen && activeSceneName.Equals(screenData.SceneName))
                 {
-                    _activeScreenData.Screen.Hide();
+                    activeScreenData.Screen.Hide();
                 }
             }
 
@@ -215,26 +218,26 @@ namespace MustHave.UI
             {
                 if (screenData.ClearStack)
                 {
-                    _screenDataStack.Clear();
+                    screenDataStack.Clear();
                 }
                 else
                 {
-                    int screenIndexInStack = _screenDataStack.FindIndex(data => data.ScreenType == screenData.ScreenType);
+                    int screenIndexInStack = screenDataStack.FindIndex(data => data.ScreenType == screenData.ScreenType);
                     //_screenDataStack.Select(data => data.ScreenType).ToList().Print(".ShowScreen: AppUI.stack: ");
                     if (screenIndexInStack >= 0)
                     {
-                        _screenDataStack.RemoveRange(screenIndexInStack, _screenDataStack.Count - screenIndexInStack);
+                        screenDataStack.RemoveRange(screenIndexInStack, screenDataStack.Count - screenIndexInStack);
                     }
                 }
 
                 if (screenData.CanvasType == this.GetType())
                 {
-                    UIScreen screen = screenData.Screen ?? GetScreen(screenData.ScreenType);
+                    UIScreen screen = screenData.Screen != null ? screenData.Screen : GetScreen(screenData.ScreenType);
                     if (screen)
                     {
-                        _sceneChangeListener = screen.GetComponent<ISceneChangeListener>();
-                        _activeCanvas.Hide();
-                        screen.ShowInParentCanvas(GetComponent<Canvas>(), _activeCanvas);
+                        sceneChangeListener = screen.GetComponent<ISceneChangeListener>();
+                        activeCanvas.Hide();
+                        screen.ShowInParentCanvas(GetComponent<Canvas>(), activeCanvas);
                     }
                 }
                 else
@@ -242,43 +245,43 @@ namespace MustHave.UI
                     UIScreen screen = screenData.Screen;
                     //Debug.Log(GetType() + ".ShowScreen: " + screenData.CanvasType + "." + screenData.ScreenType + " " + screen);
 
-                    _progressSpinnerPanel.transform.SetParent(transform, false);
-                    _activeAlertPopup.transform.SetParent(transform, false);
+                    progressSpinnerPanel.transform.SetParent(transform, false);
+                    activeAlertPopup.transform.SetParent(transform, false);
 
-                    if (!_activeSceneName.Equals(screenData.SceneName))
+                    if (!activeSceneName.Equals(screenData.SceneName))
                     {
                         //Debug.Log(GetType() + ".ShowScreen: load new scene " + screenData.SceneName + " from " + _activeScreenData.ScreenType);
                         OnSceneClose(() => {
-                            _loadingSceneScreenData = screenData;
+                            loadingSceneScreenData = screenData;
                             SceneUtils.LoadSceneAsync(this, screenData.SceneName, LoadSceneMode.Single, OnScenePreload);
                         });
                         return;
                     }
-                    else if (_activeCanvas && _activeCanvas.GetType() != screenData.CanvasType)
+                    else if (activeCanvas && activeCanvas.GetType() != screenData.CanvasType)
                     {
                         // Hide old canvas
-                        _activeCanvas.StopAllCoroutines();
-                        _activeCanvas.SetProgressSpinnerPanel(null);
-                        _activeCanvas.SetAlertPopup(null);
-                        _activeCanvas.Hide();
+                        activeCanvas.StopAllCoroutines();
+                        activeCanvas.SetProgressSpinnerPanel(null);
+                        activeCanvas.SetAlertPopup(null);
+                        activeCanvas.Hide();
                     }
 
                     if (screen && screen.Canvas)
                     {
-                        _activeCanvas = screen.Canvas;
+                        activeCanvas = screen.Canvas;
                     }
                     else
                     {
-                        _activeCanvas = FindCanvasInActiveScene(screenData.CanvasType);
-                        SetPersistentComponentsParent(_activeCanvas.TopLayer);
-                        screen = screen ?? _activeCanvas.GetScreen(screenData.ScreenType);
+                        activeCanvas = FindCanvasInActiveScene(screenData.CanvasType);
+                        SetPersistentComponentsParent(activeCanvas.TopLayer);
+                        screen = screen != null ? screen : activeCanvas.GetScreen(screenData.ScreenType);
                         //Debug.Log(GetType() + ".ShowScreen: found screen: " + screen + " " + screen.Canvas);
                         screenData = new ScreenData(screen, screenData.KeepOnStack, screenData.ClearStack);
                     }
-                    _activeScreenData = screenData;
-                    _activeCanvas.SetProgressSpinnerPanel(_progressSpinnerPanel);
-                    _activeCanvas.SetAlertPopup(_activeAlertPopup);
-                    _activeCanvas.Show();
+                    activeScreenData = screenData;
+                    activeCanvas.SetProgressSpinnerPanel(progressSpinnerPanel);
+                    activeCanvas.SetAlertPopup(activeAlertPopup);
+                    activeCanvas.Show();
                     screen.Show();
                 }
             }
@@ -286,7 +289,7 @@ namespace MustHave.UI
 
         public UIScreen GetScreen(Type screenType)
         {
-            if (_screensDict.TryGetValue(screenType, out UIScreen screen))
+            if (screensDict.TryGetValue(screenType, out UIScreen screen))
             {
                 return screen;
             }
@@ -302,40 +305,50 @@ namespace MustHave.UI
         private void SetAppCanvasRenderMode(RenderMode renderMode)
         {
             Canvas appCanvas = GetComponent<Canvas>();
-            appCanvas?.SetRenderMode(renderMode);
+            if (appCanvas)
+            {
+                appCanvas.SetRenderMode(renderMode);
+            }
         }
 
         private void SetActiveAlertPopup(Type type)
         {
-            _activeAlertPopup = (_activeCanvas?.TopLayer.GetComponentInChildren(type, true) ?? transform.GetComponentInChildren(type, true)) as AlertPopup;
-            //Debug.Log(GetType() + ".SetActiveAlertPopup: _activeAlertPopup=" + _activeAlertPopup + " _activeCanvas=" + _activeCanvas);
-            if (_activeAlertPopup && _activeCanvas)
+            if (activeCanvas)
             {
-                _activeCanvas.SetAlertPopup(_activeAlertPopup);
+                activeAlertPopup = activeCanvas.TopLayer.GetComponentInChildren(type, true) as AlertPopup;
+            }
+            if (!activeAlertPopup)
+            {
+                activeAlertPopup = transform.GetComponentInChildren(type, true) as AlertPopup;
+            }
+            //Debug.Log(GetType() + ".SetActiveAlertPopup: _activeAlertPopup=" + _activeAlertPopup + " _activeCanvas=" + _activeCanvas);
+            if (activeAlertPopup && activeCanvas)
+            {
+                activeCanvas.SetAlertPopup(activeAlertPopup);
             }
         }
 
         private void BackToPrevScreen()
         {
-            if (_screenDataStack.Count > 0)
+            if (screenDataStack.Count > 0)
             {
-                if (_activeScreenData != null)
+                if (activeScreenData != null)
                 {
-                    _activeScreenData.KeepOnStack = false;
+                    activeScreenData.KeepOnStack = false;
                 }
-                ShowScreen(_screenDataStack.PickLastElement());
+                ShowScreen(screenDataStack.PickLastElement());
             }
             else
             {
 #if UNITY_ANDROID || UNITY_EDITOR || UNITY_STANDALONE
-                _activeAlertPopup.ShowQuitWarning();
+                activeAlertPopup.ShowQuitWarning();
 #endif
             }
         }
 
         public void HACKAddScreenDataToScreenStack<T1, T2>(string sceneName) where T1 : UIScreen where T2 : UICanvas
         {
-            _screenDataStack.Add(new ScreenData(typeof(T1), typeof(T2), sceneName));
+            screenDataStack.Add(new ScreenData(typeof(T1), typeof(T2), sceneName));
         }
 
 #if UNITY_ANDROID || UNITY_EDITOR || UNITY_STANDALONE
@@ -343,11 +356,11 @@ namespace MustHave.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (_activeAlertPopup.IsShown)
+                if (activeAlertPopup.IsShown)
                 {
-                    _activeAlertPopup.OnDismissButtonClick();
+                    activeAlertPopup.OnDismissButtonClick();
                 }
-                else if (_activeScreenData != null && _activeScreenData.Screen && _activeScreenData.Screen.OnBack())
+                else if (activeScreenData != null && activeScreenData.Screen && activeScreenData.Screen.OnBack())
                 {
                     BackToPrevScreen();
                 }

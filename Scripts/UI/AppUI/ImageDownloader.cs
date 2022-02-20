@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,27 +23,27 @@ namespace MustHave.UI
     [RequireComponent(typeof(Image))]
     public class ImageDownloader : MonoBehaviour
     {
-        [SerializeField] private Animator _progressSpinner = default;
+        [SerializeField] private Animator progressSpinner = default;
 
-        private Image _image = default;
-        private UICanvas _canvas = default;
+        private Image image = default;
+        private UICanvas canvas = default;
 
-        public Image Image => _image ?? (_image = GetComponent<Image>());
-        private UICanvas Canvas => _canvas ?? (_canvas = transform.GetComponentInParents<UICanvas>());
+        public Image Image => image != null ? image : (image = GetComponent<Image>());
+        private UICanvas Canvas => canvas != null ? canvas : (canvas = transform.GetComponentInParents<UICanvas>());
         public RectTransform RectTransform => transform as RectTransform;
 
         public void DownloadOrLoadImage(ImageDownloadFormat format, string imageURL, string appDataFolderName, float loadingColorAlpha, Action onSuccess = null)
         {
             if (!string.IsNullOrEmpty(imageURL) && !string.IsNullOrEmpty(appDataFolderName))
             {
-                _progressSpinner.gameObject.SetActive(true);
+                progressSpinner.gameObject.SetActive(true);
                 Image image = Image;
                 image.sprite = null;
                 image.color = ColorUtils.ColorWithAlpha(image.color, loadingColorAlpha);
                 void onEnd()
                 {
                     image.color = ColorUtils.ColorWithAlpha(image.color, 1f);
-                    _progressSpinner.gameObject.SetActive(false);
+                    progressSpinner.gameObject.SetActive(false);
                     onSuccess?.Invoke();
                 }
                 switch (format)
@@ -95,7 +94,7 @@ namespace MustHave.UI
         {
             Texture2D texture = Texture2DExt.CreateTexture2DFromWebP(bytes, lMipmaps: true, lLinear: true, lError: out Error lError);
             if (lError == Error.Success)
-                _image.sprite = TextureUtils.CreateSpriteFromTexture(texture);
+                image.sprite = TextureUtils.CreateSpriteFromTexture(texture);
             else
                 Debug.LogError(GetType() + ".LoadTextureFromWebP: WebP Load Error : " + lError.ToString());
         }

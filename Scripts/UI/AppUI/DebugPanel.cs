@@ -5,16 +5,16 @@ namespace MustHave.UI
 {
     public class DebugPanel : UIScript
     {
-        [SerializeField] private Text _fpsText = default;
-        [SerializeField] private Text _debugText = default;
+        [SerializeField] private Text fpsText = default;
+        [SerializeField] private Text debugText = default;
 
-        private float _fps = default;
+        private float fps = default;
 
-        public string DebugText { set { _debugText.text = value; } }
+        public string DebugText { set { debugText.text = value; } }
 
         public void SetDebugText(string text)
         {
-            _debugText.text = text;
+            debugText.text = text;
         }
 
         private void Update()
@@ -22,8 +22,8 @@ namespace MustHave.UI
             float unscaledDeltaTime = Time.unscaledDeltaTime;
             if (unscaledDeltaTime > 0f)
             {
-                _fps = Mathf.Lerp(_fps, 1f / unscaledDeltaTime, 2f * unscaledDeltaTime);
-                _fpsText.text = "FPS: " + _fps.ToString("F2");
+                fps = Mathf.Lerp(fps, 1f / unscaledDeltaTime, 2f * unscaledDeltaTime);
+                fpsText.text = "FPS: " + fps.ToString("F2");
             }
         }
     }
