@@ -15,7 +15,7 @@ namespace MustHave
         {
             this.center = center;
             this.size = size;
-            extents = size / 2f;
+            extents = size * 0.5f;
             min = center - extents;
             max = center + extents;
         }
@@ -25,7 +25,7 @@ namespace MustHave
             get { return size; }
             set {
                 size = value;
-                extents = size / 2f;
+                extents = size * 0.5f;
                 min = center - extents;
                 max = center + extents;
             }
@@ -36,7 +36,7 @@ namespace MustHave
             get { return extents; }
             set {
                 extents = value;
-                size = extents * 2f;
+                size = extents * 0.5f;
                 min = center - extents;
                 max = center + extents;
             }
@@ -58,7 +58,7 @@ namespace MustHave
             set {
                 min = value;
                 size = max - min;
-                extents = size / 2f;
+                extents = size * 0.5f;
                 center = min + extents;
             }
         }
@@ -69,8 +69,8 @@ namespace MustHave
             set {
                 max = value;
                 size = max - min;
-                extents = size / 2f;
-                center = max - extents;
+                extents = size * 0.5f;
+                center = min + extents;
             }
         }
 
@@ -79,8 +79,8 @@ namespace MustHave
             this.min = min;
             this.max = max;
             size = max - min;
-            extents = size / 2f;
-            center = max - extents;
+            extents = size * 0.5f;
+            center = min + extents;
         }
 
         public bool Contains(Vector2 pos)
