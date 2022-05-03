@@ -9,11 +9,11 @@ namespace MustHave
         private Vector2Int min;
         private Vector2Int max;
 
-        public Bounds2Int(Vector2Int min, Vector2Int size)
+        public Bounds2Int(Vector2Int min, Vector2Int max)
         {
             this.min = min;
-            this.max = min + size - Vector2Int.one;
-            this.size = size;
+            this.max = max;
+            size = max - min + Vector2Int.one;
         }
 
         public Vector2Int Size

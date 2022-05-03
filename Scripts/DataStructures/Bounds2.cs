@@ -11,6 +11,13 @@ namespace MustHave
         private Vector2 min;
         private Vector2 max;
 
+        public static Bounds2 MinMax(Vector2 min, Vector2 max)
+        {
+            Bounds2 bounds = new Bounds2();
+            bounds.SetMinMax(min, max);
+            return bounds;
+        }
+
         public Bounds2(Vector2 center, Vector2 size)
         {
             this.center = center;
