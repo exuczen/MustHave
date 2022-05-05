@@ -11,6 +11,21 @@ namespace MustHave
         private Vector2 min;
         private Vector2 max;
 
+        public static implicit operator Bounds(Bounds2 bounds)
+        {
+            return new Bounds(bounds.center, bounds.size);
+        }
+
+        public static implicit operator Bounds2(Bounds bounds)
+        {
+            return new Bounds2(bounds.center, bounds.size);
+        }
+
+        public static Bounds2 BoundsToBounds2(Bounds bounds)
+        {
+            return new Bounds2(bounds.center, bounds.size);
+        }
+
         public static Bounds2 MinMax(Vector2 min, Vector2 max)
         {
             Bounds2 bounds = new Bounds2();
@@ -105,11 +120,6 @@ namespace MustHave
         public override string ToString()
         {
             return "center:" + center + " extents:" + extents;
-        }
-
-        public static Bounds2 BoundsToBounds2(Bounds bounds)
-        {
-            return new Bounds2(bounds.center, bounds.size);
         }
     }
 }
