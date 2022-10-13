@@ -86,7 +86,11 @@ namespace MustHave.Utils
             ScaleByDrawToRenderTexture(tex, width, height, mode);
 
             // Update new texture
+#if UNITY_2021_1_OR_NEWER
+            tex.Reinitialize(width, height);
+#else
             tex.Resize(width, height);
+#endif
             tex.ReadPixels(texR, 0, 0, true);
             tex.Apply(true);    //Remove this if you hate us applying textures for you :)
         }
@@ -105,7 +109,11 @@ namespace MustHave.Utils
 
             //Get rendered data back to a new texture
             Texture2D result = new Texture2D(width, height, TextureFormat.ARGB32, true);
+#if UNITY_2021_1_OR_NEWER
+            result.Reinitialize(width, height);
+#else
             result.Resize(width, height);
+#endif
             result.ReadPixels(texR, 0, 0, true);
             return result;
         }
