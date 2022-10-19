@@ -1,12 +1,23 @@
-﻿using UnityEditor;
+﻿using System;
+using System.Reflection;
+using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
+using UnityEditorInternal;
 using UnityEngine.SceneManagement;
 
 namespace MustHave
 {
     public struct EditorUtils
     {
+        public static string[] GetSortingLayerNames()
+        {
+            Type internalEditorUtilityType = typeof(InternalEditorUtility);
+            PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
+            var sortingLayers = (string[])sortingLayersProperty.GetValue(null, new object[0]);
+            return sortingLayers;
+        }
+
         public static bool SetDirtyOnEndChangeCheck(UnityEngine.Object target)
         {
             if (EditorGUI.EndChangeCheck())
