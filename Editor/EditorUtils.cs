@@ -11,10 +11,22 @@ namespace MustHave
         {
             if (EditorGUI.EndChangeCheck())
             {
-                SetSceneOrPrefabDirty(target);
+                SetSceneOrObjectDirty(target);
                 return true;
             }
             return false;
+        }
+
+        public static void SetSceneOrObjectDirty(UnityEngine.Object target)
+        {
+            if (target)
+            {
+                EditorUtility.SetDirty(target);
+            }
+            else
+            {
+                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            }
         }
 
         public static void SetSceneOrPrefabDirty(UnityEngine.Object target)
