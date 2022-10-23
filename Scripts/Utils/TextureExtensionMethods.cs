@@ -4,6 +4,14 @@ namespace MustHave.Utils
 {
     public static class TextureExtensionMethods
     {
+        public static void Clear(this RenderTexture renderTexture)
+        {
+            RenderTexture rt = RenderTexture.active;
+            RenderTexture.active = renderTexture;
+            GL.Clear(true, true, Color.clear);
+            RenderTexture.active = rt;
+        }
+
         public static Texture2D ToTexture2D(this RenderTexture renderTexture, TextureFormat textureFormat, bool destroyRenderTexture)
         {
             Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, textureFormat, false);
