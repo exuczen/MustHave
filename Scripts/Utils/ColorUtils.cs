@@ -5,6 +5,15 @@ namespace MustHave.Utils
 {
     public struct ColorUtils
     {
+        public static Color32 ColorFromARGB(int argb)
+        {
+            byte b = (byte)(argb & 0xff);
+            byte g = (byte)((argb >> 8) & 0xff);
+            byte r = (byte)((argb >> 16) & 0xff);
+            byte a = (byte)((argb >> 24) & 0xff);
+            return new Color32(r, g, b, a);
+        }
+
         public static Color ColorWithAlpha(Color color, float alpha)
         {
             color.a = alpha;
@@ -46,5 +55,5 @@ namespace MustHave.Utils
             ColorUtility.TryParseHtmlString(hex, out color);
             return color;
         }
-    } 
+    }
 }
