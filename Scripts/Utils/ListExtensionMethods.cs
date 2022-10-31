@@ -77,9 +77,7 @@ namespace MustHave.Utils
                 int listIEnd = listI[listI.Count - 1];
                 if (listIEnd < listIBeg)
                 {
-                    int temp = listIBeg;
-                    listIBeg = listIEnd;
-                    listIEnd = temp;
+                    (listIEnd, listIBeg) = (listIBeg, listIEnd);
                 }
                 for (int j = i + 1; j < lists.Count; j++)
                 {
@@ -88,9 +86,7 @@ namespace MustHave.Utils
                     int listJEnd = listJ[listJ.Count - 1];
                     if (listJEnd < listJBeg)
                     {
-                        int temp = listJBeg;
-                        listJBeg = listJEnd;
-                        listJEnd = temp;
+                        (listJEnd, listJBeg) = (listJBeg, listJEnd);
                     }
                     if ((listJBeg >= listIBeg && listJBeg <= listIEnd) ||
                         (listJEnd >= listIBeg && listJEnd <= listIEnd))
