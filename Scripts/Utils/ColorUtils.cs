@@ -7,10 +7,10 @@ namespace MustHave.Utils
     {
         public static Color32 ColorFromARGB(int argb)
         {
-            byte b = (byte)(argb & 0xff);
-            byte g = (byte)((argb >> 8) & 0xff);
-            byte r = (byte)((argb >> 16) & 0xff);
-            byte a = (byte)((argb >> 24) & 0xff);
+            byte b = (byte)(argb >>= 0 & 0xff);
+            byte g = (byte)(argb >>= 8 & 0xff);
+            byte r = (byte)(argb >>= 8 & 0xff);
+            byte a = (byte)(argb >>= 8 & 0xff);
             return new Color32(r, g, b, a);
         }
 
