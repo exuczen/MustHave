@@ -5,7 +5,7 @@ namespace MustHave.Utils
 {
     public struct ColorUtils
     {
-        public static Color32 ColorFromARGB(int argb)
+        public static Color32 Color32FromARGB(int argb)
         {
             byte b = (byte)(argb >>= 0 & 0xff);
             byte g = (byte)(argb >>= 8 & 0xff);
@@ -49,10 +49,11 @@ namespace MustHave.Utils
 
         public static Color HexToColor(string hex)
         {
-            Color color = Color.white;
             if (!hex.StartsWith("#"))
+            {
                 hex = string.Concat("#", hex);
-            ColorUtility.TryParseHtmlString(hex, out color);
+            }
+            ColorUtility.TryParseHtmlString(hex, out var color);
             return color;
         }
     }
