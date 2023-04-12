@@ -17,27 +17,14 @@ namespace MustHave.Utils
 
         public static List<int> CreateIntRange(int beg, int end)
         {
-            List<int> list = new List<int>();
-            if (end >= beg)
-            {
-                for (int i = beg; i <= end; i++)
-                {
-                    list.Add(i);
-                }
-            }
-            else
-            {
-                for (int i = beg; i >= end; i--)
-                {
-                    list.Add(i);
-                }
-            }
+            var list = new List<int>();
+            list.AddIntRangeBegEnd(beg, end);
             return list;
         }
 
         public static List<int> CreateIntList(int beg, int count)
         {
-            List<int> list = new List<int>();
+            var list = new List<int>();
             list.AddIntRange(beg, count);
             return list;
         }

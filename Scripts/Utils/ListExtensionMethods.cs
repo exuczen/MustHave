@@ -124,19 +124,19 @@ namespace MustHave.Utils
 
         public static T GetRandomElementInRange<T>(this List<T> list, int min, int max)
         {
-            int randIndex = UnityEngine.Random.Range(Mathf.Clamp(min, 0, list.Count), Mathf.Clamp(max, 0, list.Count));
+            int randIndex = Random.Range(Mathf.Clamp(min, 0, list.Count), Mathf.Clamp(max, 0, list.Count));
             return list[randIndex];
         }
 
         public static T GetRandomElement<T>(this List<T> list)
         {
-            int randIndex = UnityEngine.Random.Range(0, list.Count);
+            int randIndex = Random.Range(0, list.Count);
             return list[randIndex];
         }
 
         public static T PickRandomElement<T>(this List<T> list)
         {
-            int randIndex = UnityEngine.Random.Range(0, list.Count);
+            int randIndex = Random.Range(0, list.Count);
             T element = list[randIndex];
             list.RemoveAt(randIndex);
             return element;
@@ -176,6 +176,24 @@ namespace MustHave.Utils
             for (int i = beg; i < end; i++)
             {
                 list.Add(i);
+            }
+        }
+
+        public static void AddIntRangeBegEnd(this List<int> list, int beg, int end)
+        {
+            if (end >= beg)
+            {
+                for (int i = beg; i <= end; i++)
+                {
+                    list.Add(i);
+                }
+            }
+            else
+            {
+                for (int i = beg; i >= end; i--)
+                {
+                    list.Add(i);
+                }
             }
         }
     }
