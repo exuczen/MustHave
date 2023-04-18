@@ -18,6 +18,11 @@ namespace MustHave
             return sortingLayers;
         }
 
+        public static void SaveActiveScene()
+        {
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
+        }
+
         public static bool SetDirtyOnEndChangeCheck(UnityEngine.Object target)
         {
             if (EditorGUI.EndChangeCheck())
