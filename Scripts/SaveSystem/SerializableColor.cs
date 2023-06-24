@@ -21,7 +21,7 @@ namespace MustHave
             this.a = a;
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return string.Format("[{0}, {1}, {2}, {3}]", r, g, b, a);
         }
@@ -75,5 +75,5 @@ namespace MustHave
         {
             return base.GetHashCode();
         }
-    } 
+    }
 }
