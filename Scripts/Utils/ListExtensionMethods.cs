@@ -111,15 +111,9 @@ namespace MustHave.Utils
             lists.RemoveAll(list => list.Count == 0);
         }
 
-        public static void InverseOrder<T>(this List<T> list)
+        public static void InvertOrder<T>(this List<T> list)
         {
-            List<T> listInv = new List<T>();
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                listInv.Add(list[i]);
-            }
-            list.Clear();
-            list.AddRange(listInv);
+            ListUtils.InvertOrder(list, list.Count);
         }
 
         public static T GetRandomElementInRange<T>(this List<T> list, int min, int max)

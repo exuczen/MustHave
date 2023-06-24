@@ -35,7 +35,12 @@ namespace MustHave
         public const float M_PI2 = Mathf.PI / 2f;
         public const float M_PI = Mathf.PI;
 
-        public static float LerpInverse(float min, float max, float value)
+        public static float Round(float x, float gradation)
+        {
+            return ((int)(x / gradation + 0.5f)) * gradation;
+        }
+
+        public static float InverseLerp(float min, float max, float value)
         {
             return Mathf.InverseLerp(min, max, value);
         }
