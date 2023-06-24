@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MustHave.Utils
@@ -25,7 +21,9 @@ namespace MustHave.Utils
         {
             string extension = Path.GetExtension(filepath);
             if (!string.IsNullOrEmpty(extension))
+            {
                 filepath = filepath.TrimEnd(extension.ToCharArray());
+            }
             TextAsset jsonTextFile = Resources.Load<TextAsset>(filepath);
             if (jsonTextFile)
             {
