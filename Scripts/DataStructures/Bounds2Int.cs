@@ -19,7 +19,8 @@ namespace MustHave
         public Vector2Int Size
         {
             get { return size; }
-            set {
+            set
+            {
                 size = value;
                 max = min + size - Vector2Int.one;
             }
@@ -28,7 +29,8 @@ namespace MustHave
         public Vector2Int Min
         {
             get { return min; }
-            set {
+            set
+            {
                 min = value;
                 size = max - min + Vector2Int.one;
             }
@@ -37,26 +39,30 @@ namespace MustHave
         public Vector2Int Max
         {
             get { return max; }
-            set {
+            set
+            {
                 max = value;
                 size = max - min + Vector2Int.one;
             }
         }
 
+        public bool Overlaps(Bounds2Int other)
+        {
+            return other.min.x <= max.x && other.max.x >= min.x
+                && other.min.y <= max.y && other.max.y >= min.y;
+        }
+
         public bool Contains(Vector2Int pos)
         {
-            int dx = pos.x - min.x;
-            int dy = pos.y - min.y;
-            return dx >= 0 && dx <= size.x && dy >= 0 && dy <= size.y;
+            return pos.x >= min.x && pos.x <= max.x
+                && pos.y >= min.y && pos.y <= max.y;
         }
 
         public bool Contains(Vector2 pos)
         {
-            float dx = pos.x - min.x;
-            float dy = pos.y - min.y;
-            return dx >= 0f && dx <= size.x && dy >= 0f && dy <= size.y;
+            return pos.x >= min.x && pos.x <= max.x
+                && pos.y >= min.y && pos.y <= max.y;
         }
-
 
         public bool Equals(Bounds2Int other)
         {

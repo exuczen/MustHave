@@ -45,7 +45,8 @@ namespace MustHave
         public Vector2 Size
         {
             get { return size; }
-            set {
+            set
+            {
                 size = value;
                 extents = size * 0.5f;
                 min = center - extents;
@@ -56,7 +57,8 @@ namespace MustHave
         public Vector2 Extents
         {
             get { return extents; }
-            set {
+            set
+            {
                 extents = value;
                 size = extents * 0.5f;
                 min = center - extents;
@@ -67,7 +69,8 @@ namespace MustHave
         public Vector2 Center
         {
             get { return center; }
-            set {
+            set
+            {
                 center = value;
                 min = center - extents;
                 max = center + extents;
@@ -77,7 +80,8 @@ namespace MustHave
         public Vector2 Min
         {
             get { return min; }
-            set {
+            set
+            {
                 min = value;
                 size = max - min;
                 extents = size * 0.5f;
@@ -88,7 +92,8 @@ namespace MustHave
         public Vector2 Max
         {
             get { return max; }
-            set {
+            set
+            {
                 max = value;
                 size = max - min;
                 extents = size * 0.5f;
@@ -105,11 +110,16 @@ namespace MustHave
             center = min + extents;
         }
 
+        public bool Overlaps(Bounds2 other)
+        {
+            return other.min.x <= max.x && other.max.x >= min.x
+                && other.min.y <= max.y && other.max.y >= min.y;
+        }
+
         public bool Contains(Vector2 pos)
         {
-            float dx = pos.x - center.x;
-            float dy = pos.y - center.y;
-            return Mathf.Abs(dx) <= extents.x && Mathf.Abs(dy) <= extents.y;
+            return pos.x >= min.x && pos.x <= max.x
+                && pos.y >= min.y && pos.y <= max.y;
         }
 
         public bool Equals(Bounds2 other)
