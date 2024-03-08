@@ -396,6 +396,20 @@ namespace MustHave
             }
         }
 
+        public static int Log2(uint x)
+        {
+            if (x == 0)
+            {
+                return -1;
+            }
+            int i = 0;
+            while ((x >>= 1) > 0)
+            {
+                i++;
+            }
+            return i;
+        }
+
         public static bool IsPowerOf2(int i)
         {
             //return i > 0 && (i & (i - 1)) == 0;
