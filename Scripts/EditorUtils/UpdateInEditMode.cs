@@ -11,6 +11,8 @@ namespace MustHave
 #if UNITY_EDITOR
         private void OnEnable()
         {
+            EditorApplication.update -= OnEditorUpdate;
+
             if (!EditorApplication.isPlaying)
             {
                 EditorApplication.update += OnEditorUpdate;
@@ -19,10 +21,7 @@ namespace MustHave
 
         private void OnDisable()
         {
-            if (!EditorApplication.isPlaying)
-            {
-                EditorApplication.update -= OnEditorUpdate;
-            }
+            EditorApplication.update -= OnEditorUpdate;
         }
 
         private void OnEditorUpdate()
