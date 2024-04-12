@@ -6,6 +6,9 @@ namespace MustHave.Utils
 {
     public static class EnumExtensionMethods
     {
+        //public static int EnumToInt<T>(this T value) where T : Enum => Convert.ToInt32(value);
+        public static int EnumToInt<T>(this T value) where T : Enum => (int)(object)value;
+
         public static IEnumerable<string> CastToStringEnumerable(this Enum[] array)
         {
             return array.Select(enumName => enumName.ToString());
