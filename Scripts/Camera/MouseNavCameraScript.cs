@@ -80,7 +80,8 @@ namespace MustHave
             {
                 if (camera.orthographic)
                 {
-                    camera.orthographicSize -= zoomSpeed * mouseScrollDelta.y;
+                    camera.orthographicSize -= zoomSpeed * mouseScrollDelta.y * (1f + 0.04f * camera.orthographicSize);
+                    distance = 10f * camera.orthographicSize;
                 }
                 else
                 {
