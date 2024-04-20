@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    public class LookAtCameraScript : MonoBehaviour
+    public class LookAtCamera : MonoBehaviour
     {
         private void Update()
         {

@@ -3,7 +3,7 @@
 namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
-    public class TouchNavCameraScript : MonoBehaviour
+    public class TouchNavCamera : MonoBehaviour
     {
         [SerializeField] private float translationSpeed = default;
 

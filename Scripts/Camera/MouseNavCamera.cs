@@ -4,7 +4,7 @@ namespace MustHave
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
-    public class MouseNavCameraScript : MonoBehaviour
+    public class MouseNavCamera : MonoBehaviour
     {
         [SerializeField] private float translationSpeed = 1f;
         [SerializeField] private float zoomSpeed = 2f;
