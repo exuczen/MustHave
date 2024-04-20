@@ -8,6 +8,49 @@ namespace MustHave
 {
     public static class TextureEditor
     {
+        [MenuItem("Tools/CreateCubeTexture3D")]
+        public static void CreateCubeTexture3D()
+        {
+            // Configure the texture
+            int size = 32;
+            TextureFormat format = TextureFormat.RGBA32;
+            TextureWrapMode wrapMode = TextureWrapMode.Clamp;
+
+            // Create the texture and apply the configuration
+            Texture3D texture = new(size, size, size, format, false)
+            {
+                wrapMode = wrapMode
+            };
+            // Create a 3-dimensional array to store color data
+            Color32[] colors = new Color32[size * size * size];
+
+            // Populate the array so that the x, y, and z values of the texture will map to red, blue, and green colors
+            //float inverseResolution = 255f * 1.0f / (size - 1.0f);
+            for (int z = 0; z < size; z++)
+            {
+                int zOffset = z * size * size;
+                for (int y = 0; y < size; y++)
+                {
+                    int yOffset = y * size;
+                    for (int x = 0; x < size; x++)
+                    {
+                        byte r = (byte)(x * 255 / (size - 1));
+                        byte g = (byte)(y * 255 / (size - 1));
+                        byte b = (byte)(z * 255 / (size - 1));
+                        colors[x + yOffset + zOffset] = new Color32(r, g, b, 255);
+                    }
+                }
+            }
+            // Copy the color values to the texture
+            texture.SetPixels32(colors);
+
+            // Apply the changes to the texture and upload the updated texture to the GPU
+            texture.Apply();
+
+            // Save the texture to your Unity Project
+            AssetDatabase.CreateAsset(texture, "Assets/CubeTexture3D.asset");
+        }
+
         public static void SliceTextureToSpriteSheet(string texturePath, int width, int height, int colsCount, int rowsCount, bool inverseVertical = false)
         {
             var textureImporter = TextureImporter.GetAtPath(texturePath) as TextureImporter;
@@ -41,7 +84,8 @@ namespace MustHave
                 for (int x = 0; x < colsCount; x++)
                 {
                     Rect rect = new Rect(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
-                    var meta = new SpriteMetaData {
+                    var meta = new SpriteMetaData
+                    {
                         pivot = 0.5f * Vector2.one,
                         alignment = (int)SpriteAlignment.Center,
                         rect = rect,
