@@ -79,11 +79,11 @@ namespace MustHave
         {
             if (camera.orthographic)
             {
-                return screenTranslation * camera.orthographicSize * 2f / Screen.height;
+                return 2f * camera.orthographicSize * screenTranslation / Screen.height;
             }
             else
             {
-                float cameraWorldPlaneHeight = 2f * Mathf.Abs(cameraDistance) * Mathf.Tan(Mathf.Deg2Rad * camera.fieldOfView / 2f);
+                float cameraWorldPlaneHeight = 2f * Mathf.Abs(cameraDistance) * camera.GetTanHalfFov();
                 return screenTranslation * cameraWorldPlaneHeight / Screen.height;
             }
         }
@@ -95,7 +95,7 @@ namespace MustHave
 
         public static bool GetForwardIntersectionWithPlane(this Camera camera, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
         {
-            Ray ray = new Ray(camera.transform.position, camera.transform.forward);
+            Ray ray = new(camera.transform.position, camera.transform.forward);
             return Maths.GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out distance);
         }
 
