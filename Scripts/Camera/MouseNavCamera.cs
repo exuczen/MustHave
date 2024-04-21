@@ -8,6 +8,7 @@ namespace MustHave
     {
         private const float ScrollScale = 0.04f;
 
+        [SerializeField] private bool keyboardMovement = true;
         [SerializeField] private float translationSpeed = 10f;
         [SerializeField] private float zoomSpeed = 2f;
         [SerializeField] private float rotationSpeed = 4f;
@@ -29,7 +30,7 @@ namespace MustHave
             {
                 UpdateCameraPosition();
             }
-            SetOrthoCameraDistance();
+            SetOrthoCameraSize(camera.orthographicSize, true);
         }
 
         private void OnValidate()
@@ -43,66 +44,87 @@ namespace MustHave
             {
                 return;
             }
-            var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            float tanHalfFov = camera.GetTanHalfFov();
+            float tanHalf60 = Mathf.Tan(Mathf.Deg2Rad * 30f);
 
-            if (Input.GetMouseButton(1))
+            if (Application.isPlaying)
             {
-                Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
-                translation = transform.TransformVector(translation);
-                target.position += translation;
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                if (Input.GetKey(KeyCode.LeftAlt))
+                var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+
+                if (Input.GetMouseButton(1))
                 {
-                    if (targetPlane && targetPlane.gameObject.activeSelf
-                        && Maths.GetRayIntersectionWithPlane(transform.position, transform.forward,
-                        Vector3.up, targetPlane.transform.position, out Vector3 isecPoint, out float rayDistance)
-                        && rayDistance < 10f * distance)
+                    Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
+                    translation = transform.TransformVector(translation);
+                    target.position += translation;
+                }
+                else if (Input.GetMouseButton(0))
+                {
+                    if (Input.GetKey(KeyCode.LeftAlt))
                     {
-                        target.position = isecPoint;
-                        distance = rayDistance;
+                        if (targetPlane && targetPlane.gameObject.activeSelf
+                            && Maths.GetRayIntersectionWithPlane(transform.position, transform.forward,
+                            Vector3.up, targetPlane.transform.position, out Vector3 isecPoint, out float rayDistance)
+                            && rayDistance < 10f * distance)
+                        {
+                            target.position = isecPoint;
+                            distance = rayDistance;
+                        }
+                        var eulerAngles = transform.eulerAngles;
+                        eulerAngles.x -= mouseDelta.y * rotationSpeed;
+                        eulerAngles.y += mouseDelta.x * rotationSpeed;
+                        eulerAngles = Maths.AnglesModulo360(eulerAngles);
+                        eulerAngles.x = Mathf.Clamp(eulerAngles.x, -90f, 90f);
+
+                        transform.eulerAngles = eulerAngles;
                     }
-                    var eulerAngles = transform.eulerAngles;
-                    eulerAngles.x -= mouseDelta.y * rotationSpeed;
-                    eulerAngles.y += mouseDelta.x * rotationSpeed;
-                    eulerAngles = Maths.AnglesModulo360(eulerAngles);
-                    eulerAngles.x = Mathf.Clamp(eulerAngles.x, -90f, 90f);
+                }
+                Vector2 mouseScrollDelta = Input.mouseScrollDelta;
+                if (mouseScrollDelta.y != 0f)
+                {
+                    float scrollDelta = ScrollScale * zoomSpeed * mouseScrollDelta.y;
 
-                    transform.eulerAngles = eulerAngles;
+                    if (camera.orthographic)
+                    {
+                        SetOrthoCameraSize(camera.orthographicSize * (1f - scrollDelta), true);
+                    }
+                    else
+                    {
+                        // calculate dist for half fov = 60/2 deg
+                        float r = distance * tanHalfFov / tanHalf60;
+                        // update distance with zoom
+                        r -= scrollDelta * Mathf.Abs(r);
+                        // calculate updated distance for current fov
+                        distance = r * tanHalf60 / tanHalfFov;
+                        distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
+                    }
+                }
+                if (keyboardMovement)
+                {
+                    var translation = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+                    translation.y -= Input.GetKey(KeyCode.Q) ? 1f : 0f;
+                    translation.y += Input.GetKey(KeyCode.E) ? 1f : 0f;
+                    translation *= Time.deltaTime * 10f;
+                    translation *= Input.GetKey(KeyCode.LeftShift) ? 3f : 1f;
+
+                    if (Mathf.Abs(translation.z) > Mathf.Epsilon)
+                    {
+                        if (camera.orthographic)
+                        {
+                            SetOrthoCameraSize(camera.orthographicSize - translation.z);
+                        }
+                        else
+                        {
+                            translation.z *= tanHalf60 / tanHalfFov;
+                        }
+                    }
+                    //Debug.Log($"{GetType().Name}.{translation}");
+                    translation = transform.TransformVector(translation);
+                    target.position += translation;
                 }
             }
-            Vector2 mouseScrollDelta = Input.mouseScrollDelta;
-            if (mouseScrollDelta.y != 0f)
-            {
-                float scrollDelta = ScrollScale * zoomSpeed * mouseScrollDelta.y;
-
-                if (camera.orthographic)
-                {
-                    float orthoSize = camera.orthographicSize;
-                    orthoSize -= scrollDelta * orthoSize;
-                    orthoSize = Mathf.Max(Mathv.Epsilon, orthoSize);
-                    camera.orthographicSize = orthoSize;
-                    SetOrthoCameraDistance();
-                }
-                else
-                {
-                    // calculate dist for half fov = 60/2 deg
-                    float tanHalf60 = Mathf.Tan(Mathf.Deg2Rad * 30f);
-                    float tanHalfFov = camera.GetTanHalfFov();
-                    float r = distance * tanHalfFov / tanHalf60;
-                    // update distance with zoom
-                    r -= scrollDelta * Mathf.Abs(r);
-                    // calculate updated distance for current fov
-                    distance = r * tanHalf60 / tanHalfFov;
-                    distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
-                }
-            }
-
             if (cameraFov != camera.fieldOfView)
             {
                 float tanHalfFovPrev = Mathf.Tan(Mathf.Deg2Rad * cameraFov * 0.5f);
-                float tanHalfFov = camera.GetTanHalfFov();
                 // tanHalfFovPrev * distance = tanHalfFov * newDistance
                 distance *= tanHalfFovPrev / tanHalfFov;
                 cameraFov = camera.fieldOfView;
@@ -110,12 +132,10 @@ namespace MustHave
             if (camera.orthographic != cameraOrthographic)
             {
                 cameraOrthographic = camera.orthographic;
-                float tanHalfFov = camera.GetTanHalfFov();
 
                 if (cameraOrthographic)
                 {
-                    camera.orthographicSize = distance * tanHalfFov;
-                    SetOrthoCameraDistance();
+                    SetOrthoCameraSize(distance * tanHalfFov, true);
                 }
                 else
                 {
@@ -125,14 +145,19 @@ namespace MustHave
             UpdateCameraPosition();
         }
 
-        private void SetOrthoCameraDistance()
+        private void SetOrthoCameraSize(float orthoSize, bool setDistance = false)
         {
             if (camera.orthographic)
             {
-                distance = 10f * camera.orthographicSize;
+                orthoSize = Mathf.Max(Mathv.Epsilon, orthoSize);
+                camera.orthographicSize = orthoSize;
+
+                if (setDistance)
+                {
+                    distance = 10f * orthoSize;
+                }
             }
         }
-
 
         private void UpdateCameraPosition()
         {
