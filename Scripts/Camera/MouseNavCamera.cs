@@ -51,31 +51,36 @@ namespace MustHave
             {
                 var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
+                bool mouseButton2Pressed = Input.GetMouseButton(2);
+
                 if (Input.GetMouseButton(1))
                 {
                     Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
                     translation = transform.TransformVector(translation);
                     target.position += translation;
                 }
-                else if (Input.GetMouseButton(0))
+                else if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt) || mouseButton2Pressed)
                 {
-                    if (Input.GetKey(KeyCode.LeftAlt))
+                    if (!mouseButton2Pressed &&
+                        targetPlane && targetPlane.gameObject.activeSelf &&
+                        Maths.GetRayIntersectionWithPlane(transform.position, transform.forward,
+                        Vector3.up, targetPlane.transform.position, out Vector3 isecPoint, out float rayDistance) &&
+                        rayDistance < 10f * distance)
                     {
-                        if (targetPlane && targetPlane.gameObject.activeSelf
-                            && Maths.GetRayIntersectionWithPlane(transform.position, transform.forward,
-                            Vector3.up, targetPlane.transform.position, out Vector3 isecPoint, out float rayDistance)
-                            && rayDistance < 10f * distance)
-                        {
-                            target.position = isecPoint;
-                            distance = rayDistance;
-                        }
-                        var eulerAngles = transform.eulerAngles;
-                        eulerAngles.x -= mouseDelta.y * rotationSpeed;
-                        eulerAngles.y += mouseDelta.x * rotationSpeed;
-                        eulerAngles = Maths.AnglesModulo360(eulerAngles);
-                        eulerAngles.x = Mathf.Clamp(eulerAngles.x, -90f, 90f);
+                        target.position = isecPoint;
+                        distance = rayDistance;
+                    }
+                    var eulerAngles = transform.eulerAngles;
+                    eulerAngles.x -= mouseDelta.y * rotationSpeed;
+                    eulerAngles.y += mouseDelta.x * rotationSpeed;
+                    eulerAngles = Maths.AnglesModulo360(eulerAngles);
+                    eulerAngles.x = Mathf.Clamp(eulerAngles.x, -90f, 90f);
 
-                        transform.eulerAngles = eulerAngles;
+                    transform.eulerAngles = eulerAngles;
+
+                    if (mouseButton2Pressed)
+                    {
+                        target.position = transform.position + transform.forward * distance;
                     }
                 }
                 Vector2 mouseScrollDelta = Input.mouseScrollDelta;
@@ -103,7 +108,7 @@ namespace MustHave
                     var translation = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
                     translation.y -= Input.GetKey(KeyCode.Q) ? 1f : 0f;
                     translation.y += Input.GetKey(KeyCode.E) ? 1f : 0f;
-                    translation *= Time.deltaTime * 10f;
+                    translation *= Time.deltaTime * translationSpeed;
                     translation *= Input.GetKey(KeyCode.LeftShift) ? 3f : 1f;
 
                     if (Mathf.Abs(translation.z) > Mathf.Epsilon)
