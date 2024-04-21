@@ -16,22 +16,25 @@ namespace MustHave
         [SerializeField] private Transform targetPlane = null;
         [SerializeField, HideInInspector] private new Camera camera = default;
 
+        private bool cameraOrthographic = default;
+        private float cameraFov = 0f;
+
         private void OnEnable()
         {
             camera = GetComponent<Camera>();
+            cameraOrthographic = camera.orthographic;
+            cameraFov = camera.fieldOfView;
 
             if (target)
             {
                 UpdateCameraPosition();
             }
+            SetOrthoCameraDistance();
         }
 
         private void OnValidate()
         {
-            if (target)
-            {
-                UpdateCameraPosition();
-            }
+            OnEnable();
         }
 
         private void Update()
@@ -73,11 +76,14 @@ namespace MustHave
             if (mouseScrollDelta.y != 0f)
             {
                 float scrollDelta = ScrollScale * zoomSpeed * mouseScrollDelta.y;
+
                 if (camera.orthographic)
                 {
-                    camera.orthographicSize -= scrollDelta * camera.orthographicSize;
-                    camera.orthographicSize = Mathf.Max(Mathv.Epsilon, camera.orthographicSize);
-                    distance = 10f * camera.orthographicSize;
+                    float orthoSize = camera.orthographicSize;
+                    orthoSize -= scrollDelta * orthoSize;
+                    orthoSize = Mathf.Max(Mathv.Epsilon, orthoSize);
+                    camera.orthographicSize = orthoSize;
+                    SetOrthoCameraDistance();
                 }
                 else
                 {
@@ -92,8 +98,41 @@ namespace MustHave
                     distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
                 }
             }
+
+            if (cameraFov != camera.fieldOfView)
+            {
+                float tanHalfFovPrev = Mathf.Tan(Mathf.Deg2Rad * cameraFov * 0.5f);
+                float tanHalfFov = camera.GetTanHalfFov();
+                // tanHalfFovPrev * distance = tanHalfFov * newDistance
+                distance *= tanHalfFovPrev / tanHalfFov;
+                cameraFov = camera.fieldOfView;
+            }
+            if (camera.orthographic != cameraOrthographic)
+            {
+                cameraOrthographic = camera.orthographic;
+                float tanHalfFov = camera.GetTanHalfFov();
+
+                if (cameraOrthographic)
+                {
+                    camera.orthographicSize = distance * tanHalfFov;
+                    SetOrthoCameraDistance();
+                }
+                else
+                {
+                    distance = camera.orthographicSize / tanHalfFov;
+                }
+            }
             UpdateCameraPosition();
         }
+
+        private void SetOrthoCameraDistance()
+        {
+            if (camera.orthographic)
+            {
+                distance = 10f * camera.orthographicSize;
+            }
+        }
+
 
         private void UpdateCameraPosition()
         {
