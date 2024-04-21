@@ -9,7 +9,8 @@ namespace MustHave
         private const float ScrollScale = 0.04f;
 
         [SerializeField] private bool keyboardMovement = true;
-        [SerializeField] private float translationSpeed = 10f;
+        [SerializeField] private float keyTranslationSpeed = 10f;
+        [SerializeField] private float panTranslationSpeed = 10f;
         [SerializeField] private float zoomSpeed = 2f;
         [SerializeField] private float rotationSpeed = 4f;
         [SerializeField] private float distance = 10f;
@@ -55,7 +56,7 @@ namespace MustHave
 
                 if (Input.GetMouseButton(1))
                 {
-                    Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
+                    Vector3 translation = -panTranslationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
                     translation = transform.TransformVector(translation);
                     target.position += translation;
                 }
@@ -108,7 +109,7 @@ namespace MustHave
                     var translation = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
                     translation.y -= Input.GetKey(KeyCode.Q) ? 1f : 0f;
                     translation.y += Input.GetKey(KeyCode.E) ? 1f : 0f;
-                    translation *= Time.deltaTime * translationSpeed;
+                    translation *= Time.deltaTime * keyTranslationSpeed;
                     translation *= Input.GetKey(KeyCode.LeftShift) ? 3f : 1f;
 
                     if (Mathf.Abs(translation.z) > Mathf.Epsilon)
