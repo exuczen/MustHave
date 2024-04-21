@@ -6,7 +6,9 @@ namespace MustHave
     [RequireComponent(typeof(Camera))]
     public class MouseNavCamera : MonoBehaviour
     {
-        [SerializeField] private float translationSpeed = 1f;
+        private const float ScrollScale = 0.04f;
+
+        [SerializeField] private float translationSpeed = 10f;
         [SerializeField] private float zoomSpeed = 2f;
         [SerializeField] private float rotationSpeed = 4f;
         [SerializeField] private float distance = 10f;
@@ -14,12 +16,9 @@ namespace MustHave
         [SerializeField] private Transform targetPlane = null;
         [SerializeField, HideInInspector] private new Camera camera = default;
 
-        private Vector3 mousePositionPrev = default;
-
         private void OnEnable()
         {
             camera = GetComponent<Camera>();
-            mousePositionPrev = Input.mousePosition;
 
             if (target)
             {
@@ -41,21 +40,16 @@ namespace MustHave
             {
                 return;
             }
-            Vector3 mousePosition = Input.mousePosition;
-            Vector3 mouseDeltaPos = mousePosition - mousePositionPrev;
-            mousePositionPrev = mousePosition;
+            var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
             if (Input.GetMouseButton(1))
             {
-                Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDeltaPos, Mathf.Max(10f, distance));
+                Vector3 translation = -translationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
                 translation = transform.TransformVector(translation);
                 target.position += translation;
             }
             else if (Input.GetMouseButton(0))
             {
-                float mouseX = Input.GetAxis("Mouse X");
-                float mouseY = Input.GetAxis("Mouse Y");
-
                 if (Input.GetKey(KeyCode.LeftAlt))
                 {
                     if (targetPlane && targetPlane.gameObject.activeSelf
@@ -67,8 +61,8 @@ namespace MustHave
                         distance = rayDistance;
                     }
                     var eulerAngles = transform.eulerAngles;
-                    eulerAngles.x -= mouseY * rotationSpeed;
-                    eulerAngles.y += mouseX * rotationSpeed;
+                    eulerAngles.x -= mouseDelta.y * rotationSpeed;
+                    eulerAngles.y += mouseDelta.x * rotationSpeed;
                     eulerAngles = Maths.AnglesModulo360(eulerAngles);
                     eulerAngles.x = Mathf.Clamp(eulerAngles.x, -90f, 90f);
 
@@ -78,9 +72,11 @@ namespace MustHave
             Vector2 mouseScrollDelta = Input.mouseScrollDelta;
             if (mouseScrollDelta.y != 0f)
             {
+                float scrollDelta = ScrollScale * zoomSpeed * mouseScrollDelta.y;
                 if (camera.orthographic)
                 {
-                    camera.orthographicSize -= zoomSpeed * mouseScrollDelta.y * (1f + 0.04f * camera.orthographicSize);
+                    camera.orthographicSize -= scrollDelta * camera.orthographicSize;
+                    camera.orthographicSize = Mathf.Max(Mathv.Epsilon, camera.orthographicSize);
                     distance = 10f * camera.orthographicSize;
                 }
                 else
@@ -90,7 +86,7 @@ namespace MustHave
                     float tanHalfFov = camera.GetTanHalfFov();
                     float r = distance * tanHalfFov / tanHalf60;
                     // update distance with zoom
-                    r -= zoomSpeed * mouseScrollDelta.y * (1f + 0.04f * Mathf.Abs(r));
+                    r -= scrollDelta * Mathf.Abs(r);
                     // calculate updated distance for current fov
                     distance = r * tanHalf60 / tanHalfFov;
                     distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
