@@ -52,17 +52,19 @@ namespace MustHave
             {
                 var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-                bool mouseButton2Pressed = Input.GetMouseButton(2);
+                bool rotatingAroundTarget = Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt);
+                bool rotatingAroundSelf = Input.GetMouseButton(1);
+                bool panning = Input.GetMouseButton(2);
 
-                if (Input.GetMouseButton(1))
+                if (panning)
                 {
                     Vector3 translation = -panTranslationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
                     translation = transform.TransformVector(translation);
                     target.position += translation;
                 }
-                else if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt) || mouseButton2Pressed)
+                else if (rotatingAroundTarget || rotatingAroundSelf)
                 {
-                    if (!mouseButton2Pressed &&
+                    if (!rotatingAroundSelf &&
                         targetPlane && targetPlane.gameObject.activeSelf &&
                         Maths.GetRayIntersectionWithPlane(transform.position, transform.forward,
                         Vector3.up, targetPlane.transform.position, out Vector3 isecPoint, out float rayDistance) &&
@@ -79,7 +81,7 @@ namespace MustHave
 
                     transform.eulerAngles = eulerAngles;
 
-                    if (mouseButton2Pressed)
+                    if (rotatingAroundSelf)
                     {
                         target.position = transform.position + transform.forward * distance;
                     }
