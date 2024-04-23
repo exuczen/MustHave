@@ -10,7 +10,6 @@ namespace MustHave
 
         [SerializeField] private bool keyboardMovement = true;
         [SerializeField] private float keyTranslationSpeed = 10f;
-        [SerializeField] private float panTranslationSpeed = 10f;
         [SerializeField] private float zoomSpeed = 2f;
         [SerializeField] private float rotationSpeed = 4f;
         [SerializeField] private float distance = 10f;
@@ -21,11 +20,17 @@ namespace MustHave
         private bool cameraOrthographic = default;
         private float cameraFov = 0f;
 
+        private Vector3 mousePositionPrev = default;
+
+        private bool appGainedFocus = false;
+
         private void OnEnable()
         {
             camera = GetComponent<Camera>();
             cameraOrthographic = camera.orthographic;
             cameraFov = camera.fieldOfView;
+
+            mousePositionPrev = Input.mousePosition;
 
             if (target)
             {
@@ -39,6 +44,12 @@ namespace MustHave
             OnEnable();
         }
 
+        private void OnApplicationFocus(bool focus)
+        {
+            mousePositionPrev = Input.mousePosition;
+            appGainedFocus = true;
+        }
+
         private void Update()
         {
             if (!target)
@@ -48,17 +59,19 @@ namespace MustHave
             float tanHalfFov = camera.GetTanHalfFov();
             float tanHalf60 = Mathf.Tan(Mathf.Deg2Rad * 30f);
 
+            var mousePosition = Input.mousePosition;
+
             if (Application.isPlaying)
             {
-                var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
                 bool rotatingAroundTarget = Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt);
                 bool rotatingAroundSelf = Input.GetMouseButton(1);
-                bool panning = Input.GetMouseButton(2);
+                bool panning = Input.GetMouseButton(2) && !appGainedFocus;
 
                 if (panning)
                 {
-                    Vector3 translation = -panTranslationSpeed * camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
+                    var mouseDelta = mousePosition - mousePositionPrev;
+
+                    Vector3 translation = -camera.ScreenToWorldTranslation(mouseDelta, Mathf.Max(1f, distance));
                     translation = transform.TransformVector(translation);
                     target.position += translation;
                 }
@@ -73,6 +86,8 @@ namespace MustHave
                         target.position = isecPoint;
                         distance = rayDistance;
                     }
+                    var mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+
                     var eulerAngles = transform.eulerAngles;
                     eulerAngles.x -= mouseDelta.y * rotationSpeed;
                     eulerAngles.y += mouseDelta.x * rotationSpeed;
@@ -151,6 +166,9 @@ namespace MustHave
                 }
             }
             UpdateCameraPosition();
+
+            mousePositionPrev = mousePosition;
+            appGainedFocus = false;
         }
 
         private void SetOrthoCameraSize(float orthoSize, bool setDistance = false)

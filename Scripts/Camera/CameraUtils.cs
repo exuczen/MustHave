@@ -4,6 +4,6 @@ namespace MustHave
 {
     public struct CameraUtils
     {
-        public static Camera MainOrCurrent { get => Camera.main != null ? Camera.main : Camera.current; }
+        public static Camera MainOrCurrent => Camera.main ? Camera.main : Camera.current;
     }
 }
