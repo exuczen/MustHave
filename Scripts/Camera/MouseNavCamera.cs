@@ -17,8 +17,8 @@ namespace MustHave
         [SerializeField] private Transform targetPlane = null;
         [SerializeField, HideInInspector] private new Camera camera = default;
 
-        private bool cameraOrthographic = default;
-        private float cameraFov = 0f;
+        private bool cameraOrthoPrev = default;
+        private float cameraFovPrev = 0f;
 
         private Vector3 mousePositionPrev = default;
 
@@ -27,10 +27,8 @@ namespace MustHave
         private void OnEnable()
         {
             camera = GetComponent<Camera>();
-            cameraOrthographic = camera.orthographic;
-            cameraFov = camera.fieldOfView;
 
-            mousePositionPrev = Input.mousePosition;
+            SetPreviousData();
 
             if (target)
             {
@@ -46,7 +44,7 @@ namespace MustHave
 
         private void OnApplicationFocus(bool focus)
         {
-            mousePositionPrev = Input.mousePosition;
+            SetPreviousData();
             appGainedFocus = true;
         }
 
@@ -145,18 +143,15 @@ namespace MustHave
                     target.position += translation;
                 }
             }
-            if (cameraFov != camera.fieldOfView)
+            if (cameraFovPrev != camera.fieldOfView)
             {
-                float tanHalfFovPrev = Mathf.Tan(Mathf.Deg2Rad * cameraFov * 0.5f);
+                float tanHalfFovPrev = Mathf.Tan(Mathf.Deg2Rad * cameraFovPrev * 0.5f);
                 // tanHalfFovPrev * distance = tanHalfFov * newDistance
                 distance *= tanHalfFovPrev / tanHalfFov;
-                cameraFov = camera.fieldOfView;
             }
-            if (camera.orthographic != cameraOrthographic)
+            if (cameraOrthoPrev != camera.orthographic)
             {
-                cameraOrthographic = camera.orthographic;
-
-                if (cameraOrthographic)
+                if (camera.orthographic)
                 {
                     SetOrthoCameraSize(distance * tanHalfFov, true);
                 }
@@ -166,9 +161,16 @@ namespace MustHave
                 }
             }
             UpdateCameraPosition();
+            SetPreviousData();
 
-            mousePositionPrev = mousePosition;
             appGainedFocus = false;
+        }
+
+        private void SetPreviousData()
+        {
+            cameraOrthoPrev = camera.orthographic;
+            cameraFovPrev = camera.fieldOfView;
+            mousePositionPrev = Input.mousePosition;
         }
 
         private void SetOrthoCameraSize(float orthoSize, bool setDistance = false)
