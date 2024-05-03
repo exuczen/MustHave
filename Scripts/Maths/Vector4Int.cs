@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MustHave
 {
@@ -13,9 +14,43 @@ namespace MustHave
             this.w = w;
         }
 
-        public override string ToString()
+        public int this[int index]
         {
-            return xyz.ToString() + " " + w;
+            get
+            {
+                if (index >= 0 && index < 3)
+                {
+                    return xyz[index];
+                }
+                else if (index == 3)
+                {
+                    return w;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                if (index >= 0 && index < 3)
+                {
+                    xyz[index] = value;
+                }
+                else if (index == 3)
+                {
+                    w = value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
+        }
+
+        public override readonly string ToString()
+        {
+            return $"{xyz} {w}";
         }
     }
 }

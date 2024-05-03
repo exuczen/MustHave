@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace MustHave
@@ -9,6 +6,54 @@ namespace MustHave
     public struct Mathv
     {
         public const float Epsilon = Vector2.kEpsilon;
+
+        public static bool Any<T>(Func<int, T> component, Func<T, bool> predicate, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (predicate(component(i)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool All<T>(Func<int, T> component, Func<T, bool> predicate, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (!predicate(component(i)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool Any(Vector4 v, Func<float, bool> predicate) => Any(i => v[i], predicate, 4);
+
+        public static bool Any(Vector4Int v, Func<int, bool> predicate) => Any(i => v[i], predicate, 4);
+
+        public static bool Any(Vector3 v, Func<float, bool> predicate) => Any(i => v[i], predicate, 3);
+
+        public static bool Any(Vector3Int v, Func<int, bool> predicate) => Any(i => v[i], predicate, 3);
+
+        public static bool Any(Vector2 v, Func<float, bool> predicate) => Any(i => v[i], predicate, 2);
+
+        public static bool Any(Vector2Int v, Func<int, bool> predicate) => Any(i => v[i], predicate, 2);
+
+        public static bool All(Vector4 v, Func<float, bool> predicate) => All(i => v[i], predicate, 4);
+
+        public static bool All(Vector4Int v, Func<int, bool> predicate) => All(i => v[i], predicate, 4);
+
+        public static bool All(Vector3 v, Func<float, bool> predicate) => All(i => v[i], predicate, 3);
+
+        public static bool All(Vector3Int v, Func<int, bool> predicate) => All(i => v[i], predicate, 3);
+
+        public static bool All(Vector2 v, Func<float, bool> predicate) => All(i => v[i], predicate, 2);
+
+        public static bool All(Vector2Int v, Func<int, bool> predicate) => All(i => v[i], predicate, 2);
 
         public static Vector3 Random(Vector3 min, Vector3 max)
         {
