@@ -10,6 +10,7 @@ namespace MustHave
 
         [SerializeField] private bool keyboardMovement = true;
         [SerializeField] private float keyTranslationSpeed = 10f;
+        [SerializeField, Range(0.01f, 2f)] private float keyTranslationMlp = 1f;
         [SerializeField] private float zoomSpeed = 2f;
         [SerializeField] private float rotationSpeed = 4f;
         [SerializeField] private float distance = 10f;
@@ -17,12 +18,16 @@ namespace MustHave
         [SerializeField] private Transform targetPlane = null;
         [SerializeField, HideInInspector] private new Camera camera = default;
 
+        private readonly GUIStyle guiStyle = new();
+
         private bool cameraOrthoPrev = default;
         private float cameraFovPrev = 0f;
 
         private Vector3 mousePositionPrev = default;
 
         private bool appGainedFocus = false;
+
+        private float keyTranslationMlpChangeTime = -1f;
 
         private void OnEnable()
         {
@@ -35,6 +40,8 @@ namespace MustHave
                 UpdateCameraPosition();
             }
             SetOrthoCameraSize(camera.orthographicSize, true);
+
+            keyTranslationMlpChangeTime = -1f;
         }
 
         private void OnValidate()
@@ -46,6 +53,27 @@ namespace MustHave
         {
             SetPreviousData();
             appGainedFocus = true;
+        }
+
+        private void OnGUI()
+        {
+            static Rect getMiddleRect(int width = 60, int height = 20) => new((Screen.width - width) >> 1, (Screen.height - height) >> 1, width, height);
+
+            if (keyTranslationMlpChangeTime > 0f)
+            {
+                if (Time.time - keyTranslationMlpChangeTime <= 1f)
+                {
+                    guiStyle.alignment = TextAnchor.MiddleCenter;
+                    guiStyle.normal.textColor = Color.white;
+                    guiStyle.fontSize = 30;
+                    GUI.Box(getMiddleRect(200, 100), string.Empty);
+                    GUI.Box(getMiddleRect(100, 100), $" x {keyTranslationMlp:f2}", guiStyle);
+                }
+                else
+                {
+                    keyTranslationMlpChangeTime = -1f;
+                }
+            }
         }
 
         private void Update()
@@ -102,21 +130,33 @@ namespace MustHave
                 Vector2 mouseScrollDelta = Input.mouseScrollDelta;
                 if (mouseScrollDelta.y != 0f)
                 {
-                    float scrollDelta = ScrollScale * zoomSpeed * mouseScrollDelta.y;
+                    float scrollDelta = ScrollScale * mouseScrollDelta.y;
 
-                    if (camera.orthographic)
+                    if (!Input.GetMouseButton(1))
                     {
-                        SetOrthoCameraSize(camera.orthographicSize * (1f - scrollDelta), true);
+                        scrollDelta *= zoomSpeed;
+
+                        if (camera.orthographic)
+                        {
+                            SetOrthoCameraSize(camera.orthographicSize * (1f - scrollDelta), true);
+                        }
+                        else
+                        {
+                            // calculate dist for half fov = 60/2 deg
+                            float r = distance * tanHalfFov / tanHalf60;
+                            // update distance with zoom
+                            r -= scrollDelta * Mathf.Abs(r);
+                            // calculate updated distance for current fov
+                            distance = r * tanHalf60 / tanHalfFov;
+                            distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
+                        }
                     }
-                    else
+                    else if (keyboardMovement)
                     {
-                        // calculate dist for half fov = 60/2 deg
-                        float r = distance * tanHalfFov / tanHalf60;
-                        // update distance with zoom
-                        r -= scrollDelta * Mathf.Abs(r);
-                        // calculate updated distance for current fov
-                        distance = r * tanHalf60 / tanHalfFov;
-                        distance = Mathf.Max(distance, 2f * camera.nearClipPlane + Mathv.Epsilon);
+                        keyTranslationMlp += scrollDelta;
+                        keyTranslationMlp = (int)(keyTranslationMlp / ScrollScale + 0.5f) * ScrollScale;
+                        keyTranslationMlp = Mathf.Clamp(keyTranslationMlp, 0.01f, 2f);
+                        keyTranslationMlpChangeTime = Time.time;
                     }
                 }
                 if (keyboardMovement)
@@ -124,7 +164,7 @@ namespace MustHave
                     var translation = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
                     translation.y -= Input.GetKey(KeyCode.Q) ? 1f : 0f;
                     translation.y += Input.GetKey(KeyCode.E) ? 1f : 0f;
-                    translation *= Time.deltaTime * keyTranslationSpeed;
+                    translation *= Time.deltaTime * keyTranslationSpeed * keyTranslationMlp;
                     translation *= Input.GetKey(KeyCode.LeftShift) ? 3f : 1f;
 
                     if (Mathf.Abs(translation.z) > Mathf.Epsilon)
@@ -194,3 +234,4 @@ namespace MustHave
         }
     }
 }
+

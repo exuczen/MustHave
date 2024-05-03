@@ -5,9 +5,9 @@ using UnityEngine.Events;
 
 namespace MustHave.Utils
 {
-    public struct CoroutineUtils
+    public readonly struct CoroutineUtils
     {
-        public static readonly WaitForEndOfFrame WaitForEndOfFrame = new WaitForEndOfFrame();
+        public static readonly WaitForEndOfFrame WaitForEndOfFrame = new();
 
         public static IEnumerator WaitForFrames(int count)
         {
