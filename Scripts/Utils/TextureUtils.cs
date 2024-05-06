@@ -7,12 +7,21 @@ namespace MustHave.Utils
 {
     public struct TextureUtils
     {
+        public static void Release(ref RenderTexture texture)
+        {
+            if (texture)
+            {
+                texture.Release();
+                texture = null;
+            }
+        }
+
         /// <summary>
         /// Creates the texture filled with given color.
         /// </summary>
         public static Texture2D CreateTexture(int width, int height, Color fillColor)
         {
-            Texture2D result = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            Texture2D result = new(width, height, TextureFormat.RGBA32, false);
 
             for (int x = 0; x < width; x++)
             {
@@ -68,7 +77,8 @@ namespace MustHave.Utils
         /// <returns></returns>
         public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, int width, int height, System.Action<Texture2D> postprocess = null)
         {
-            RenderTexture renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32) {
+            RenderTexture renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
+            {
                 // TODO: Customize anti-aliasing value. Anti-aliasing value must be one of (1, 2, 4 or 8), indicating the number of samples per pixel.
                 antiAliasing = 4
             };
