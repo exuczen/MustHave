@@ -10,6 +10,20 @@ namespace MustHave
 {
     public struct EditorUtils
     {
+        public static Action<bool> UnityEditorFocusChanged
+        {
+            get
+            {
+                var fieldInfo = typeof(EditorApplication).GetField("focusChanged", BindingFlags.Static | BindingFlags.NonPublic);
+                return (Action<bool>)fieldInfo.GetValue(null);
+            }
+            set
+            {
+                var fieldInfo = typeof(EditorApplication).GetField("focusChanged", BindingFlags.Static | BindingFlags.NonPublic);
+                fieldInfo.SetValue(null, value);
+            }
+        }
+
         public static string[] GetSortingLayerNames()
         {
             Type internalEditorUtilityType = typeof(InternalEditorUtility);
