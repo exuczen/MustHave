@@ -147,14 +147,15 @@ namespace MustHave
         }
 
         /// <summary></summary>
-        /// <param name="angle">amgle in degrees</param>
+        /// <param name="angle">angle in degrees</param>
         /// <param name="midZeroRange">true for (-180,180) output range, false for (0,360)</param>
         /// <returns></returns>
         public static float AngleModulo360(float angle, bool midZeroRange = true)
         {
+            angle %= 360f;
+
             if (midZeroRange)
             {
-                angle %= 360f;
                 if (Mathf.Abs(angle) > 180f)
                 {
                     angle -= Mathf.Sign(angle) * 360f;
@@ -162,7 +163,7 @@ namespace MustHave
             }
             else
             {
-                angle = ((angle % 360f) + 360f) % 360f;
+                angle = (angle + 360f) % 360f;
             }
             return angle;
         }
