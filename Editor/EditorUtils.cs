@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace MustHave
@@ -21,6 +22,57 @@ namespace MustHave
             {
                 var fieldInfo = typeof(EditorApplication).GetField("focusChanged", BindingFlags.Static | BindingFlags.NonPublic);
                 fieldInfo.SetValue(null, value);
+            }
+        }
+
+        public static bool AddLayer(string layerName, out bool exists)
+        {
+            //for (int i = 0; i < InternalEditorUtility.layers.Length; i++)
+            //{
+            //    Debug.Log($"AddLayer: Layer[{i}]: {InternalEditorUtility.layers[i]}");
+            //}
+            var tagManagerObject = AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
+            var tagManager = new SerializedObject(tagManagerObject);
+            var layers = tagManager.FindProperty("layers");
+
+            int firstEmptySlotIndex = -1;
+
+            exists = false;
+
+            for (int i = 0; i < layers.arraySize; i++)
+            {
+                var element = layers.GetArrayElementAtIndex(i);
+                if (!string.IsNullOrEmpty(element.stringValue))
+                {
+                    if (layerName.Equals(element.stringValue))
+                    {
+                        Debug.LogWarning($"AddLayer: Layer {layerName} exists at index {i}.");
+                        exists = true;
+                        return false;
+                    }
+                }
+                else if (firstEmptySlotIndex < 0)
+                {
+                    firstEmptySlotIndex = i;
+                }
+            }
+            if (firstEmptySlotIndex < 0)
+            {
+                Debug.LogError($"AddLayer: Can't add {layerName}. All slots are used.");
+
+                return false;
+            }
+            else
+            {
+                var firstEmptySlot = layers.GetArrayElementAtIndex(firstEmptySlotIndex);
+                firstEmptySlot.stringValue = layerName;
+
+                tagManager.ApplyModifiedProperties();
+                tagManager.Update();
+
+                Debug.Log($"AddLayer: Added {layerName} at index {firstEmptySlotIndex}");
+
+                return true;
             }
         }
 
