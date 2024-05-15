@@ -11,7 +11,7 @@ namespace MustHave
         [SerializeField]
         private T prefab = null;
         [SerializeField]
-        private List<T> unusedObjects = new List<T>();
+        private List<T> unusedObjects = new();
         [SerializeField]
         private int initialCapacity = 10;
         [SerializeField]

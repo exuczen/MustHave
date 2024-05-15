@@ -4,19 +4,19 @@ using MustHave.Utils;
 
 namespace MustHave
 {
-    public class ObjectPool<T> where T : MonoBehaviour, IPoolable
+    public class DeprecatedObjectPool<T> where T : MonoBehaviour, IPoolable
     {
         public const int DeltaCapacity = 5;
 
         public int ObjectCount => objectsUnused.Count + objectsInUse.Count;
 
-        protected readonly List<T> objectsUnused = new List<T>();
-        protected readonly HashSet<T> objectsInUse = new HashSet<T>();
+        protected readonly List<T> objectsUnused = new();
+        protected readonly HashSet<T> objectsInUse = new();
         protected readonly Transform parent = null;
 
         private readonly T prefab = null;
 
-        public ObjectPool(T prefab, Transform parent, int count)
+        public DeprecatedObjectPool(T prefab, Transform parent, int count)
         {
             this.parent = parent;
             this.prefab = prefab;

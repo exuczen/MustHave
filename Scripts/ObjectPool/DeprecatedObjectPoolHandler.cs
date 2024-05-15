@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    public abstract class ObjectPoolHandler<T> : MonoBehaviour where T : PoolObject
+    public abstract class DeprecatedObjectPoolHandler<T> : MonoBehaviour where T : DeprecatedPoolObject
     {
         [SerializeField]
         protected bool fillPoolsOnAwake = true;

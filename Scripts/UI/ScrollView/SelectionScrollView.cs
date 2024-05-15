@@ -28,7 +28,7 @@ namespace MustHave.UI
         protected List<T> buttons = new List<T>();
         protected T selectedButton = null;
 
-        private ObjectPool<T> buttonPool = null;
+        private DeprecatedObjectPool<T> buttonPool = null;
 
         protected virtual void OnEnable()
         {
@@ -66,7 +66,7 @@ namespace MustHave.UI
         public void CreateButtonsPool(int capacity = -1)
         {
             OnCreateButtonsPools();
-            buttonPool = new ObjectPool<T>(buttonPrefab, buttonPoolParent, capacity < 0 ? buttonPoolCapacity : capacity);
+            buttonPool = new DeprecatedObjectPool<T>(buttonPrefab, buttonPoolParent, capacity < 0 ? buttonPoolCapacity : capacity);
             if (capacity > 0)
             {
                 buttonPoolCapacity = capacity;

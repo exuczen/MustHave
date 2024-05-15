@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    public abstract class PoolObject : MonoBehaviour
+    public abstract class DeprecatedPoolObject : MonoBehaviour
     {
         protected Transform pool = default;
 
