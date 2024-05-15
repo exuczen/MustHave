@@ -60,6 +60,17 @@ namespace MustHave
             return new Rect() { min = min, max = max, };
         }
 
+        public static float GetTanHalfFovHori(this Camera camera)
+        {
+            float horiFov = Camera.VerticalToHorizontalFieldOfView(camera.fieldOfView, camera.aspect);
+            return Mathf.Tan(Mathf.Deg2Rad * horiFov * 0.5f);
+        }
+
+        public static float GetTanHalfFovVerti(this Camera camera)
+        {
+            return camera.GetTanHalfFov();
+        }
+
         public static float GetTanHalfFov(this Camera camera)
         {
             return Mathf.Tan(Mathf.Deg2Rad * camera.fieldOfView * 0.5f);
