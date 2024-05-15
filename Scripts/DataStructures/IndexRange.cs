@@ -43,18 +43,18 @@
             FullLength = fullLength;
         }
 
-        public int GetIndexCount() => GetIndexCount(Beg, End, FullLength);
+        public readonly int GetIndexCount() => GetIndexCount(Beg, End, FullLength);
 
-        public int GetNext(int index) => GetNext(index, FullLength);
+        public readonly int GetNext(int index) => GetNext(index, FullLength);
 
-        public int GetPrev(int index) => GetPrev(index, FullLength);
+        public readonly int GetPrev(int index) => GetPrev(index, FullLength);
 
-        public IndexRange GetInverseRange()
+        public readonly IndexRange GetInverseRange()
         {
             return new IndexRange(GetNext(End), GetPrev(Beg), FullLength);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return string.Format("IndexRange: {0} - {1} | {2}", Beg, End, FullLength);
         }

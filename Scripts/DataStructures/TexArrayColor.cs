@@ -42,12 +42,12 @@ namespace MustHave
             color.a = alpha;
         }
 
-        public override bool Equals(object other)
+        public override readonly bool Equals(object other)
         {
             return base.Equals(other);
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return base.GetHashCode();
         }
