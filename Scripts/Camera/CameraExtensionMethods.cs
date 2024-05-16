@@ -62,6 +62,14 @@ namespace MustHave
 
         public static float GetTanHalfFovHori(this Camera camera)
         {
+            // tanHalfFovY = 0.5 * h / r;
+            // tanHalfFovX = 0.5 * w / r;
+            // r = 0.5 * h / tanHalfFovY
+            // r = 0.5 * w / tanHalfFovX
+            // h / tanHalfFovY = w / tanHalfFovX
+            // h / w = tanHalfFovY / tanHalfFovX
+            // tanHalfFovX = tanHalfFovY * w / h
+
             float horiFov = Camera.VerticalToHorizontalFieldOfView(camera.fieldOfView, camera.aspect);
             return Mathf.Tan(Mathf.Deg2Rad * horiFov * 0.5f);
         }
