@@ -7,8 +7,8 @@ namespace MustHave.Utils
     {
         public static void Reset(this Transform transform, bool resetScale = true)
         {
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
+            transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
             if (resetScale)
             {
                 transform.localScale = Vector3.one;

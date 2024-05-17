@@ -70,6 +70,8 @@ namespace MustHave
                 tagManager.ApplyModifiedProperties();
                 tagManager.Update();
 
+                AssetDatabase.Refresh();
+
                 Debug.Log($"AddLayer: Added {layerName} at index {firstEmptySlotIndex}");
 
                 return true;
