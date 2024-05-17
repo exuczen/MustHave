@@ -13,6 +13,12 @@ namespace MustHave.Utils
     {
         public static bool IsLoadingScene { get; private set; }
 
+        public static bool IsActiveSceneLoadedAndValid()
+        {
+            var activeScene = SceneManager.GetActiveScene();
+            return activeScene.isLoaded && activeScene.IsValid();
+        }
+
         public static bool IsActiveScene(Enum sceneName)
         {
             return ActiveSceneName.Equals(sceneName.ToString());

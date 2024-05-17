@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace MustHave
+namespace MustHave.Utils
 {
     public struct ObjectUtils
     {
@@ -34,14 +34,9 @@ namespace MustHave
                 {
                     Object.Destroy(obj);
                 }
-                else
+                else if (SceneUtils.IsActiveSceneLoadedAndValid())
                 {
-                    var activeScene = SceneManager.GetActiveScene();
-
-                    if (activeScene.isLoaded && activeScene.IsValid())
-                    {
-                        Object.DestroyImmediate(obj);
-                    }
+                    Object.DestroyImmediate(obj);
                 }
             }
         }
