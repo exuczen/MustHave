@@ -12,17 +12,20 @@ namespace MustHave
         private struct CameraData
         {
             public bool orthographic;
+            public float orthographicSize;
             public float fieldOfView;
 
             public void CopyFrom(Camera camera)
             {
                 orthographic = camera.orthographic;
+                orthographicSize = camera.orthographicSize;
                 fieldOfView = camera.fieldOfView;
             }
 
             public readonly bool Equals(Camera camera)
             {
                 return orthographic == camera.orthographic &&
+                   orthographicSize == camera.orthographicSize &&
                         fieldOfView == camera.fieldOfView;
             }
         }
