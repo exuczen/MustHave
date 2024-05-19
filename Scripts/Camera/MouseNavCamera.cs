@@ -46,7 +46,10 @@ namespace MustHave
 
         private void OnValidate()
         {
-            OnEnable();
+            if (enabled)
+            {
+                OnEnable();
+            }
         }
 
         private void OnApplicationFocus(bool focus)
