@@ -4,6 +4,22 @@ namespace MustHave.Utils
 {
     public struct ShaderUtils
     {
+        public static int GetThreadGroupsCount(uint numthreads, int size, bool clamp = true)
+        {
+            return GetThreadGroupsCount((int)numthreads, size, clamp);
+        }
+
+        public static int GetThreadGroupsCount(int numthreads, int size, bool clamp = true)
+        {
+            if (numthreads == 0)
+            {
+                return 0;
+            }
+            int n = numthreads;
+            int count = (size + n - 1) / n;
+            return clamp ? Mathf.Clamp(count, 1, 65535) : count;
+        }
+
         public static void PrintComputeShaderKeywords(ComputeShader shader)
         {
             Debug.Log($"{shader.name}: keywordSpace.keywordCount: {shader.keywordSpace.keywordCount}");
