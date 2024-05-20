@@ -16,8 +16,11 @@ namespace MustHave
         [SerializeField] private float distance = 10f;
         [SerializeField] private Transform target = null;
         [SerializeField] private Transform targetPlane = null;
+#if UNITY_EDITOR
         [SerializeField, HideInInspector] private new Camera camera = default;
-
+#else
+        [SerializeField, HideInInspector] private Camera camera = default;
+#endif
         private readonly GUIStyle guiStyle = new();
 
         private bool cameraOrthoPrev = default;

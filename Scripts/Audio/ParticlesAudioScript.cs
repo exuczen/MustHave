@@ -10,8 +10,11 @@ namespace MustHave.Audio
         [SerializeField] private AudioClip deathClip = default;
         [SerializeField, Range(0f, 1f)] private float birthClipVolume = 1f;
         [SerializeField, Range(0f, 1f)] private float deathClipVolume = 1f;
-
+#if UNITY_EDITOR
         private new ParticleSystem particleSystem = default;
+#else
+        private ParticleSystem particleSystem = default;
+#endif
         private int particlesCount = 0;
         private bool running = false;
 

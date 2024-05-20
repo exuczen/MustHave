@@ -31,8 +31,11 @@ namespace MustHave
         }
 
         private CameraData prevData = default;
+#if UNITY_EDITOR
         private new Camera camera = null;
-
+#else
+        private Camera camera = null;
+#endif
         private void OnApplicationFocus(bool focus)
         {
             SetPreviousData();

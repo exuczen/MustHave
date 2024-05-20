@@ -5,7 +5,7 @@ namespace MustHave
 {
     public class AppTargetFramerateEditor : EditorWindow
     {
-        [MenuItem("Tools/AppTargetFramerateEditor")]
+        [MenuItem("Tools/Target Framerate Editor")]
         private static void Init()
         {
             var window = GetWindow<AppTargetFramerateEditor>("TargetFramerateEditor");

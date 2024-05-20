@@ -11,7 +11,7 @@ namespace MustHave
 #if UNITY_EDITOR
     public static class TextureEditor
     {
-        [MenuItem("Tools/CreateCubeTexture3D")]
+        [MenuItem("Tools/Create Cube Texture3D")]
         public static void CreateCubeTexture3D()
         {
             // Configure the texture

@@ -6,9 +6,11 @@ namespace MustHave
     public class TouchNavCamera : MonoBehaviour
     {
         [SerializeField] private float translationSpeed = default;
-
+#if UNITY_EDITOR
         private new Camera camera = default;
-
+#else
+        private Camera camera = default;
+#endif
         private void Awake()
         {
             camera = GetComponent<Camera>();
