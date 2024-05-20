@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
@@ -6,9 +7,11 @@ using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#endif
 
 namespace MustHave
 {
+#if UNITY_EDITOR
     public struct EditorUtils
     {
         public static Action<bool> UnityEditorFocusChanged
@@ -125,4 +128,7 @@ namespace MustHave
             }
         }
     }
+#else
+    public struct EditorUtils {}
+#endif
 }
