@@ -114,6 +114,7 @@ namespace MustHave
                 //Debug.Log($"{GetType().Name}.Setup: srcFov: {parentCamera.fieldOfView:f2} dstFov: {shapeCamera.fieldOfView:f2}");
             }
             shapeCamera.targetTexture = shapeTexture;
+            shapeCamera.clearFlags = CameraClearFlags.SolidColor;
             shapeCamera.backgroundColor = Color.clear;
             shapeCamera.cullingMask = Layer.OutlineMask;
             shapeCamera.allowMSAA = false;
