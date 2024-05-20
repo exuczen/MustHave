@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+#endif
 
 namespace MustHave
 {
+#if UNITY_EDITOR
     public static class TextureEditor
     {
         [MenuItem("Tools/CreateCubeTexture3D")]
@@ -117,4 +120,7 @@ namespace MustHave
             return sprites;
         }
     }
+#else
+    public static class TextureEditor { }
+#endif
 }
