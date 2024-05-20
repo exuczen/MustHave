@@ -1,5 +1,6 @@
 {
     "name": "WebPAssembly",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
