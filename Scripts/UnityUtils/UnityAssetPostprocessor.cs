@@ -6,7 +6,7 @@ using UnityEditor;
 namespace MustHave
 {
 #if UNITY_EDITOR
-    public class EditorAssetPostprocessor : AssetPostprocessor
+    public class UnityAssetPostprocessor : AssetPostprocessor
     {
         public static event Action AllAssetsPostprocessed = delegate { };
 
@@ -16,6 +16,6 @@ namespace MustHave
         }
     }
 #else
-    public class EditorAssetPostprocessor {}
+    public class UnityAssetPostprocessor {}
 #endif
 }

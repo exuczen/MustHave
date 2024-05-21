@@ -1,14 +1,11 @@
-﻿#if UNITY_EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-#endif
 
 namespace MustHave
 {
-#if UNITY_EDITOR
     public static class TextureEditor
     {
         [MenuItem("Tools/Create Cube Texture3D")]
@@ -56,7 +53,7 @@ namespace MustHave
 
         public static void SliceTextureToSpriteSheet(string texturePath, int width, int height, int colsCount, int rowsCount, bool inverseVertical = false)
         {
-            var textureImporter = TextureImporter.GetAtPath(texturePath) as TextureImporter;
+            var textureImporter = AssetImporter.GetAtPath(texturePath) as TextureImporter;
             if (!textureImporter)
             {
                 Debug.Log("SliceTextureToSpriteSheet: file does not exists: " + texturePath);
@@ -86,7 +83,7 @@ namespace MustHave
                 int y = inverseVertical ? rowsCount - i - 1 : i;
                 for (int x = 0; x < colsCount; x++)
                 {
-                    Rect rect = new Rect(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+                    Rect rect = new(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
                     var meta = new SpriteMetaData
                     {
                         pivot = 0.5f * Vector2.one,
@@ -120,7 +117,4 @@ namespace MustHave
             return sprites;
         }
     }
-#else
-    public static class TextureEditor { }
-#endif
 }

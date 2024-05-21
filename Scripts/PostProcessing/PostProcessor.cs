@@ -168,8 +168,8 @@ namespace MustHave
                 EditorSceneManager.activeSceneChangedInEditMode -= OnActiveSceneChangedInEditMode;
                 EditorSceneManager.activeSceneChangedInEditMode += OnActiveSceneChangedInEditMode;
 #endif
-                EditorAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
-                EditorAssetPostprocessor.AllAssetsPostprocessed += OnAllAssetsPostprocessed;
+                UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
+                UnityAssetPostprocessor.AllAssetsPostprocessed += OnAllAssetsPostprocessed;
             }
 #endif
             if (cameraChangeListener)
@@ -188,7 +188,7 @@ namespace MustHave
                 EditorSceneManager.sceneOpened -= OnSceneOpened;
                 EditorSceneManager.activeSceneChangedInEditMode -= OnActiveSceneChangedInEditMode;
 #endif
-                EditorAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
+                UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
             }
 #endif
             if (cameraChangeListener)

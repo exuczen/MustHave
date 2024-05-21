@@ -95,7 +95,7 @@ namespace MustHave
 #if UNITY_EDITOR
             if (!layerAdded)
             {
-                layerAdded = EditorUtils.AddLayer(Layer.OutlineLayerName, out bool layerExists) || layerExists;
+                layerAdded = UnityUtils.AddLayer(Layer.OutlineLayerName, out bool layerExists) || layerExists;
 
                 if (layerAdded)
                 {
