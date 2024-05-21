@@ -1,7 +1,8 @@
-﻿#if UNITY_EDITOR
-using System;
-using UnityEditor;
+﻿using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MustHave
 {
@@ -14,6 +15,7 @@ namespace MustHave
 
         public void AlignToForwardAxis()
         {
+#if UNITY_EDITOR
             SceneView sceneView = SceneView.lastActiveSceneView;
             if (sceneView)
             {
@@ -22,7 +24,7 @@ namespace MustHave
                 sceneView.rotation = Quaternion.LookRotation(forward, transform.up);
                 sceneView.Repaint();
             }
+#endif
         }
     }
 }
-#endif

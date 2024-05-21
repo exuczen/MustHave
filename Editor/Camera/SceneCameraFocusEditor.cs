@@ -33,7 +33,6 @@ namespace MustHave
             selectedFwdAxisSignIndex = GUILayout.SelectionGrid(selectedFwdAxisSignIndex, new string[] { " - ", " + " }, 2);
             cameraFocus.ForwardAxisSign = (selectedFwdAxisSignIndex << 1) - 1;
             GUILayout.EndHorizontal();
-            
         }
     }
 }

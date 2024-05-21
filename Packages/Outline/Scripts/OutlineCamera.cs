@@ -83,7 +83,7 @@ namespace MustHave
 #if UNITY_EDITOR
                         objectCamera = UnityEditor.PrefabUtility.InstantiatePrefab(objectCameraPrefab, transform) as OutlineObjectCamera;
 #else
-                    objectCamera = Instantiate(objectCameraPrefab, transform);
+                        objectCamera = Instantiate(objectCameraPrefab, transform);
 #endif
                         objectCamera.name = OutlineObjectCamera.PrefabName;
                     }
@@ -212,6 +212,10 @@ namespace MustHave
 
         private void SetDebugShaderMode(DebugShaderMode debugMode)
         {
+            if (!shader)
+            {
+                return;
+            }
             var prevKeyword = new LocalKeyword(shader, debugShaderMode.ToString());
             var keyword = new LocalKeyword(shader, debugMode.ToString());
 

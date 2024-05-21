@@ -138,9 +138,9 @@ namespace MustHave.IconsRenderer
             }
         }
 
-#if UNITY_EDITOR
         public void AssignIconsToPrefabs(List<Sprite> sprites)
         {
+#if UNITY_EDITOR
             IIconSourceProvider provider = iconSourceProvider as IIconSourceProvider;
             int count = Mathf.Min(sprites.Count, provider.IconSourceCount);
             for (int i = 0; i < count; i++)
@@ -155,8 +155,8 @@ namespace MustHave.IconsRenderer
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
-        }
 #endif
+        }
 
         private void RecreateRenderTextures()
         {
@@ -201,7 +201,8 @@ namespace MustHave.IconsRenderer
                 {
                     DestroyRenderTexture(renderTexture);
                 }
-                renderTexture = new RenderTexture(width, height, 0) {
+                renderTexture = new RenderTexture(width, height, 0)
+                {
                     antiAliasing = 8,
                 };
             }
