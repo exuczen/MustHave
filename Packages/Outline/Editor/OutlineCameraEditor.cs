@@ -1,33 +1,35 @@
-﻿using MustHave;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(OutlineCamera))]
-public class OutlineCameraEditor : Editor
+namespace MustHave
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(OutlineCamera))]
+    public class OutlineCameraEditor : Editor
     {
-        base.OnInspectorGUI();
-
-        var camera = target as OutlineCamera;
-
-        EditorGUI.BeginChangeCheck();
-
-        camera.DebugShader = EditorGUILayout.Toggle("Debug Shader", camera.DebugShader);
-
-        var shaderDebugMode = camera.ShaderDebugMode;
-
-        if (camera.DebugShader)
+        public override void OnInspectorGUI()
         {
-            shaderDebugMode = (OutlineCamera.DebugShaderMode)EditorGUILayout.EnumPopup("Debug Mode", shaderDebugMode);
-        }
-        if (EditorGUI.EndChangeCheck())
-        {
+            base.OnInspectorGUI();
+
+            var camera = target as OutlineCamera;
+
+            EditorGUI.BeginChangeCheck();
+
+            camera.DebugShader = EditorGUILayout.Toggle("Debug Shader", camera.DebugShader);
+
+            var shaderDebugMode = camera.ShaderDebugMode;
+
             if (camera.DebugShader)
             {
-                camera.ShaderDebugMode = shaderDebugMode;
+                shaderDebugMode = (OutlineCamera.DebugShaderMode)EditorGUILayout.EnumPopup("Debug Mode", shaderDebugMode);
             }
-            EditorUtils.SetSceneOrObjectDirty(target);
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (camera.DebugShader)
+                {
+                    camera.ShaderDebugMode = shaderDebugMode;
+                }
+                EditorUtils.SetSceneOrObjectDirty(target);
+            }
         }
     }
 }

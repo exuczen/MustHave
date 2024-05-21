@@ -1,30 +1,32 @@
-﻿using MustHave;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(OutlineObject))]
-public class OutlineObjectEditor : Editor
+namespace MustHave
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(OutlineObject))]
+    public class OutlineObjectEditor : Editor
     {
-        base.OnInspectorGUI();
-
-        var camera = CameraUtils.MainOrCurrent;
-        var outlineCamera = camera ? camera.GetComponent<OutlineCamera>() : null;
-        if (outlineCamera)
+        public override void OnInspectorGUI()
         {
-            EditorGUI.BeginChangeCheck();
+            base.OnInspectorGUI();
 
-            int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, OutlineCamera.LineMaxThickness);
-
-            if (EditorGUI.EndChangeCheck())
+            var camera = CameraUtils.MainOrCurrent;
+            var outlineCamera = camera ? camera.GetComponent<OutlineCamera>() : null;
+            if (outlineCamera)
             {
-                outlineCamera.LineThickness = lineThickness;
+                EditorGUI.BeginChangeCheck();
 
-                if (!EditorApplication.isPlaying)
+                int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, OutlineCamera.LineMaxThickness);
+
+                if (EditorGUI.EndChangeCheck())
                 {
-                    EditorUtils.SetSceneOrObjectDirty(outlineCamera);
-                    EditorApplication.QueuePlayerLoopUpdate();
+                    outlineCamera.LineThickness = lineThickness;
+
+                    if (!EditorApplication.isPlaying)
+                    {
+                        EditorUtils.SetSceneOrObjectDirty(outlineCamera);
+                        EditorApplication.QueuePlayerLoopUpdate();
+                    }
                 }
             }
         }
