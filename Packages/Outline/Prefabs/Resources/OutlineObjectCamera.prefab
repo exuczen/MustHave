@@ -10,8 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8163909568474950643}
   - component: {fileID: 8163909568474950640}
-  - component: {fileID: 700463154928315720}
-  - component: {fileID: 502934876733549401}
+  - component: {fileID: 566796444583111364}
   m_Layer: 0
   m_Name: OutlineObjectCamera
   m_TagString: Untagged
@@ -61,7 +60,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 137.87079
+  field of view: 60
   orthographic: 0
   orthographic size: 16.097158
   m_Depth: -1
@@ -79,27 +78,7 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &700463154928315720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8163909568474950652}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a78ffc6b7410185448afe7a0ad76a58f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  computeShader: {fileID: 7200000, guid: 39b641cc29368ab4a880b67ff5e7738d, type: 3}
-  outlineShapeMaterial: {fileID: 2100000, guid: 72e4195249107024486d80e533fa88ea,
-    type: 2}
-  circleSpriteMaterial: {fileID: 2100000, guid: 0dabd004453941543979dd8a1ad5f30f,
-    type: 2}
-  quadMeshFilter: {fileID: 8163909569428046519}
-  circleCamera: {fileID: 8163909569494346248}
-  layerAdded: 1
---- !u!114 &502934876733549401
+--- !u!114 &566796444583111364
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -108,9 +87,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 8163909568474950652}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b38795e3b5cca3c41af28f5745a2b095, type: 3}
+  m_Script: {fileID: 11500000, guid: fe6b8360142b7be4da3061083850c811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  computeShader: {fileID: 7200000, guid: edeab9fbf91b47440acec1d336c452fb, type: 3}
+  outlineShapeMaterial: {fileID: 2100000, guid: d0ce2205e75561443ac5b4c85828e04d,
+    type: 2}
+  circleSpriteMaterial: {fileID: 2100000, guid: 11918368331216c4384cdb79fd7f52c0,
+    type: 2}
+  quadMeshFilter: {fileID: 8163909569428046519}
+  circleCamera: {fileID: 8163909569494346248}
+  layerAdded: 0
 --- !u!1 &8163909569428046515
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +240,7 @@ Camera:
   far clip plane: 1000
   field of view: 137.87079
   orthographic: 1
-  orthographic size: 16.097158
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

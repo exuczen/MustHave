@@ -1,7 +1,9 @@
 ﻿using MustHave.UI;
+using UnityEngine;
 
 namespace MustHave
 {
+    //[CreateAssetMenu(fileName = "AppMessageEvents", menuName = "ScriptableObjects/AppMessageEvents")]
     public class AppMessageEvents : MessageEventGroup
     {
         public DataMessageEvent<ScreenData> ShowScreenMessage { get; } = new DataMessageEvent<ScreenData>();
