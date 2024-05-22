@@ -1,5 +1,5 @@
-﻿#if UNITY_EDITOR
-using System;
+﻿using System;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
 
@@ -7,6 +7,9 @@ namespace MustHave
 {
 #if UNITY_EDITOR
     public class UnityAssetPostprocessor : AssetPostprocessor
+#else
+    public class UnityAssetPostprocessor
+#endif
     {
         public static event Action AllAssetsPostprocessed = delegate { };
 
@@ -15,7 +18,4 @@ namespace MustHave
             AllAssetsPostprocessed();
         }
     }
-#else
-    public class UnityAssetPostprocessor {}
-#endif
 }
