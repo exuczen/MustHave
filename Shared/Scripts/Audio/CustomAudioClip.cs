@@ -2,7 +2,7 @@
 
 namespace MustHave.Audio
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(fileName = "CustomAudioClip", menuName = "MustHave/ScriptableObjects/CustomAudioClip")]
     public class CustomAudioClip : ScriptableObject
     {
         [SerializeField] private AudioClip audioClip = default;

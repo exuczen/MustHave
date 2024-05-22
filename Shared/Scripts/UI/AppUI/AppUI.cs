@@ -17,8 +17,8 @@ namespace MustHave.UI
         [SerializeField] private AlertPopup alertPopup = default;
         [SerializeField] private ProgressSpinnerPanel progressSpinnerPanel = default;
 
-        private readonly List<ScreenData> screenDataStack = new List<ScreenData>();
-        private readonly Dictionary<Type, UIScreen> screensDict = new Dictionary<Type, UIScreen>();
+        private readonly List<ScreenData> screenDataStack = new();
+        private readonly Dictionary<Type, UIScreen> screensDict = new();
         private string activeSceneName = default;
         private UICanvas activeCanvas = default;
         private ScreenData activeScreenData = default;
@@ -179,10 +179,7 @@ namespace MustHave.UI
                 activeCanvas = null;
                 activeScreenData = null;
                 // Invoke callback
-                if (onSuccess != null)
-                {
-                    onSuccess.Invoke();
-                }
+                onSuccess?.Invoke();
             }
         }
 

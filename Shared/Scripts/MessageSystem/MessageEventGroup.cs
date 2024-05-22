@@ -5,7 +5,7 @@ namespace MustHave
 {
     public abstract class MessageEventGroup : ScriptableObject
     {
-        protected List<MessageEvent> events = new List<MessageEvent>();
+        protected List<MessageEvent> events = new();
 
         public abstract void Initialize();
 

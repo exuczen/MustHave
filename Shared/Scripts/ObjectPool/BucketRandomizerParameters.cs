@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    [CreateAssetMenu(menuName = "Dialogue System/BucketRandomizerParameters")]
+    [CreateAssetMenu(menuName = "MustHave/DialogueSystem/BucketRandomizerParameters")]
     public class BucketRandomizerParameters : ScriptableObject
     {
         public int SuccessCount => successCount;
