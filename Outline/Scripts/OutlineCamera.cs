@@ -195,7 +195,7 @@ namespace MustHave
                 extendedSize.x = extendedSize.y * texSize.x / texSize.y;
 
                 texOffset.y = offset;
-                texOffset.x = (int)(texOffset.y * texSize.x / texSize.y + 0.5f);
+                texOffset.x = (int)(1f * texOffset.y * texSize.x / texSize.y + 0.5f);
             }
             else
             {
@@ -203,7 +203,7 @@ namespace MustHave
                 extendedSize.y = extendedSize.x * texSize.y / texSize.x;
 
                 texOffset.x = offset;
-                texOffset.y = (int)(texOffset.x * texSize.y / texSize.x + 0.5f);
+                texOffset.y = (int)(1f * texOffset.x * texSize.y / texSize.x + 0.5f);
             }
             shapeTexOffset = texOffset;
 

@@ -157,7 +157,22 @@ namespace MustHave
 
         private float GetExtendedOrthoSize(Camera parentCamera, int pixelOffset)
         {
-            return parentCamera.orthographicSize * (1f + 2f * pixelOffset / parentCamera.pixelHeight);
+            float orthoHalfHeight = parentCamera.orthographicSize;
+            float w = parentCamera.pixelWidth;
+            float h = parentCamera.pixelHeight;
+
+            if (w > h)
+            {
+                return orthoHalfHeight * (1f + 2f * pixelOffset / parentCamera.pixelHeight);
+
+            }
+            else
+            {
+                //float orthoHalfWidth = orthoHalfHeight * w / h;
+                //float destOrthoHalfWidth = orthoHalfWidth * (1f + 2f * pixelOffset / parentCamera.pixelWidth);
+                //float destOrthoHalfHeight = destOrthoHalfWidth * h / w;
+                return orthoHalfHeight * (1f + 2f * pixelOffset / parentCamera.pixelWidth);
+            }
         }
 
         private float GetExtendedFieldOfView(Camera parentCamera, int pixelOffset)
@@ -305,6 +320,11 @@ namespace MustHave
             {
                 return;
             }
+            int layer = circleRenderParams.layer;
+            if (layer < 0 || layer > 31)
+            {
+                return;
+            }
             var circlesCamTransform = circleCamera.transform;
 
             float scale = 2f * (radius + 1) / circleCamera.pixelHeight;
@@ -312,27 +332,41 @@ namespace MustHave
             float minDepth = 1f / count;
 
             // At this point renderers are sorted by distance from camera
+            int j = 0;
             for (int i = 0; i < count; i++)
             {
-                SetCircleInstanceData(i, scaleXY, minDepth);
+                if (SetCircleInstanceData(j, scaleXY, minDepth))
+                {
+                    j++;
+                }
             }
-            circleInstanceBuffer.SetData(circleInstanceData, 0, 0, renderersData.Count);
-            circleRenderParams.material.SetFloat("_MinDepth", minDepth);
-            circleRenderParams.worldBounds = new Bounds(circlesCamTransform.position, Vector3.one);
+            count = j;
+            if (count > 0)
+            {
+                circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
+                circleRenderParams.material.SetFloat("_MinDepth", minDepth);
+                circleRenderParams.worldBounds = new Bounds(circlesCamTransform.position, Vector3.one);
 
-            Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, renderersData.Count);
-            //Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleInstanceData, renderersData.Count);
-            //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
-            //    circleRenderParams.worldBounds, renderersData.Count, circlePropertyBlock,
-            //    ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+                Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
+                //Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleInstanceData, count);
+                //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
+                //    circleRenderParams.worldBounds, count, circlePropertyBlock,
+                //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+            }
         }
 
-        private void SetCircleInstanceData(int i, Vector2 scale, float minDepth)
+        private bool SetCircleInstanceData(int i, Vector2 scale, float minDepth)
         {
             var data = renderersData[i];
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
             var viewPoint = shapeCamera.WorldToViewportPoint(center);
+
+            if (!CameraUtils.IsBetweenNearAndFar(circleCamera, viewPoint.z))
+            {
+                return false;
+            }
+            //Debug.Log($"{GetType().Name}.SetCircleInstanceData: {viewPoint}");
             //var worldPoint = circlesCamera.ViewportToWorldPoint(viewPoint);
             //objectToWorld.SetTRS(worldPoint, Quaternion.LookRotation(circlesCamTransform.forward, circlesCamTransform.up), Vector3.one);
             var clipPoint = new Vector3()
@@ -350,6 +384,7 @@ namespace MustHave
                 color = color,
                 scale = scale
             };
+            return true;
         }
 
         public void OnUpdate(OutlineCamera outlineCamera)

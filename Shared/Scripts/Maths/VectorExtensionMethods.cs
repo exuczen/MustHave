@@ -23,20 +23,17 @@ namespace MustHave
                 );
         }
 
-        public static bool IsInCameraView(this Vector3 pos, Camera camera, float viewportOffsetX = 0f, float viewportOffsetY = 0f)
+        public static bool IsInCameraViewXY(this Vector3 pos, Camera camera, float viewportOffsetX = 0f, float viewportOffsetY = 0f)
         {
-            Vector3 viewportPos = camera.WorldToViewportPoint(pos);
-            return
-                viewportPos.x > -viewportOffsetX && viewportPos.x < 1f + viewportOffsetX &&
-                viewportPos.y > -viewportOffsetY && viewportPos.y < 1f + viewportOffsetY;
+            return IsInCameraViewXY((Vector2)pos, camera, viewportOffsetX, viewportOffsetY);
         }
 
-        public static bool IsInCameraView(this Vector2 pos, Camera camera, float viewportOffsetX = 0f, float viewportOffsetY = 0f)
+        public static bool IsInCameraViewXY(this Vector2 pos, Camera camera, float viewportOffsetX = 0f, float viewportOffsetY = 0f)
         {
             Vector2 viewportPos = camera.WorldToViewportPoint(pos);
             return
-                viewportPos.x > -viewportOffsetX && viewportPos.x < 1f + viewportOffsetX &&
-                viewportPos.y > -viewportOffsetY && viewportPos.y < 1f + viewportOffsetY;
+                viewportPos.x >= -viewportOffsetX && viewportPos.x <= 1f + viewportOffsetX &&
+                viewportPos.y >= -viewportOffsetY && viewportPos.y <= 1f + viewportOffsetY;
         }
     }
 }
