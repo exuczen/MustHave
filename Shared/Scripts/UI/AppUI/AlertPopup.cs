@@ -123,7 +123,7 @@ namespace MustHave.UI
 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
 #else
-                Application.Quit();
+                    Application.Quit();
 #endif
                 })).SetText(WARNING_QUIT_CONFIRM).Show();
         }

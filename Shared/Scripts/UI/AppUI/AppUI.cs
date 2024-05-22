@@ -337,9 +337,7 @@ namespace MustHave.UI
             }
             else
             {
-#if UNITY_ANDROID || UNITY_EDITOR || UNITY_STANDALONE
                 activeAlertPopup.ShowQuitWarning();
-#endif
             }
         }
 
@@ -348,7 +346,6 @@ namespace MustHave.UI
             screenDataStack.Add(new ScreenData(typeof(T1), typeof(T2), sceneName));
         }
 
-#if UNITY_ANDROID || UNITY_EDITOR || UNITY_STANDALONE
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -363,6 +360,5 @@ namespace MustHave.UI
                 }
             }
         }
-#endif
     }
 }
