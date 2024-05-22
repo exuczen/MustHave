@@ -216,29 +216,33 @@ namespace MustHave
             {
                 return;
             }
-            var prevKeyword = new LocalKeyword(shader, debugShaderMode.ToString());
+            //var prevKeyword = new LocalKeyword(shader, debugShaderMode.ToString());
             var keyword = new LocalKeyword(shader, debugMode.ToString());
 
-            if (!keyword.isValid || !prevKeyword.isValid)
-            {
-                if (!keyword.isValid)
-                {
-                    Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {keyword}");
-                }
-                if (!prevKeyword.isValid)
-                {
-                    Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {prevKeyword}");
-                }
-                return;
-            }
+            /* Disabled keyword validity check on purpose - there are scenarios, where skipping 
+             * invalid keyword causes missing kernel errors after shader recompilation.
+             * Using string keyword names instead of LocalKeyword struct for the same reason.  */
+
+            //if (!keyword.isValid || !prevKeyword.isValid)
+            //{
+            //    if (!keyword.isValid)
+            //    {
+            //        Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {keyword}");
+            //    }
+            //    if (!prevKeyword.isValid)
+            //    {
+            //        Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {prevKeyword}");
+            //    }
+            //    return;
+            //}
             if (debugShaderMode == debugMode && shader.IsKeywordEnabled(keyword))
             {
                 return;
             }
             //Debug.Log($"{GetType().Name}.SetDebugShaderMode: {debugMode}");
-            shader.DisableKeyword(prevKeyword);
+            shader.DisableKeyword(debugShaderMode.ToString());
             debugShaderMode = debugMode;
-            shader.EnableKeyword(keyword);
+            shader.EnableKeyword(debugShaderMode.ToString());
         }
     }
 }
