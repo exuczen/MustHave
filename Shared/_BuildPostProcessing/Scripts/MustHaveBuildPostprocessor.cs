@@ -8,7 +8,7 @@ using System;
 
 namespace MustHave
 {
-    public class MustHaveBuildPostprocessor
+    public static class MustHaveBuildPostprocessor
     {
 #if UNITY_EDITOR
         private const string MustHaveLibName = "MustHave.dll";
@@ -20,23 +20,52 @@ namespace MustHave
 
         private static string GetPluginLibPath(string subfolderName, string libName) => Path.Combine(MustHavePluginsFolderPath, subfolderName, libName);
         private static string GetFullPath(string localPath) => Path.Combine(Application.dataPath, localPath);
+        private static string GetAssetsPath(string localPath) => Path.Combine("Assets", localPath);
 
-        [MenuItem("Tools/Setup MustHave DLLs For Export")]
-        public static void SetupMustHaveLibsForExport()
+        [MenuItem("Tools/Enable MustHave DLLs platforms for export")]
+        public static void EnableMustHaveLibsPlatforms()
         {
-            throw new NotImplementedException();
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                importer.SetCompatibleWithAnyPlatform(true);
+                importer.SetExcludeEditorFromAnyPlatform(true);
+                SetExcludeStandaloneFromAnyPlatform(importer, false);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(true);
+            AssetDatabase.Refresh();
+        }
+
+        [MenuItem("Tools/Disable MustHave DLLs platforms")]
+        public static void DisableMustHaveLibsPlatforms()
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                importer.SetCompatibleWithEditor(false);
+                SetCompatibleWithStandalonePlatforms(importer, false);
+                importer.SetCompatibleWithAnyPlatform(false);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(false);
+            AssetDatabase.Refresh();
         }
 
         [PostProcessBuild(0)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            var managedPluginFolderPath = Directory.GetParent(pathToBuiltProject).FullName;
-            managedPluginFolderPath = Path.Combine(managedPluginFolderPath, $"{Application.productName}_Data", "Managed");
-            var srcMustHaveLibPath = Path.Combine(managedPluginFolderPath, MustHaveLibName);
-            var dstMustHaveLibPath = GetFullPath(MustHaveStandaloneLibPath);
+            Debug.Log($"OnPostprocessBuild: {target}");
+            bool standaloneWindows = target.ToString().StartsWith("StandaloneWindows");
+            if (standaloneWindows)
+            {
+                var managedPluginFolderPath = Directory.GetParent(pathToBuiltProject).FullName;
+                managedPluginFolderPath = Path.Combine(managedPluginFolderPath, $"{Application.productName}_Data", "Managed");
+                var srcMustHaveLibPath = Path.Combine(managedPluginFolderPath, MustHaveLibName);
+                var dstMustHaveLibPath = GetFullPath(MustHaveStandaloneLibPath);
 
-            TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
-
+                TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
+            }
             var projectFolderPath = Directory.GetParent(Application.dataPath).FullName;
             var assemblyFolderPath = Path.Combine(projectFolderPath, "Library", "ScriptAssemblies");
             var mustHaveAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveLibName);
@@ -48,6 +77,48 @@ namespace MustHave
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
+
+        private static void SetMustHaveEditorLibsCompatibleWithEditor(bool compatible)
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveEditorLibPath)) as PluginImporter;
+            if (importer)
+            {
+                importer.SetCompatibleWithEditor(compatible);
+                importer.SaveAndReimport();
+            }
+            importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveEditorEditorLibPath)) as PluginImporter;
+            if (importer)
+            {
+                importer.SetCompatibleWithEditor(compatible);
+                importer.SaveAndReimport();
+            }
+        }
+
+        private static void SetCompatibleWithStandalonePlatforms(PluginImporter importer, bool compatible)
+        {
+            ForEachStandalonePlatform((importer, target, value) => importer.SetCompatibleWithPlatform(target, value), importer, compatible);
+        }
+
+        private static void SetExcludeStandaloneFromAnyPlatform(PluginImporter importer, bool exclude)
+        {
+            ForEachStandalonePlatform((importer, target, value) => importer.SetExcludeFromAnyPlatform(target, value), importer, exclude);
+        }
+
+        private static void ForEachStandalonePlatform(Action<PluginImporter, BuildTarget, bool> action, PluginImporter importer, bool value)
+        {
+            action(importer, BuildTarget.StandaloneWindows, value);
+            action(importer, BuildTarget.StandaloneWindows64, value);
+
+            //action(importer, BuildTarget.StandaloneLinux, value);
+            action(importer, BuildTarget.StandaloneLinux64, value);
+            //action(importer, BuildTarget.StandaloneLinuxUniversal, value);
+
+            action(importer, BuildTarget.StandaloneOSX, value);
+            //action(importer, BuildTarget.StandaloneOSXIntel, value);
+            //action(importer, BuildTarget.StandaloneOSXIntel64, value);
+            //action(importer, BuildTarget.StandaloneOSXUniversal, value);
+        }
+
 
         private static void TryCopyFile(string sourceFilePath, string destFilePath, bool deleteExisting = true)
         {
