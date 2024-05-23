@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace MustHave.IconsRenderer
+namespace MustHave
 {
     //[CreateAssetMenu(fileName = "DebugIconSourceProvider", menuName = "ScriptableObjects/DebugIconSourceProvider", order = 1)]
     public class DebugIconSourceProvider : ScriptableObject, IIconSourceProvider

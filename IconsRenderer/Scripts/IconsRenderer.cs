@@ -4,7 +4,7 @@ using UnityEngine;
 using MustHave.UI;
 using MustHave.Utils;
 
-namespace MustHave.IconsRenderer
+namespace MustHave
 {
     public class IconsRenderer : MonoBehaviour
     {

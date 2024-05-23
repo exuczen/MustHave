@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace MustHave.IconsRenderer
+namespace MustHave
 {
     public class IconSourceObject : MonoBehaviour
     {

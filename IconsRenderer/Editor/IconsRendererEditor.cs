@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace MustHave.IconsRenderer
+namespace MustHave
 {
     [CustomEditor(typeof(IconsRenderer))]
     public class IconsRendererEditor : Editor

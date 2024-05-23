@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MustHave.IconsRenderer
+namespace MustHave
 {
     public class DebugIconSourceObject : IconSourceObject
     {

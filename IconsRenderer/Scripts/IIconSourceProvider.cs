@@ -1,4 +1,4 @@
-﻿namespace MustHave.IconsRenderer
+﻿namespace MustHave
 {
     public interface IIconSourceProvider
     {
