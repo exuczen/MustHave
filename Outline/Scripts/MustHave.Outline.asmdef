@@ -2,7 +2,7 @@
     "name": "MustHave.Outline",
     "rootNamespace": "",
     "references": [
-        "MustHave"
+        "MustHave.Shared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

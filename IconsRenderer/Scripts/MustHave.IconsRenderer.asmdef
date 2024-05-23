@@ -2,7 +2,7 @@
     "name": "MustHave.IconsRenderer",
     "rootNamespace": "",
     "references": [
-        "MustHave"
+        "MustHave.Shared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,15 +2,17 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
-#endif
 using System.IO;
 using System;
+#endif
 
 namespace MustHave
 {
     public static class MustHaveBuildPostprocessor
     {
 #if UNITY_EDITOR
+        private const string MustHaveSharedLibName = "MustHave.Shared.dll";
+        private const string MustHaveEditorSharedLibName = "MustHaveEditor.Shared.dll";
         private const string MustHaveLibName = "MustHave.dll";
         private const string MustHaveEditorLibName = "MustHaveEditor.dll";
         private const string MustHavePluginsFolderPath = @"Packages/MustHave/Shared/Plugins";
@@ -52,6 +54,12 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Tools/Export MustHave Outline Package")]
+        public static void ExportMustHaveOutlinePackage()
+        {
+            throw new NotImplementedException();
+        }
+
         [PostProcessBuild(0)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
@@ -61,18 +69,20 @@ namespace MustHave
             {
                 var managedPluginFolderPath = Directory.GetParent(pathToBuiltProject).FullName;
                 managedPluginFolderPath = Path.Combine(managedPluginFolderPath, $"{Application.productName}_Data", "Managed");
-                var srcMustHaveLibPath = Path.Combine(managedPluginFolderPath, MustHaveLibName);
+                var srcMustHaveLibPath = Path.Combine(managedPluginFolderPath, MustHaveSharedLibName);
                 var dstMustHaveLibPath = GetFullPath(MustHaveStandaloneLibPath);
 
                 TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
             }
             var projectFolderPath = Directory.GetParent(Application.dataPath).FullName;
             var assemblyFolderPath = Path.Combine(projectFolderPath, "Library", "ScriptAssemblies");
-            var mustHaveAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveLibName);
-            var mustHaveEditorAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveEditorLibName);
+            var mustHaveAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveSharedLibName);
+            var mustHaveEditorAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveEditorSharedLibName);
 
             TryCopyFile(mustHaveAssemblyLibPath, GetFullPath(MustHaveEditorLibPath));
             TryCopyFile(mustHaveEditorAssemblyLibPath, GetFullPath(MustHaveEditorEditorLibPath));
+
+            //DisableMustHaveLibsPlatforms();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
