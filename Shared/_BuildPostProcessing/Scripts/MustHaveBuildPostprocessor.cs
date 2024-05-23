@@ -14,9 +14,11 @@ namespace MustHave
         private const string MustHaveLibName = "MustHave.dll";
         private const string MustHaveEditorLibName = "MustHaveEditor.dll";
         private const string MustHavePluginsFolderPath = @"Packages/MustHave/Shared/Plugins";
-        private static readonly string MustHaveStandaloneLibPath = Path.Combine(MustHavePluginsFolderPath, "MustHaveStandalone", MustHaveLibName);
-        private static readonly string MustHaveEditorLibPath = Path.Combine(MustHavePluginsFolderPath, "MustHaveEditor", MustHaveLibName);
-        private static readonly string MustHaveEditorEditorLibPath = Path.Combine(MustHavePluginsFolderPath, "MustHaveEditor", MustHaveEditorLibName);
+        private static readonly string MustHaveStandaloneLibPath = GetPluginLibPath("MustHaveStandalone", MustHaveLibName);
+        private static readonly string MustHaveEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveLibName);
+        private static readonly string MustHaveEditorEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveEditorLibName);
+
+        private static string GetPluginLibPath(string subfolderName, string libName) => Path.Combine(MustHavePluginsFolderPath, subfolderName, libName);
         private static string GetFullPath(string localPath) => Path.Combine(Application.dataPath, localPath);
 
         [MenuItem("Tools/Setup MustHave DLLs For Export")]
@@ -64,7 +66,7 @@ namespace MustHave
                     }
                     File.Copy(sourceFilePath, destFilePath);
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     throw;
                 }
