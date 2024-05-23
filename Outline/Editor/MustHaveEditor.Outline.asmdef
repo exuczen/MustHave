@@ -2,9 +2,9 @@
     "name": "MustHaveEditor.Outline",
     "rootNamespace": "",
     "references": [
-        "MustHave.Shared",
+        "MustHave",
         "MustHave.Outline",
-        "MustHaveEditor.Shared"
+        "MustHaveEditor"
     ],
     "includePlatforms": [
         "Editor"

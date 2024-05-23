@@ -1,7 +1,7 @@
 {
-    "name": "MustHaveEditor.Shared",
+    "name": "MustHaveEditor",
     "references": [
-        "MustHave.Shared"
+        "MustHave"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
