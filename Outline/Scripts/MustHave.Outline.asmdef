@@ -1,0 +1,16 @@
+{
+    "name": "MustHave.Outline",
+    "rootNamespace": "",
+    "references": [
+        "MustHave"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

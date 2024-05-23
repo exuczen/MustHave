@@ -1,0 +1,20 @@
+{
+    "name": "MustHaveEditor.Outline",
+    "rootNamespace": "",
+    "references": [
+        "MustHave",
+        "MustHave.Outline",
+        "MustHaveEditor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
