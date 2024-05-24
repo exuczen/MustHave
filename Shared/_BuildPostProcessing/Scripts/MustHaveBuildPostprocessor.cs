@@ -11,6 +11,11 @@ namespace MustHave
     public static class MustHaveBuildPostprocessor
     {
 #if UNITY_EDITOR
+        private static readonly string ProjectFolderPath = Directory.GetParent(Application.dataPath).FullName;
+
+        private const string ExportedPackageFolderName = "ExportedPackages";
+        private const string ExportedOutlinePackageName = "MustHaveOutline.unitypackage";
+
         private const string MustHaveLibName = "MustHave.dll";
         private const string MustHaveEditorLibName = "MustHaveEditor.dll";
         private const string MustHavePluginsFolderPath = @"Packages/MustHave/Shared/Plugins";
@@ -37,6 +42,26 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Tools/Export MustHave Outline Package")]
+        public static void ExportMustHaveOutlinePackage()
+        {
+            var assetPaths = new string[2] {
+                "Assets/Packages/MustHave/Outline",
+                "Assets/Packages/MustHave/Shared/Plugins"
+            };
+            var packageFolderName = ExportedPackageFolderName;
+            var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);
+            var packageFileLocalPath = Path.Combine(packageFolderName, ExportedOutlinePackageName);
+
+            if (!Directory.Exists(packageFolderPath))
+            {
+                Directory.CreateDirectory(packageFolderPath);
+            }
+            AssetDatabase.ExportPackage(assetPaths, packageFileLocalPath, ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
         [MenuItem("Tools/Disable MustHave DLLs platforms")]
         public static void DisableMustHaveLibsPlatforms()
         {
@@ -50,12 +75,6 @@ namespace MustHave
             }
             SetMustHaveEditorLibsCompatibleWithEditor(false);
             AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Tools/Export MustHave Outline Package")]
-        public static void ExportMustHaveOutlinePackage()
-        {
-            throw new NotImplementedException();
         }
 
         [PostProcessBuild(0)]
@@ -72,8 +91,7 @@ namespace MustHave
 
                 TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
             }
-            var projectFolderPath = Directory.GetParent(Application.dataPath).FullName;
-            var assemblyFolderPath = Path.Combine(projectFolderPath, "Library", "ScriptAssemblies");
+            var assemblyFolderPath = Path.Combine(ProjectFolderPath, "Library", "ScriptAssemblies");
             var mustHaveAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveLibName);
             var mustHaveEditorAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveEditorLibName);
 
