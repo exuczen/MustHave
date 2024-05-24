@@ -1,10 +1,12 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine.Assertions;
+#endif
 
-public static class TSVUtils
+public struct TSVUtils
 {
 #if UNITY_EDITOR
     public const string TSVFolderPath = @"Assets/Editor/Data/TSV/";

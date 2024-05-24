@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MustHave.Utils
 {
-    public static class BinUtils
+    public readonly struct BinUtils
     {
         public static BinaryFormatter Formatter { get; } = new BinaryFormatter();
 
