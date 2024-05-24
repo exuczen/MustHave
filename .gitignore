@@ -56,8 +56,6 @@ Shared/Scripts/MessageSystem/TypeMessageEvent.cs.meta
 Shared/Scripts/ObjectPool/BucketRandomizer.cs.meta
 Shared/Scripts/ObjectPool/IPoolable.cs.meta
 Shared/Scripts/ObjectPool/ListRandomizer.cs.meta
-Shared/Scripts/SaveSystem/SerializableColor.cs.meta
-Shared/Scripts/SaveSystem/SerializableVector3.cs.meta
 Shared/Scripts/StateMachine/AnimatorStateData.cs.meta
 Shared/Scripts/UI/AppUI/AlertButtonData.cs.meta
 Shared/Scripts/UI/AppUI/ISceneChangeListener.cs.meta
