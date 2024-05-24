@@ -1,6 +1,6 @@
 ﻿namespace MustHave
 {
-    public static class UnitConverter
+    public struct UnitConverter
     {
         public static float InchToCm(float inches)
         {

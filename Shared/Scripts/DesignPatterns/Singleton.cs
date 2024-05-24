@@ -4,7 +4,10 @@ namespace MustHave
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        protected static T instance;
+        public static GameObject GameObject => Instance.gameObject;
+        public static Transform Transform => Instance.transform;
+
+        protected static T instance = null;
 
         protected virtual void Awake()
         {
@@ -55,9 +58,5 @@ namespace MustHave
         {
             instance = (instance ?? FindObjectOfType<T>()) ?? Instantiate(prefab, Vector3.zero, Quaternion.identity);
         }
-
-        public static GameObject GameObject { get { return Instance.gameObject; } }
-
-        public static Transform Transform { get { return Instance.transform; } }
     }
 }

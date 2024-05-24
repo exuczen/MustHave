@@ -5,7 +5,10 @@ namespace MustHave
 {
     public class UISingleton<T> : UIBehaviour where T : UIBehaviour
     {
-        protected static T instance;
+        public static GameObject GameObject => Instance.gameObject;
+        public static Transform Transform => Instance.transform;
+
+        protected static T instance = null;
 
         protected override void Awake()
         {
@@ -22,9 +25,18 @@ namespace MustHave
 
         protected virtual void OnAwake() { }
 
+        protected override void OnDestroy()
+        {
+            if (this == instance)
+            {
+                instance = null;
+            }
+        }
+
         public static T Instance
         {
-            get {
+            get
+            {
                 if (instance == null)
                 {
                     instance = FindObjectOfType<T>();
@@ -46,18 +58,6 @@ namespace MustHave
         public static void FindOrCreateInstance(T prefab)
         {
             instance = (instance ?? FindObjectOfType<T>()) ?? Instantiate(prefab, Vector3.zero, Quaternion.identity);
-        }
-
-        public static GameObject GameObject { get { return Instance.gameObject; } }
-
-        public static Transform Transform { get { return Instance.transform; } }
-
-        protected override void OnDestroy()
-        {
-            if (this == instance)
-            {
-                instance = null;
-            }
         }
     }
 }

@@ -41,7 +41,7 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# Metas of scripts that are not unity components
+# Metas of scripts that are not serialized unity components or scriptables
 Shared/Scripts/Camera/CameraExtensionMethods.cs.meta
 Shared/Scripts/Camera/CameraUtils.cs.meta
 Shared/Scripts/Camera/ProjectionExtensionMethods.cs.meta

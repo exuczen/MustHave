@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    public static class TypeConverter
+    public struct TypeConverter
     {
         public static short FloatToShort(float value, float max)
         {
