@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#define MUSTHAVE_BUILD_POSTPROCESS
+
+using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
@@ -24,52 +26,7 @@ namespace MustHave
         private static string GetFullPath(string localPath) => Path.Combine(Application.dataPath, localPath);
         private static string GetAssetsPath(string localPath) => Path.Combine("Assets", localPath);
 
-        [MenuItem("Tools/Enable MustHave DLLs platforms for export")]
-        public static void EnableMustHaveLibsPlatforms()
-        {
-            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
-            if (importer)
-            {
-                SetCompatibleWithAnyPlatformExceptEditor(importer);
-                importer.SaveAndReimport();
-            }
-            SetMustHaveEditorLibsCompatibleWithEditor(true);
-            AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Tools/Export MustHave Outline Package")]
-        public static void ExportMustHaveOutlinePackage()
-        {
-            var assetPaths = new string[2] {
-                "Assets/Packages/MustHave/Outline",
-                "Assets/Packages/MustHave/Shared/Plugins"
-            };
-            var packageFolderName = ExportedPackageFolderName;
-            var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);
-            var packageFileLocalPath = Path.Combine(packageFolderName, ExportedOutlinePackageName);
-
-            if (!Directory.Exists(packageFolderPath))
-            {
-                Directory.CreateDirectory(packageFolderPath);
-            }
-            AssetDatabase.ExportPackage(assetPaths, packageFileLocalPath, ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Tools/Disable MustHave DLLs platforms")]
-        public static void DisableMustHaveLibsPlatforms()
-        {
-            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
-            if (importer)
-            {
-                SetNonCompatibleWithAnyPlatform(importer);
-                importer.SaveAndReimport();
-            }
-            SetMustHaveEditorLibsCompatibleWithEditor(false);
-            AssetDatabase.Refresh();
-        }
-
+#if MUSTHAVE_BUILD_POSTPROCESS
         [PostProcessBuild(0)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
@@ -91,9 +48,54 @@ namespace MustHave
             TryCopyFile(mustHaveAssemblyLibPath, GetFullPath(MustHaveEditorLibPath));
             TryCopyFile(mustHaveEditorAssemblyLibPath, GetFullPath(MustHaveEditorEditorLibPath));
 
-            //DisableMustHaveLibsPlatforms();
-
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+#endif
+
+        [MenuItem("Tools/Export MustHave Outline Package")]
+        public static void ExportMustHaveOutlinePackage()
+        {
+            var assetPaths = new string[2] {
+                "Assets/Packages/MustHave/Outline",
+                "Assets/Packages/MustHave/Shared/Plugins"
+            };
+            var packageFolderName = ExportedPackageFolderName;
+            var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);
+            var packageFileLocalPath = Path.Combine(packageFolderName, ExportedOutlinePackageName);
+
+            if (!Directory.Exists(packageFolderPath))
+            {
+                Directory.CreateDirectory(packageFolderPath);
+            }
+            AssetDatabase.ExportPackage(assetPaths, packageFileLocalPath, ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        [MenuItem("Tools/Enable MustHave DLLs platforms for export")]
+        public static void EnableMustHaveLibsPlatforms()
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                SetCompatibleWithAnyPlatformExceptEditor(importer);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(true);
+            AssetDatabase.Refresh();
+        }
+
+        [MenuItem("Tools/Disable MustHave DLLs platforms")]
+        public static void DisableMustHaveLibsPlatforms()
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                SetNonCompatibleWithAnyPlatform(importer);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(false);
             AssetDatabase.Refresh();
         }
 
