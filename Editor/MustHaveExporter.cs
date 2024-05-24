@@ -1,16 +1,13 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
 using System;
-#endif
 
 namespace MustHave
 {
-    public static class MustHaveBuildPostprocessor
+    public static class MustHaveExporter
     {
-#if UNITY_EDITOR
         private static readonly string ProjectFolderPath = Directory.GetParent(Application.dataPath).FullName;
 
         private const string ExportedPackageFolderName = "ExportedPackages";
@@ -145,7 +142,6 @@ namespace MustHave
             //action(importer, BuildTarget.StandaloneOSXUniversal, value);
         }
 
-
         private static void TryCopyFile(string sourceFilePath, string destFilePath, bool deleteExisting = true)
         {
             if (File.Exists(sourceFilePath))
@@ -174,6 +170,5 @@ namespace MustHave
                 Debug.LogWarning($"TryCopyFile: File does not exist: {sourceFilePath}");
             }
         }
-#endif
     }
 }
