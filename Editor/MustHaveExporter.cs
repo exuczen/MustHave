@@ -30,9 +30,7 @@ namespace MustHave
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
             {
-                importer.SetCompatibleWithAnyPlatform(true);
-                importer.SetExcludeEditorFromAnyPlatform(true);
-                SetExcludeStandaloneFromAnyPlatform(importer, false);
+                SetCompatibleWithAnyPlatformExceptEditor(importer);
                 importer.SaveAndReimport();
             }
             SetMustHaveEditorLibsCompatibleWithEditor(true);
@@ -65,9 +63,7 @@ namespace MustHave
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
             {
-                importer.SetCompatibleWithEditor(false);
-                SetCompatibleWithStandalonePlatforms(importer, false);
-                importer.SetCompatibleWithAnyPlatform(false);
+                SetNonCompatibleWithAnyPlatform(importer);
                 importer.SaveAndReimport();
             }
             SetMustHaveEditorLibsCompatibleWithEditor(false);
@@ -106,15 +102,35 @@ namespace MustHave
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveEditorLibPath)) as PluginImporter;
             if (importer)
             {
-                importer.SetCompatibleWithEditor(compatible);
+                SetCompatibleWithEditorOnly(importer, compatible);
                 importer.SaveAndReimport();
             }
             importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveEditorEditorLibPath)) as PluginImporter;
             if (importer)
             {
-                importer.SetCompatibleWithEditor(compatible);
+                SetCompatibleWithEditorOnly(importer, compatible);
                 importer.SaveAndReimport();
             }
+        }
+
+        private static void SetCompatibleWithEditorOnly(PluginImporter importer, bool compatible)
+        {
+            SetNonCompatibleWithAnyPlatform(importer);
+            importer.SetCompatibleWithEditor(compatible);
+        }
+
+        private static void SetCompatibleWithAnyPlatformExceptEditor(PluginImporter importer)
+        {
+            importer.SetCompatibleWithAnyPlatform(true);
+            importer.SetExcludeEditorFromAnyPlatform(true);
+            SetExcludeStandaloneFromAnyPlatform(importer, false);
+        }
+
+        private static void SetNonCompatibleWithAnyPlatform(PluginImporter importer)
+        {
+            importer.SetCompatibleWithEditor(false);
+            SetCompatibleWithStandalonePlatforms(importer, false);
+            importer.SetCompatibleWithAnyPlatform(false);
         }
 
         private static void SetCompatibleWithStandalonePlatforms(PluginImporter importer, bool compatible)
