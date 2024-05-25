@@ -3,6 +3,11 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
 using System;
+#if MUSTHAVE_SHOW_TOOLS
+using MenuItem = UnityEditor.MenuItem;
+#else
+using MenuItem = MustHave.InactiveMenuItem;
+#endif
 
 namespace MustHave
 {

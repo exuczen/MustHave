@@ -3,12 +3,17 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+#if MUSTHAVE_SHOW_TOOLS
+using MenuItem = UnityEditor.MenuItem;
+#else
+using MenuItem = MustHave.InactiveMenuItem;
+#endif
 
 namespace MustHave
 {
     public static class TextureEditor
     {
-        [MenuItem("Tools/Create Cube Texture3D")]
+        [MenuItem("Tools/Texture Editor/Create Cube Texture3D")]
         public static void CreateCubeTexture3D()
         {
             // Configure the texture

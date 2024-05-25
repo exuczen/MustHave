@@ -1,5 +1,11 @@
 ﻿using UnityEditor;
 using UnityEngine;
+#if MUSTHAVE_SHOW_TOOLS
+using MenuItem = UnityEditor.MenuItem;
+#else
+using MenuItem = MustHave.InactiveMenuItem;
+#endif
+
 
 namespace MustHave
 {

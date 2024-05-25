@@ -15,5 +15,7 @@ MonoBehaviour:
   defineSymbols:
   - enabled: 1
     name: UNITY_POST_PROCESSING_STACK_V2
+  - enabled: 1
+    name: MUSTHAVE_SHOW_TOOLS
   - enabled: 0
     name: MUSTHAVE_BUILD_POSTPROCESS

@@ -6,6 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MustHave.Utils;
+#if MUSTHAVE_SHOW_TOOLS
+using MenuItem = UnityEditor.MenuItem;
+#else
+using MenuItem = MustHave.InactiveMenuItem;
+#endif
+
 
 public class FindMissingScriptsEditor : Editor
 {
