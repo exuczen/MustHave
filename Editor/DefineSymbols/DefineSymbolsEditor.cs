@@ -10,19 +10,25 @@ namespace MustHave
     {
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
-
             var symbols = target as DefineSymbols;
 
             Undo.RecordObject(symbols, symbols.name);
 
+            EditorGUI.BeginChangeCheck();
+
+            base.OnInspectorGUI();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(symbols);
+            }
             EditorGUILayout.BeginVertical("Box");
 
             if (GUILayout.Button("Get From Standalone"))
             {
                 PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone, out string[] defines);
 
-                symbols.SetFromArray(defines);
+                symbols.CopyFromArray(defines);
 
                 var serializedSymbols = new SerializedObject(symbols);
                 serializedSymbols.ApplyModifiedProperties();
@@ -34,6 +40,8 @@ namespace MustHave
                 PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, symbols.GetEnabled());
             }
             EditorGUILayout.EndHorizontal();
+
+            AssetDatabase.SaveAssetIfDirty(symbols);
         }
     }
 }

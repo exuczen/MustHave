@@ -5,10 +5,10 @@ namespace MustHave
     [Serializable]
     public struct DefineSymbol
     {
-        public bool enabled;
         public string name;
+        public bool enabled;
 
-        public DefineSymbol(bool enabled, string name)
+        public DefineSymbol(string name, bool enabled)
         {
             this.enabled = enabled;
             this.name = name;

@@ -22,12 +22,24 @@ namespace MustHave
             return enabledNames;
         }
 
-        public void SetFromArray(string[] defines)
+        public void CopyFromArray(string[] names)
         {
-            defineSymbols.Clear();
-            foreach (var name in defines)
+            for (int i = 0; i < defineSymbols.Count; i++)
             {
-                defineSymbols.Add(new DefineSymbol(true, name));
+                var symbol = defineSymbols[i];
+                defineSymbols[i] = new DefineSymbol(symbol.name, false);
+            }
+            foreach (var name in names)
+            {
+                int index = defineSymbols.FindIndex(symbol => string.Equals(name, symbol.name));
+                if (index >= 0)
+                {
+                    defineSymbols[index] = new DefineSymbol(name, true);
+                }
+                else
+                {
+                    defineSymbols.Add(new DefineSymbol(name, true));
+                }
             }
         }
     }

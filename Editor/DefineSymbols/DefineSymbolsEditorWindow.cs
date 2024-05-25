@@ -10,7 +10,7 @@ namespace MustHave
 
         private Editor editor = null;
 
-        [MenuItem("Tools/MustHave/Define Symbols Editor Window")]
+        [MenuItem("Tools/MustHave/Scripting Define Symbols")]
         private static void ShowWindow()
         {
             GetWindow<DefineSymbolsEditorWindow>();

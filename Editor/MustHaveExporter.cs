@@ -8,7 +8,7 @@ namespace MustHave
 {
     public static class MustHaveExporter
     {
-        private static readonly string ProjectFolderPath = Directory.GetParent(Application.dataPath).FullName;
+        private static readonly string ProjectFolderPath = BuildUtils.ProjectFolderPath;
 
         private const string ExportedPackageFolderName = "ExportedPackages";
         private const string ExportedOutlinePackageName = "MustHaveOutline.unitypackage";
@@ -51,7 +51,6 @@ namespace MustHave
         }
 #endif
 
-        [MenuItem("Tools/MustHave/Enable MustHave DLLs platforms for export")]
         public static void EnableMustHaveLibsPlatforms()
         {
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
@@ -64,7 +63,6 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Tools/MustHave/Disable MustHave DLLs platforms")]
         public static void DisableMustHaveLibsPlatforms()
         {
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
@@ -77,7 +75,6 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Tools/MustHave/Export MustHave Outline Package")]
         public static void ExportMustHaveOutlinePackage()
         {
             var assetPaths = new string[2] {
