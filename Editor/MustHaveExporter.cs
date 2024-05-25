@@ -1,5 +1,3 @@
-﻿#define MUSTHAVE_BUILD_POSTPROCESS
-
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
