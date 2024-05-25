@@ -17,7 +17,7 @@ using UnityEditor.SceneManagement;
 namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
-    public class PostProcessor : MonoBehaviour
+    public class RenderPostProcessor : MonoBehaviour
     {
         protected static readonly int SourceTextureID = Shader.PropertyToID("Source");
         protected static readonly int OutputTextureID = Shader.PropertyToID("Output");

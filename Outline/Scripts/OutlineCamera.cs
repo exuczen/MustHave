@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 namespace MustHave
 {
     [ExecuteInEditMode]
-    public class OutlineCamera : PostProcessor
+    public class OutlineCamera : RenderPostProcessor
     {
         public const int LineMaxThickness = 100;
 

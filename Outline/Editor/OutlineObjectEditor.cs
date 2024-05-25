@@ -20,6 +20,8 @@ namespace MustHave
 
                 if (EditorGUI.EndChangeCheck())
                 {
+                    Undo.RecordObject(outlineCamera, outlineCamera.name);
+
                     outlineCamera.LineThickness = lineThickness;
 
                     if (!EditorApplication.isPlaying)
