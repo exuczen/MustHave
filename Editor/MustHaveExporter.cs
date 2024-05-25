@@ -3,11 +3,6 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
 using System;
-#if MUSTHAVE_SHOW_TOOLS
-using MenuItem = UnityEditor.MenuItem;
-#else
-using MenuItem = MustHave.InactiveMenuItem;
-#endif
 
 namespace MustHave
 {
@@ -56,7 +51,33 @@ namespace MustHave
         }
 #endif
 
-        [MenuItem("Tools/Export MustHave Outline Package")]
+        [MenuItem("Tools/MustHave/Enable MustHave DLLs platforms for export")]
+        public static void EnableMustHaveLibsPlatforms()
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                SetCompatibleWithAnyPlatformExceptEditor(importer);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(true);
+            AssetDatabase.Refresh();
+        }
+
+        [MenuItem("Tools/MustHave/Disable MustHave DLLs platforms")]
+        public static void DisableMustHaveLibsPlatforms()
+        {
+            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
+            if (importer)
+            {
+                SetNonCompatibleWithAnyPlatform(importer);
+                importer.SaveAndReimport();
+            }
+            SetMustHaveEditorLibsCompatibleWithEditor(false);
+            AssetDatabase.Refresh();
+        }
+
+        [MenuItem("Tools/MustHave/Export MustHave Outline Package")]
         public static void ExportMustHaveOutlinePackage()
         {
             var assetPaths = new string[2] {
@@ -73,32 +94,6 @@ namespace MustHave
             }
             AssetDatabase.ExportPackage(assetPaths, packageFileLocalPath, ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Tools/Enable MustHave DLLs platforms for export")]
-        public static void EnableMustHaveLibsPlatforms()
-        {
-            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
-            if (importer)
-            {
-                SetCompatibleWithAnyPlatformExceptEditor(importer);
-                importer.SaveAndReimport();
-            }
-            SetMustHaveEditorLibsCompatibleWithEditor(true);
-            AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Tools/Disable MustHave DLLs platforms")]
-        public static void DisableMustHaveLibsPlatforms()
-        {
-            var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
-            if (importer)
-            {
-                SetNonCompatibleWithAnyPlatform(importer);
-                importer.SaveAndReimport();
-            }
-            SetMustHaveEditorLibsCompatibleWithEditor(false);
             AssetDatabase.Refresh();
         }
 

@@ -1,11 +1,5 @@
 ﻿using UnityEditor;
 using UnityEngine;
-#if MUSTHAVE_SHOW_TOOLS
-using MenuItem = UnityEditor.MenuItem;
-#else
-using MenuItem = MustHave.InactiveMenuItem;
-#endif
-
 
 namespace MustHave
 {
@@ -16,7 +10,7 @@ namespace MustHave
 
         private Editor editor = null;
 
-        [MenuItem("Tools/Define Symbols Editor Window")]
+        [MenuItem("Tools/MustHave/Define Symbols Editor Window")]
         private static void ShowWindow()
         {
             GetWindow<DefineSymbolsEditorWindow>();
