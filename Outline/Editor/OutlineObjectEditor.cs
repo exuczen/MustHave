@@ -24,6 +24,9 @@ namespace MustHave
 
                     outlineCamera.LineThickness = lineThickness;
 
+                    var serializedCamera = new SerializedObject(camera);
+                    serializedCamera.ApplyModifiedProperties();
+
                     if (!EditorApplication.isPlaying)
                     {
                         EditorUtils.SetSceneOrObjectDirty(outlineCamera);

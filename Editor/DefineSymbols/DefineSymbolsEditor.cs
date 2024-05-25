@@ -14,6 +14,8 @@ namespace MustHave
 
             var symbols = target as DefineSymbols;
 
+            Undo.RecordObject(symbols, symbols.name);
+
             EditorGUILayout.BeginVertical("Box");
 
             if (GUILayout.Button("Get From Standalone"))
@@ -21,6 +23,11 @@ namespace MustHave
                 PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone, out string[] defines);
 
                 symbols.SetFromArray(defines);
+
+                var serializedSymbols = new SerializedObject(symbols);
+                serializedSymbols.ApplyModifiedProperties();
+
+                EditorUtility.SetDirty(symbols);
             }
             if (GUILayout.Button("Set For Standalone"))
             {
