@@ -1,11 +1,14 @@
 fileFormatVersion: 2
-guid: 8847b2fb558b53a409860456a2102333
+guid: 1853cffe6dbe32841a01383122afb259
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
-  - defineSymbols: {fileID: 11400000, guid: 117243dcbb1fedf48af3e5ed85d0ac88, type: 2}
+  - editorDefineSymbols: {fileID: 11400000, guid: 117243dcbb1fedf48af3e5ed85d0ac88,
+      type: 2}
+  - buildDefineSymbols: {fileID: 11400000, guid: de9426d0df02cf242a53dd27e8d83f5c,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -6,9 +6,14 @@ namespace MustHave
     public class MustHaveExporterWindow : EditorWindow
     {
         [SerializeField]
-        private DefineSymbols defineSymbols = null;
+        private DefineSymbols editorDefineSymbols = null;
+        [SerializeField]
+        private DefineSymbols buildDefineSymbols = null;
 
-        private Editor defineSymbolsEditor = null;
+        private Editor editorDefineSymbolsEditor = null;
+        private Editor buildDefineSymbolsEditor = null;
+
+        private Vector2 scrollViewPosition = default;
 
         [MenuItem("Tools/MustHave/MustHave Exporter")]
         private static void ShowWindow()
@@ -18,16 +23,7 @@ namespace MustHave
 
         private void OnGUI()
         {
-            var defineSymbolsType = typeof(DefineSymbols);
-            defineSymbols = EditorGUILayout.ObjectField(defineSymbolsType.Name, defineSymbols, defineSymbolsType, true) as DefineSymbols;
-            if (!defineSymbols)
-            {
-                return;
-            }
-            if (!defineSymbolsEditor)
-            {
-                defineSymbolsEditor = Editor.CreateEditor(defineSymbols);
-            }
+
             int step = 1;
             var labelStyle = new GUIStyle
             {
@@ -35,16 +31,14 @@ namespace MustHave
             };
             labelStyle.normal.textColor = Color.white;
 
+            scrollViewPosition = GUILayout.BeginScrollView(scrollViewPosition, false, true);
+
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField($"{step++}. Set Scripting Define Symbols", labelStyle);
+            EditorGUILayout.LabelField($"{step++}. Set Scripting Define Symbols for build", labelStyle);
             {
-                EditorGUILayout.BeginVertical("Box");
-                defineSymbolsEditor.OnInspectorGUI();
-                EditorGUILayout.EndVertical();
+                DefineSymbolsEditorWindow.OnDefineSymbolsGUI("Build", buildDefineSymbols, ref buildDefineSymbolsEditor);
             }
-            EditorGUILayout.Space();
-
             if (GUILayout.Button($"{step++}. Build Windows64", EditorStyles.miniButtonLeft))
             {
                 BuildUtils.BuildActiveScene(BuildTarget.StandaloneWindows64, "exe");
@@ -61,7 +55,11 @@ namespace MustHave
             {
                 MustHaveExporter.DisableMustHaveLibsPlatforms();
             }
-            EditorGUILayout.LabelField($"{step++}. Restore Scripting Define Symbols", labelStyle);
+            EditorGUILayout.LabelField($"{step++}. Restore Scripting Define Symbols in editor", labelStyle);
+            {
+                DefineSymbolsEditorWindow.OnDefineSymbolsGUI("Editor", editorDefineSymbols, ref editorDefineSymbolsEditor);
+            }
+            GUILayout.EndScrollView();
         }
     }
 }
