@@ -15,7 +15,7 @@ namespace MustHave
 
         private const string MustHaveLibName = "MustHave.dll";
         private const string MustHaveEditorLibName = "MustHaveEditor.dll";
-        private const string MustHavePluginsFolderPath = @"Packages/MustHave/Shared/Plugins";
+        private const string MustHavePluginsFolderPath = @"Packages/MustHave/SharedPlugins";
         private static readonly string MustHaveStandaloneLibPath = GetPluginLibPath("MustHaveStandalone", MustHaveLibName);
         private static readonly string MustHaveEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveLibName);
         private static readonly string MustHaveEditorEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveEditorLibName);
@@ -79,7 +79,7 @@ namespace MustHave
         {
             var assetPaths = new string[2] {
                 "Assets/Packages/MustHave/Outline",
-                "Assets/Packages/MustHave/Shared/Plugins"
+                "Assets/Packages/MustHave/SharedPlugins"
             };
             var packageFolderName = ExportedPackageFolderName;
             var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);
