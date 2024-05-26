@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
 using System;
+using MustHave.Utils;
 
 namespace MustHave
 {
@@ -13,6 +14,10 @@ namespace MustHave
         private const string ExportedPackageFolderName = "ExportedPackages";
         private const string ExportedOutlinePackageName = "MustHaveOutline.unitypackage";
 
+        private const string SharedFolderPath = @"Packages/MustHave/Shared";
+        private const string SharedHiddenFolderPath = @"Packages/MustHaveHidden~/Shared";
+        private static readonly string SharedFolderMetaPath = $"{SharedFolderPath}.meta";
+        private static readonly string SharedHiddenFolderMetaPath = $"{SharedHiddenFolderPath}.meta";
         private const string MustHaveLibName = "MustHave.dll";
         private const string MustHaveEditorLibName = "MustHaveEditor.dll";
         private const string MustHavePluginsFolderPath = @"Packages/MustHave/SharedPlugins";
@@ -37,22 +42,49 @@ namespace MustHave
                 var srcMustHaveLibPath = Path.Combine(managedPluginFolderPath, MustHaveLibName);
                 var dstMustHaveLibPath = GetFullPath(MustHaveStandaloneLibPath);
 
-                TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
+                FileUtils.TryCopyFile(srcMustHaveLibPath, dstMustHaveLibPath);
             }
             var assemblyFolderPath = Path.Combine(ProjectFolderPath, "Library", "ScriptAssemblies");
             var mustHaveAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveLibName);
             var mustHaveEditorAssemblyLibPath = Path.Combine(assemblyFolderPath, MustHaveEditorLibName);
 
-            TryCopyFile(mustHaveAssemblyLibPath, GetFullPath(MustHaveEditorLibPath));
-            TryCopyFile(mustHaveEditorAssemblyLibPath, GetFullPath(MustHaveEditorEditorLibPath));
+            FileUtils.TryCopyFile(mustHaveAssemblyLibPath, GetFullPath(MustHaveEditorLibPath));
+            FileUtils.TryCopyFile(mustHaveEditorAssemblyLibPath, GetFullPath(MustHaveEditorEditorLibPath));
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 #endif
+        //[MenuItem("Tools/Move MustHave/Shared to hidden")]
+        public static void MoveSharedFolderToHiddenFolder(bool refresh)
+        {
+            FileUtils.TryMoveFile(GetFullPath(SharedFolderMetaPath), GetFullPath(SharedHiddenFolderMetaPath));
+            FileUtils.TryMoveDirectory(GetFullPath(SharedFolderPath), GetFullPath(SharedHiddenFolderPath));
+
+            if (refresh)
+            {
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+        }
+
+        //[MenuItem("Tools/Move MustHave/Shared from hidden")]
+        public static void MoveSharedFolderFromHiddenFolder(bool refresh)
+        {
+            FileUtils.TryMoveFile(GetFullPath(SharedHiddenFolderMetaPath), GetFullPath(SharedFolderMetaPath));
+            FileUtils.TryMoveDirectory(GetFullPath(SharedHiddenFolderPath), GetFullPath(SharedFolderPath));
+
+            if (refresh)
+            {
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+        }
 
         public static void EnableMustHaveLibsPlatforms()
         {
+            MoveSharedFolderToHiddenFolder(false);
+
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
             {
@@ -60,11 +92,15 @@ namespace MustHave
                 importer.SaveAndReimport();
             }
             SetMustHaveEditorLibsCompatibleWithEditor(true);
+
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
         public static void DisableMustHaveLibsPlatforms()
         {
+            MoveSharedFolderFromHiddenFolder(false);
+
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
             {
@@ -72,6 +108,8 @@ namespace MustHave
                 importer.SaveAndReimport();
             }
             SetMustHaveEditorLibsCompatibleWithEditor(false);
+
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
@@ -153,35 +191,6 @@ namespace MustHave
             //action(importer, BuildTarget.StandaloneOSXIntel, value);
             //action(importer, BuildTarget.StandaloneOSXIntel64, value);
             //action(importer, BuildTarget.StandaloneOSXUniversal, value);
-        }
-
-        private static void TryCopyFile(string sourceFilePath, string destFilePath, bool deleteExisting = true)
-        {
-            if (File.Exists(sourceFilePath))
-            {
-                try
-                {
-                    if (deleteExisting)
-                    {
-                        File.Delete(destFilePath);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"TryCopyFile: File exists: {destFilePath}");
-                        return;
-                    }
-                    File.Copy(sourceFilePath, destFilePath);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                Debug.Log($"Succesfully copied file: {sourceFilePath} to {destFilePath}");
-            }
-            else
-            {
-                Debug.LogWarning($"TryCopyFile: File does not exist: {sourceFilePath}");
-            }
         }
     }
 }
