@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b90be70838aad84983f8fdbf7ea2dcc, type: 3}
   m_Name: StandaloneDefineSymbols
   m_EditorClassIdentifier: 
+  buildTargetGroup: 1
   defineSymbols:
   - name: UNITY_POST_PROCESSING_STACK_V2
     enabled: 1

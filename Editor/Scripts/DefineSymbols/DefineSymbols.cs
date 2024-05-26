@@ -1,5 +1,7 @@
 ﻿using MustHave.UI;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace MustHave
@@ -7,6 +9,12 @@ namespace MustHave
     [CreateAssetMenu(fileName = "ScriptingDefineSymbols", menuName = "MustHave/ScriptableObjects/ScriptingDefineSymbols")]
     public class DefineSymbols : ScriptableObject
     {
+        public BuildTargetGroup BuildTargetGroup => buildTargetGroup;
+        public NamedBuildTarget BuildTarget => NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
+
+        [SerializeField]
+        private BuildTargetGroup buildTargetGroup = BuildTargetGroup.Standalone;
+
         [SerializeField]
         [ArrayElementTitle("name")]
         private List<DefineSymbol> defineSymbols = new();

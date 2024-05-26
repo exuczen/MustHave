@@ -24,9 +24,9 @@ namespace MustHave
             }
             EditorGUILayout.BeginVertical("Box");
 
-            if (GUILayout.Button("Get From Standalone"))
+            if (GUILayout.Button($"Get From {symbols.BuildTargetGroup}"))
             {
-                PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone, out string[] defines);
+                PlayerSettings.GetScriptingDefineSymbols(symbols.BuildTarget, out string[] defines);
 
                 symbols.CopyFromArray(defines);
 
@@ -35,9 +35,9 @@ namespace MustHave
 
                 EditorUtility.SetDirty(symbols);
             }
-            if (GUILayout.Button("Set For Standalone"))
+            if (GUILayout.Button($"Set For {symbols.BuildTargetGroup}"))
             {
-                PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, symbols.GetEnabled());
+                PlayerSettings.SetScriptingDefineSymbols(symbols.BuildTarget, symbols.GetEnabled());
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
