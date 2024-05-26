@@ -9,6 +9,8 @@ namespace MustHave
         private DefineSymbols editorDefineSymbols = null;
         [SerializeField]
         private DefineSymbols buildDefineSymbols = null;
+        [SerializeField]
+        private BuildTarget buildTarget = BuildTarget.StandaloneWindows64;
 
         private Editor editorDefineSymbolsEditor = null;
         private Editor buildDefineSymbolsEditor = null;
@@ -39,9 +41,13 @@ namespace MustHave
             {
                 DefineSymbolsEditorWindow.OnDefineSymbolsGUI("Build", buildDefineSymbols, ref buildDefineSymbolsEditor);
             }
-            if (GUILayout.Button($"{step++}. Build Windows64", EditorStyles.miniButtonLeft))
+            if (GUILayout.Button($"{step++}. Build {buildTarget}"))
             {
-                BuildUtils.BuildActiveScene(BuildTarget.StandaloneWindows64, "exe");
+                BuildUtils.BuildActiveScene(buildTarget);
+            }
+            // Build Target
+            {
+                buildTarget = (BuildTarget)EditorGUILayout.EnumPopup("Build Target", buildTarget);
             }
             if (GUILayout.Button($"{step++}. Enable MustHave DLLs platforms for export"))
             {
