@@ -38,6 +38,9 @@ namespace MustHave
             if (GUILayout.Button("Set For Standalone"))
             {
                 PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, symbols.GetEnabled());
+
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
             }
             EditorGUILayout.EndHorizontal();
 
