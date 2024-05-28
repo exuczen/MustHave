@@ -9,6 +9,7 @@ MonoImporter:
       type: 2}
   - buildDefineSymbols: {fileID: 11400000, guid: de9426d0df02cf242a53dd27e8d83f5c,
       type: 2}
+  - exporterData: {fileID: 11400000, guid: 0c852fbc95351714da992a5a320512ce, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

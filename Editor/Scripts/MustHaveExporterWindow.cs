@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,11 +7,11 @@ namespace MustHave
     public class MustHaveExporterWindow : EditorWindow
     {
         [SerializeField]
+        private MustHaveExporterData exporterData = null;
+        [SerializeField]
         private DefineSymbols editorDefineSymbols = null;
         [SerializeField]
         private DefineSymbols buildDefineSymbols = null;
-        [SerializeField]
-        private BuildTarget buildTarget = BuildTarget.StandaloneWindows64;
 
         private Editor editorDefineSymbolsEditor = null;
         private Editor buildDefineSymbolsEditor = null;
@@ -25,7 +26,10 @@ namespace MustHave
 
         private void OnGUI()
         {
-
+            if (!exporterData)
+            {
+                return;
+            }
             int step = 1;
             var labelStyle = new GUIStyle
             {
@@ -35,27 +39,33 @@ namespace MustHave
 
             scrollViewPosition = GUILayout.BeginScrollView(scrollViewPosition, false, true);
 
+            Undo.RecordObject(exporterData, exporterData.name);
+
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField($"{step++}. Set Scripting Define Symbols for build", labelStyle);
             {
                 DefineSymbolsEditorWindow.OnDefineSymbolsGUI("Build", buildDefineSymbols, ref buildDefineSymbolsEditor);
             }
-            if (GUILayout.Button($"{step++}. Build {buildTarget}"))
+            if (GUILayout.Button($"{step++}. Build {exporterData.BuildTarget}"))
             {
-                BuildUtils.BuildActiveScene(buildTarget);
+                BuildUtils.BuildActiveScene(exporterData.BuildTarget);
             }
             // Build Target
             {
-                buildTarget = (BuildTarget)EditorGUILayout.EnumPopup("Build Target", buildTarget);
+                OnExporterDataEnumGUI(() => exporterData.BuildTarget, value => exporterData.BuildTarget = value, "Build Target");
             }
             if (GUILayout.Button($"{step++}. Enable MustHave DLLs platforms for export"))
             {
                 MustHaveExporter.EnableMustHaveLibsPlatforms();
             }
-            if (GUILayout.Button($"{step++}. Export MustHave Outline Package"))
+            if (GUILayout.Button($"{step++}. Export MustHave {exporterData.PackageName} Package"))
             {
-                MustHaveExporter.ExportMustHaveOutlinePackage();
+                MustHaveExporter.ExportMustHavePackage(exporterData.PackageName);
+            }
+            // Package Name
+            {
+                OnExporterDataEnumGUI(() => exporterData.PackageName, value => exporterData.PackageName = value, "Package Name");
             }
             if (GUILayout.Button($"{step++}. Disable MustHave DLLs platforms"))
             {
@@ -65,7 +75,21 @@ namespace MustHave
             {
                 DefineSymbolsEditorWindow.OnDefineSymbolsGUI("Editor", editorDefineSymbols, ref editorDefineSymbolsEditor);
             }
+            AssetDatabase.SaveAssetIfDirty(exporterData);
+
             GUILayout.EndScrollView();
+        }
+
+        private void OnExporterDataEnumGUI<T>(Func<T> getEnumValue, Action<T> setEnumValue, string popupName) where T : Enum
+        {
+            EditorGUI.BeginChangeCheck();
+
+            setEnumValue((T)EditorGUILayout.EnumPopup(popupName, getEnumValue()));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(exporterData);
+            }
         }
     }
 }

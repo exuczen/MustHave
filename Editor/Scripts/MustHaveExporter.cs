@@ -12,7 +12,6 @@ namespace MustHave
         private static readonly string ProjectFolderPath = BuildUtils.ProjectFolderPath;
 
         private const string ExportedPackageFolderName = "ExportedPackages";
-        private const string ExportedOutlinePackageName = "MustHaveOutline.unitypackage";
 
         private const string SharedFolderPath = @"Packages/MustHave/Shared";
         private const string SharedHiddenFolderPath = @"Packages/MustHaveHidden~/Shared";
@@ -28,6 +27,7 @@ namespace MustHave
         private static string GetPluginLibPath(string subfolderName, string libName) => Path.Combine(MustHavePluginsFolderPath, subfolderName, libName);
         private static string GetFullPath(string localPath) => Path.Combine(Application.dataPath, localPath);
         private static string GetAssetsPath(string localPath) => Path.Combine("Assets", localPath);
+        private static string GetExportedPackageFileName(PackageName enumName) => $"MustHave{enumName}.unitypackage";
 
 #if MUSTHAVE_BUILD_POSTPROCESS
         [PostProcessBuild(0)]
@@ -113,15 +113,16 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 
-        public static void ExportMustHaveOutlinePackage()
+        public static void ExportMustHavePackage(PackageName enumName)
         {
             var assetPaths = new string[2] {
-                "Assets/Packages/MustHave/Outline",
+                $"Assets/Packages/MustHave/{enumName}",
                 "Assets/Packages/MustHave/SharedPlugins"
             };
             var packageFolderName = ExportedPackageFolderName;
             var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);
-            var packageFileLocalPath = Path.Combine(packageFolderName, ExportedOutlinePackageName);
+            var packageFileName = GetExportedPackageFileName(enumName);
+            var packageFileLocalPath = Path.Combine(packageFolderName, packageFileName);
 
             if (!Directory.Exists(packageFolderPath))
             {
