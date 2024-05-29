@@ -6,10 +6,10 @@ namespace MustHave.Utils
     {
         public static void Clear(this RenderTexture renderTexture, Color color)
         {
-            RenderTexture rt = RenderTexture.active;
+            RenderTexture activeRT = RenderTexture.active;
             RenderTexture.active = renderTexture;
             GL.Clear(true, true, color);
-            RenderTexture.active = rt;
+            RenderTexture.active = activeRT;
         }
 
         public static void Clear(this RenderTexture renderTexture)
@@ -19,13 +19,13 @@ namespace MustHave.Utils
 
         public static Texture2D ToTexture2D(this RenderTexture renderTexture, TextureFormat textureFormat, bool destroyRenderTexture)
         {
-            Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, textureFormat, false);
-            RenderTexture activePreviously = RenderTexture.active;
+            var texture = new Texture2D(renderTexture.width, renderTexture.height, textureFormat, false);
+            RenderTexture activeRT = RenderTexture.active;
             RenderTexture.active = renderTexture;
             // Read screen contents into the texture
             texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
             texture.Apply();
-            RenderTexture.active = activePreviously;
+            RenderTexture.active = activeRT;
             if (destroyRenderTexture)
             {
                 if (Application.isPlaying)
@@ -80,7 +80,7 @@ namespace MustHave.Utils
             }
             else
             {
-                Debug.LogError("TextureExtensionMethods.SetPixelColor: out of texture bounds: " + x + ", " + y);
+                Debug.LogError($"TextureExtensionMethods.SetPixelColor: out of texture bounds: {x}, {y}");
                 uv = Vector2.zero;
                 return false;
             }
@@ -95,7 +95,7 @@ namespace MustHave.Utils
         /// <param name="mode">Filtering mode</param>
         public static void Scale(this Texture2D tex, int width, int height, FilterMode mode = FilterMode.Trilinear)
         {
-            Rect texR = new Rect(0, 0, width, height);
+            var texRect = new Rect(0, 0, width, height);
             ScaleByDrawToRenderTexture(tex, width, height, mode);
 
             // Update new texture
@@ -104,8 +104,8 @@ namespace MustHave.Utils
 #else
             tex.Resize(width, height);
 #endif
-            tex.ReadPixels(texR, 0, 0, true);
-            tex.Apply(true);    //Remove this if you hate us applying textures for you :)
+            tex.ReadPixels(texRect, 0, 0, true);
+            tex.Apply(true);
         }
 
         /// <summary>
@@ -117,17 +117,17 @@ namespace MustHave.Utils
         /// <param name="mode">Filtering mode</param>
         public static Texture2D CreateScaledTexture2D(this Texture2D src, int width, int height, FilterMode mode = FilterMode.Trilinear)
         {
-            Rect texR = new Rect(0, 0, width, height);
+            var texRect = new Rect(0, 0, width, height);
             ScaleByDrawToRenderTexture(src, width, height, mode);
 
             //Get rendered data back to a new texture
-            Texture2D result = new Texture2D(width, height, TextureFormat.ARGB32, true);
+            var result = new Texture2D(width, height, TextureFormat.ARGB32, true);
 #if UNITY_2021_1_OR_NEWER
             result.Reinitialize(width, height);
 #else
             result.Resize(width, height);
 #endif
-            result.ReadPixels(texR, 0, 0, true);
+            result.ReadPixels(texRect, 0, 0, true);
             return result;
         }
 
@@ -154,7 +154,7 @@ namespace MustHave.Utils
             //src.Apply(true);
 
             //Using RTT for best quality and performance. Thanks, Unity 5
-            RenderTexture rtt = new RenderTexture(width, height, 32);
+            var rtt = new RenderTexture(width, height, 32);
 
             //Set the RTT in order to render to it
             Graphics.SetRenderTarget(rtt);

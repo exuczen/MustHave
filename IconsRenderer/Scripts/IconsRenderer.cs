@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using MustHave.UI;
 using MustHave.Utils;
@@ -11,6 +10,7 @@ namespace MustHave
         public int SheetTextureSize => cellXYCount * iconSize;
         public int CellXYCount => cellXYCount;
         public string SpriteSheetFilePath => @spriteSheetFolderPath + "/" + spriteSheetFileName;
+        public IIconSourceProvider IconSourceProvider => iconSourceProvider as IIconSourceProvider;
 
         [SerializeField, RequireInterface(typeof(IIconSourceProvider))]
         private Object iconSourceProvider = null;
@@ -37,7 +37,7 @@ namespace MustHave
         [SerializeField]
         private float iconNormalizedOffset = 0.1f;
         [SerializeField]
-        private List<IconSourceObject> sourceObjects = new List<IconSourceObject>();
+        private List<IconSourceObject> sourceObjects = new();
 
         private void Start()
         {
@@ -136,26 +136,6 @@ namespace MustHave
                 }
                 TextureUtils.SaveTextureToPNG(texture, @spriteSheetFolderPath, spriteSheetFileName);
             }
-        }
-
-        public void AssignIconsToPrefabs(List<Sprite> sprites)
-        {
-#if UNITY_EDITOR
-            IIconSourceProvider provider = iconSourceProvider as IIconSourceProvider;
-            int count = Mathf.Min(sprites.Count, provider.IconSourceCount);
-            for (int i = 0; i < count; i++)
-            {
-                var iconSourcePrefab = provider.GetIconSourcePrefab(i);
-                iconSourcePrefab.Sprite = sprites[i];
-                EditorUtility.SetDirty(iconSourcePrefab);
-                //Debug.Log("AssignIconsToPrefabs: " + sprites[i].name + " " + iconSource.IconSourceGameObject.name);
-            }
-            if (count > 0)
-            {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
-#endif
         }
 
         private void RecreateRenderTextures()

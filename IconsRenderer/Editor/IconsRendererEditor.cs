@@ -56,7 +56,19 @@ namespace MustHave
         private void AssignIconsToPrefabs(IconsRenderer renderer)
         {
             var sprites = TextureEditor.GetSprites(renderer.SpriteSheetFilePath);
-            renderer.AssignIconsToPrefabs(sprites);
+            var provider = renderer.IconSourceProvider;
+            int count = Mathf.Min(sprites.Count, provider.IconSourceCount);
+            for (int i = 0; i < count; i++)
+            {
+                var iconSourcePrefab = provider.GetIconSourcePrefab(i);
+                iconSourcePrefab.Sprite = sprites[i];
+                EditorUtility.SetDirty(iconSourcePrefab);
+                //Debug.Log("AssignIconsToPrefabs: " + sprites[i].name + " " + iconSource.IconSourceGameObject.name);
+            }
+            if (count > 0)
+            {
+                AssetUtils.SaveAndRefresh();
+            }
         }
     }
 }

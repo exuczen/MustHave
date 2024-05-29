@@ -63,8 +63,7 @@ namespace MustHave
 
             if (refresh)
             {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetUtils.SaveAndRefresh();
             }
         }
 
@@ -76,8 +75,7 @@ namespace MustHave
 
             if (refresh)
             {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetUtils.SaveAndRefresh();
             }
         }
 
@@ -93,8 +91,7 @@ namespace MustHave
             }
             SetMustHaveEditorLibsCompatibleWithEditor(true);
 
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetUtils.SaveAndRefresh();
         }
 
         public static void DisableMustHaveLibsPlatforms()
@@ -109,8 +106,7 @@ namespace MustHave
             }
             SetMustHaveEditorLibsCompatibleWithEditor(false);
 
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetUtils.SaveAndRefresh();
         }
 
         public static void ExportMustHavePackage(PackageName enumName)
@@ -129,8 +125,7 @@ namespace MustHave
                 Directory.CreateDirectory(packageFolderPath);
             }
             AssetDatabase.ExportPackage(assetPaths, packageFileLocalPath, ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetUtils.SaveAndRefresh();
         }
 
         private static void SetMustHaveEditorLibsCompatibleWithEditor(bool compatible)

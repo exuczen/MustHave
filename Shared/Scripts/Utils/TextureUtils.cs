@@ -21,17 +21,17 @@ namespace MustHave.Utils
         /// </summary>
         public static Texture2D CreateTexture(int width, int height, Color fillColor)
         {
-            Texture2D result = new(width, height, TextureFormat.RGBA32, false);
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    result.SetPixel(x, y, fillColor);
+                    texture.SetPixel(x, y, fillColor);
                 }
             }
-            result.Apply();
-            return result;
+            texture.Apply();
+            return texture;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace MustHave.Utils
         public static void LoadImageFromFilepath(string filePath, Image image)
         {
             var bytes = File.ReadAllBytes(filePath);
-            Texture2D texture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
+            var texture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
             texture.LoadImage(bytes);
             image.sprite = CreateSpriteFromTexture(texture);
         }
@@ -55,19 +55,16 @@ namespace MustHave.Utils
             bool canvasEnabled = canvas.enabled;
             canvas.enabled = false;
             yield return new WaitForEndOfFrame();
-            Texture2D texture = CaptureScreenshotByRenderingToTexture(camera, TextureFormat.ARGB32);
+            var texture = CaptureScreenshotByRenderToTexture(camera, TextureFormat.ARGB32);
             canvas.enabled = canvasEnabled;
-            if (resultCallback != null)
-            {
-                resultCallback.Invoke(texture);
-            }
+            resultCallback?.Invoke(texture);
         }
 
-        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, System.Action<Texture2D> postprocess = null)
+        public static Texture2D CaptureScreenshotByRenderToTexture(Camera camera, TextureFormat textureFormat, System.Action<Texture2D> postprocess = null)
         {
             int width = Screen.width;
             int height = Screen.height;
-            return CaptureScreenshotByRenderingToTexture(camera, textureFormat, width, height, postprocess);
+            return CaptureScreenshotByRenderToTexture(camera, textureFormat, width, height, postprocess);
         }
 
         /// <summary>
@@ -75,26 +72,24 @@ namespace MustHave.Utils
         /// </summary>
         /// <param name="resultCallback"></param>
         /// <returns></returns>
-        public static Texture2D CaptureScreenshotByRenderingToTexture(Camera camera, TextureFormat textureFormat, int width, int height, System.Action<Texture2D> postprocess = null)
+        public static Texture2D CaptureScreenshotByRenderToTexture(Camera camera, TextureFormat textureFormat, int width, int height, System.Action<Texture2D> postprocess = null)
         {
-            RenderTexture renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
+            var renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
             {
                 // TODO: Customize anti-aliasing value. Anti-aliasing value must be one of (1, 2, 4 or 8), indicating the number of samples per pixel.
                 antiAliasing = 4
             };
-
-            RenderTexture target = camera.targetTexture;
+            var targetTexture = camera.targetTexture;
             camera.targetTexture = renderTexture;
             camera.Render();
-            camera.targetTexture = target;
+            camera.targetTexture = targetTexture;
 
-            Texture2D texture = renderTexture.ToTexture2D(textureFormat, true);
+            var texture = renderTexture.ToTexture2D(textureFormat, true);
             if (postprocess != null)
             {
                 postprocess?.Invoke(texture);
                 texture.Apply();
             }
-
             return texture;
         }
 
@@ -106,11 +101,8 @@ namespace MustHave.Utils
         public static IEnumerator CaptureScreenshotAsTextureRoutine(System.Action<Texture2D> resultCallback)
         {
             yield return new WaitForEndOfFrame();
-            Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture();
-            if (resultCallback != null)
-            {
-                resultCallback.Invoke(texture);
-            }
+            var texture = ScreenCapture.CaptureScreenshotAsTexture();
+            resultCallback?.Invoke(texture);
         }
 
         /// <summary>
@@ -131,7 +123,7 @@ namespace MustHave.Utils
                     Object.DestroyImmediate(image.sprite);
                 }
             }
-            image.sprite = CreateSpriteFromTexture(CaptureScreenshotByRenderingToTexture(camera, TextureFormat.RGB24));
+            image.sprite = CreateSpriteFromTexture(CaptureScreenshotByRenderToTexture(camera, TextureFormat.RGB24));
             if (!string.IsNullOrEmpty(spriteName))
             {
                 image.sprite.name = spriteName;
@@ -155,7 +147,7 @@ namespace MustHave.Utils
 
         public static void CaptureScreenshotToPNG(Camera camera, TextureFormat textureFormat, int width, int height, string folderPath, string filename, System.Action<Texture2D> postprocess = null)
         {
-            var texture = CaptureScreenshotByRenderingToTexture(camera, textureFormat, width, height, postprocess);
+            var texture = CaptureScreenshotByRenderToTexture(camera, textureFormat, width, height, postprocess);
             SaveTextureToPNG(texture, folderPath, filename);
         }
 

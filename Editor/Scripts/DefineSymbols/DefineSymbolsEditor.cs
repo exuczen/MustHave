@@ -1,6 +1,4 @@
-﻿using MustHave.Utils;
-using UnityEditor;
-using UnityEditor.Build;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace MustHave
@@ -39,8 +37,7 @@ namespace MustHave
             {
                 PlayerSettings.SetScriptingDefineSymbols(symbols.BuildTarget, symbols.GetEnabled());
 
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetUtils.SaveAndRefresh();
             }
             EditorGUILayout.EndHorizontal();
 

@@ -9,7 +9,7 @@ namespace MustHave
         public int IconSourceCount => iconSources.Count;
 
         [SerializeField]
-        private List<IconSourceObject> iconSources = new List<IconSourceObject>();
+        private List<IconSourceObject> iconSources = new();
 
         public IconSourceObject GetIconSourcePrefab(int index)
         {
