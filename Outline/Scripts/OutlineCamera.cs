@@ -1,6 +1,12 @@
 ﻿using MustHave.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
+#if UNITY_PIPELINE_URP
+using UnityEngine.Rendering.Universal;
+#endif
+#if UNITY_PIPELINE_HDRP
+using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace MustHave
 {
@@ -10,6 +16,7 @@ namespace MustHave
         public const int LineMaxThickness = 100;
 
         public OutlineObjectCamera ObjectCamera => objectCamera;
+        public RenderPipelineType RenderPipelineType => renderPipelineType;
         public int LineThickness
         {
             get => lineThickness;
@@ -64,6 +71,8 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool debugShader = false;
 
+        private RenderPipelineType renderPipelineType = RenderPipelineType.Default;
+
         private void Update()
         {
             objectCamera.OnUpdate(this);
@@ -98,7 +107,18 @@ namespace MustHave
 
                 shader = objectCamera.ComputeShader;
             }
+
+            renderPipelineType = RenderUtils.GetRenderPipelineType();
+
+            if (renderPipelineType != RenderPipelineType.Default)
+            {
+                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+                RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+                RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+                RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+            }
             base.OnEnable();
+
             objectCamera.enabled = true;
         }
 
@@ -109,6 +129,11 @@ namespace MustHave
             if (objectCamera)
             {
                 objectCamera.enabled = false;
+            }
+            if (renderPipelineType != RenderPipelineType.Default)
+            {
+                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+                RenderPipelineManager.beginCameraRendering -= OnEndCameraRendering;
             }
         }
 
@@ -167,8 +192,10 @@ namespace MustHave
 
         protected override void SetupOnRenderImage()
         {
-            objectCamera.RenderShapes();
-
+            if (renderPipelineType == RenderPipelineType.Default)
+            {
+                objectCamera.RenderShapes();
+            }
             shader.SetInt(ShaderData.LineThicknessID, lineThickness);
         }
 
@@ -243,6 +270,22 @@ namespace MustHave
             shader.DisableKeyword(debugShaderMode.ToString());
             debugShaderMode = debugMode;
             shader.EnableKeyword(debugShaderMode.ToString());
+        }
+
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if (objectCamera && camera == objectCamera.ShapeCamera)
+            {
+                objectCamera.OnBeginRenderingShapes();
+            }
+        }
+
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if (objectCamera && camera == objectCamera.ShapeCamera)
+            {
+                objectCamera.OnEndRenderingShapes();
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MustHave
 
         private const int RenderersCapacity = 1 << 10;
 
-        private readonly struct Layer
+        public readonly struct Layer
         {
             public const string OutlineLayerName = "Outline-MustHave";
 
@@ -118,7 +118,7 @@ namespace MustHave
             shapeCamera.backgroundColor = Color.clear;
             shapeCamera.cullingMask = Layer.OutlineMask;
             shapeCamera.allowMSAA = false;
-            shapeCamera.enabled = false;
+            shapeCamera.enabled = outlineCamera ? outlineCamera.RenderPipelineType != RenderPipelineType.Default : false;
             shapeCamera.depthTextureMode = DepthTextureMode.Depth;
 
             if (outlineCamera)
@@ -289,8 +289,10 @@ namespace MustHave
             }
         }
 
-        public void RenderShapes()
+        public void OnBeginRenderingShapes()
         {
+            shapeTexture.Clear();
+
             int count = RenderersCount;
             if (count <= 0)
             {
@@ -305,16 +307,29 @@ namespace MustHave
             {
                 renderersData[i].Setup(shapeMaterials[i], Layer.OutlineLayer, minDepth);
             }
-            shapeCamera.Render();
+        }
 
+        public void OnEndRenderingShapes()
+        {
             foreach (var data in renderersData)
             {
                 data.Restore();
             }
         }
 
-        private void RenderCircles(int radius)
+        public void RenderShapes()
         {
+            OnBeginRenderingShapes();
+
+            shapeCamera.Render();
+
+            OnEndRenderingShapes();
+        }
+
+        public void RenderCircles(int radius)
+        {
+            circleTexture.Clear();
+
             int count = RenderersCount;
             if (count <= 0)
             {
