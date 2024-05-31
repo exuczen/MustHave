@@ -1,3 +1,5 @@
+//#define SHOW_MOVE_CORE_IN_TOOLS
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -13,13 +15,13 @@ namespace MustHave
 
         private const string ExportedPackageFolderName = "ExportedPackages";
 
-        private const string SharedFolderPath = @"Packages/MustHave/Shared";
-        private const string SharedHiddenFolderPath = @"Packages/MustHaveHidden~/Shared";
-        private static readonly string SharedFolderMetaPath = $"{SharedFolderPath}.meta";
-        private static readonly string SharedHiddenFolderMetaPath = $"{SharedHiddenFolderPath}.meta";
-        private const string MustHaveLibName = "MustHave.dll";
-        private const string MustHaveEditorLibName = "MustHaveEditor.dll";
-        private const string MustHavePluginsFolderPath = @"Packages/MustHave/SharedPlugins";
+        private const string CoreFolderPath = @"Packages/MustHave/Core";
+        private const string CoreHiddenFolderPath = @"Packages/MustHaveHidden~/Core";
+        private static readonly string CoreFolderMetaPath = $"{CoreFolderPath}.meta";
+        private static readonly string CoreHiddenFolderMetaPath = $"{CoreHiddenFolderPath}.meta";
+        private const string MustHaveLibName = "MustHave.Core.dll";
+        private const string MustHaveEditorLibName = "MustHaveEditor.Core.dll";
+        private const string MustHavePluginsFolderPath = @"Packages/MustHave/Shared/Plugins";
         private static readonly string MustHaveStandaloneLibPath = GetPluginLibPath("MustHaveStandalone", MustHaveLibName);
         private static readonly string MustHaveEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveLibName);
         private static readonly string MustHaveEditorEditorLibPath = GetPluginLibPath("MustHaveEditor", MustHaveEditorLibName);
@@ -55,11 +57,25 @@ namespace MustHave
             AssetDatabase.Refresh();
         }
 #endif
-        //[MenuItem("Tools/Move MustHave/Shared to hidden")]
-        public static void MoveSharedFolderToHiddenFolder(bool refresh)
+
+#if SHOW_MOVE_CORE_IN_TOOLS
+        [MenuItem("Tools/Move MustHave/Core to hidden")]
+        public static void MoveCoreFolderToHiddenFolder()
         {
-            FileUtils.TryMoveFile(GetFullPath(SharedFolderMetaPath), GetFullPath(SharedHiddenFolderMetaPath));
-            FileUtils.TryMoveDirectory(GetFullPath(SharedFolderPath), GetFullPath(SharedHiddenFolderPath));
+            MoveCoreFolderToHiddenFolder(true);
+        }
+
+        [MenuItem("Tools/Move MustHave/Core from hidden")]
+        public static void MoveCoreFolderFromHiddenFolder()
+        {
+            MoveCoreFolderFromHiddenFolder(true);
+        }
+#endif
+
+        public static void MoveCoreFolderToHiddenFolder(bool refresh)
+        {
+            FileUtils.TryMoveFile(GetFullPath(CoreFolderMetaPath), GetFullPath(CoreHiddenFolderMetaPath));
+            FileUtils.TryMoveDirectory(GetFullPath(CoreFolderPath), GetFullPath(CoreHiddenFolderPath));
 
             if (refresh)
             {
@@ -67,11 +83,10 @@ namespace MustHave
             }
         }
 
-        //[MenuItem("Tools/Move MustHave/Shared from hidden")]
-        public static void MoveSharedFolderFromHiddenFolder(bool refresh)
+        public static void MoveCoreFolderFromHiddenFolder(bool refresh)
         {
-            FileUtils.TryMoveFile(GetFullPath(SharedHiddenFolderMetaPath), GetFullPath(SharedFolderMetaPath));
-            FileUtils.TryMoveDirectory(GetFullPath(SharedHiddenFolderPath), GetFullPath(SharedFolderPath));
+            FileUtils.TryMoveFile(GetFullPath(CoreHiddenFolderMetaPath), GetFullPath(CoreFolderMetaPath));
+            FileUtils.TryMoveDirectory(GetFullPath(CoreHiddenFolderPath), GetFullPath(CoreFolderPath));
 
             if (refresh)
             {
@@ -81,7 +96,7 @@ namespace MustHave
 
         public static void EnableMustHaveLibsPlatforms()
         {
-            MoveSharedFolderToHiddenFolder(false);
+            MoveCoreFolderToHiddenFolder(false);
 
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
@@ -96,7 +111,7 @@ namespace MustHave
 
         public static void DisableMustHaveLibsPlatforms()
         {
-            MoveSharedFolderFromHiddenFolder(false);
+            MoveCoreFolderFromHiddenFolder(false);
 
             var importer = AssetImporter.GetAtPath(GetAssetsPath(MustHaveStandaloneLibPath)) as PluginImporter;
             if (importer)
@@ -115,8 +130,8 @@ namespace MustHave
 
             var assetPaths = new string[] {
                 $"Assets/Packages/MustHave/{enumName}",
-                "Assets/Packages/MustHave/SharedScripts",
-                "Assets/Packages/MustHave/SharedPlugins"
+                "Assets/Packages/MustHave/Shared/Scripts",
+                "Assets/Packages/MustHave/Shared/Plugins"
             };
             var packageFolderName = ExportedPackageFolderName;
             var packageFolderPath = Path.Combine(ProjectFolderPath, packageFolderName);

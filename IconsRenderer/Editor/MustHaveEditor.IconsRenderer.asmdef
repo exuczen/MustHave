@@ -3,7 +3,7 @@
     "rootNamespace": "",
     "references": [
         "MustHave.IconsRenderer",
-        "MustHaveEditor"
+        "MustHaveEditor.Core"
     ],
     "includePlatforms": [
         "Editor"

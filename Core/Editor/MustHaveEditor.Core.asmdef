@@ -1,8 +1,12 @@
 {
-    "name": "MustHave",
+    "name": "MustHaveEditor.Core",
     "rootNamespace": "",
-    "references": [],
-    "includePlatforms": [],
+    "references": [
+        "MustHave.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

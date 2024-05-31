@@ -2,7 +2,7 @@
     "name": "MustHave.Outline",
     "rootNamespace": "",
     "references": [
-        "MustHave",
+        "MustHave.Core",
         "MustHave.Shared",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"

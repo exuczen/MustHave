@@ -57,7 +57,9 @@ namespace MustHave
                     throw new System.InvalidOperationException();
 #if UNITY_PIPELINE_URP
                 case RenderPipelineType.URP:
+#pragma warning disable CS0618 // Type or member is obsolete
                     UniversalRenderPipeline.RenderSingleCamera(context, camera);
+#pragma warning restore CS0618 // Type or member is obsolete
                     break;
 #endif
 #if UNITY_PIPELINE_HDRP

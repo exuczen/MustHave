@@ -2,7 +2,7 @@
     "name": "MustHave.Shared",
     "rootNamespace": "",
     "references": [
-        "MustHave",
+        "MustHave.Core",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

@@ -1,9 +1,7 @@
 {
-    "name": "MustHave.IconsRenderer",
+    "name": "MustHave.Core",
     "rootNamespace": "",
-    "references": [
-        "MustHave.Core"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
