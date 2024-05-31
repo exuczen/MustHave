@@ -111,8 +111,11 @@ namespace MustHave
 
         public static void ExportMustHavePackage(PackageName enumName)
         {
-            var assetPaths = new string[2] {
+            //TODO: Remove UniversalAdditionalCameraData from OutlineObjectCamera prefab before export
+
+            var assetPaths = new string[] {
                 $"Assets/Packages/MustHave/{enumName}",
+                "Assets/Packages/MustHave/SharedScripts",
                 "Assets/Packages/MustHave/SharedPlugins"
             };
             var packageFolderName = ExportedPackageFolderName;

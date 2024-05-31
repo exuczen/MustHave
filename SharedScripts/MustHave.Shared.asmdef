@@ -1,9 +1,8 @@
 {
-    "name": "MustHave.Outline",
+    "name": "MustHave.Shared",
     "rootNamespace": "",
     "references": [
         "MustHave",
-        "MustHave.Shared",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

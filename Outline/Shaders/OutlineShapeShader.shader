@@ -2,11 +2,14 @@ Shader "MustHave/OutlineShapeShader"
 {
     Properties
     {
-        _Color("Color", Vector) = (1, 1, 1, 1)
+        _Color("Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags
+        { 
+            "RenderType" = "Opaque"
+        }
         Blend Off
 
         Pass
