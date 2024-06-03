@@ -118,7 +118,7 @@ namespace MustHave
             shapeCamera.backgroundColor = Color.clear;
             shapeCamera.cullingMask = Layer.OutlineMask;
             shapeCamera.allowMSAA = false;
-            shapeCamera.enabled = outlineCamera ? outlineCamera.RenderPipelineType != RenderPipelineType.Default : false;
+            shapeCamera.enabled = outlineCamera ? outlineCamera.PipelineType != RenderPipelineType.Default : false;
             shapeCamera.depthTextureMode = DepthTextureMode.Depth;
 
             if (outlineCamera)

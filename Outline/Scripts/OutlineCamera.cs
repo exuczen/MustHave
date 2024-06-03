@@ -1,22 +1,16 @@
 ﻿using MustHave.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
-#if UNITY_PIPELINE_URP
-using UnityEngine.Rendering.Universal;
-#endif
-#if UNITY_PIPELINE_HDRP
-using UnityEngine.Rendering.HighDefinition;
-#endif
 
 namespace MustHave
 {
     [ExecuteInEditMode]
-    public class OutlineCamera : RenderPostProcessor
+    public class OutlineCamera : ComputeShaderPostProcess
     {
         public const int LineMaxThickness = 100;
 
         public OutlineObjectCamera ObjectCamera => objectCamera;
-        public RenderPipelineType RenderPipelineType => renderPipelineType;
+
         public int LineThickness
         {
             get => lineThickness;
@@ -71,8 +65,6 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool debugShader = false;
 
-        private RenderPipelineType renderPipelineType = RenderPipelineType.Default;
-
         private void Update()
         {
             objectCamera.OnUpdate(this);
@@ -107,16 +99,6 @@ namespace MustHave
 
                 shader = objectCamera.ComputeShader;
             }
-
-            renderPipelineType = RenderUtils.GetRenderPipelineType();
-
-            if (renderPipelineType != RenderPipelineType.Default)
-            {
-                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
-                RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
-                RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
-                RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
-            }
             base.OnEnable();
 
             objectCamera.enabled = true;
@@ -129,11 +111,6 @@ namespace MustHave
             if (objectCamera)
             {
                 objectCamera.enabled = false;
-            }
-            if (renderPipelineType != RenderPipelineType.Default)
-            {
-                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
-                RenderPipelineManager.beginCameraRendering -= OnEndCameraRendering;
             }
         }
 
@@ -192,11 +169,18 @@ namespace MustHave
 
         protected override void SetupOnRenderImage()
         {
-            if (renderPipelineType == RenderPipelineType.Default)
+            if (PipelineType != RenderPipelineType.Default)
             {
-                objectCamera.RenderShapes();
+                throw new System.InvalidOperationException($"PipelineType: {PipelineType}");
             }
+            objectCamera.RenderShapes();
+
             shader.SetInt(ShaderData.LineThicknessID, lineThickness);
+        }
+
+        protected override void SetupOnRenderImage(CommandBuffer cmd)
+        {
+            cmd.SetComputeIntParam(shader, ShaderData.LineThicknessID, lineThickness);
         }
 
         protected override void OnDestroy()
@@ -272,15 +256,24 @@ namespace MustHave
             shader.EnableKeyword(debugShaderMode.ToString());
         }
 
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
+        protected override void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            if (objectCamera && camera == objectCamera.ShapeCamera)
+            if (objectCamera)
             {
-                objectCamera.OnBeginRenderingShapes();
+                if (camera == objectCamera.ShapeCamera)
+                {
+                    objectCamera.OnBeginRenderingShapes();
+                }
+#if UNITY_PIPELINE_URP
+                else
+                {
+                    base.OnBeginCameraRendering(context, camera);
+                }
+#endif
             }
         }
 
-        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        protected override void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
         {
             if (objectCamera && camera == objectCamera.ShapeCamera)
             {

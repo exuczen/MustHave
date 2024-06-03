@@ -39,7 +39,7 @@ namespace MustHave
                 {
                     pipelineType = RenderPipelineType.CustomSRP;
                 }
-                Debug.Log($"RenderPipelineAsset: {pipeline.GetType()} | {pipelineType}");
+                Debug.Log($"RenderPipelineAsset: {pipeline.GetType().Name} | {pipelineType}");
             }
             else
             {
@@ -57,9 +57,11 @@ namespace MustHave
                     throw new System.InvalidOperationException();
 #if UNITY_PIPELINE_URP
                 case RenderPipelineType.URP:
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS0618 // Type or member is obsolete
                     UniversalRenderPipeline.RenderSingleCamera(context, camera);
 #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore IDE0079 // Remove unnecessary suppression
                     break;
 #endif
 #if UNITY_PIPELINE_HDRP

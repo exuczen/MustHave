@@ -1,12 +1,17 @@
-﻿// This is renamed, refactored and extended version of BasePP class from https://github.com/NikLever/UnityComputeShaders/blob/main/UnityComputeShaders%20-%20start/Assets/Scripts/BasePP.cs
-// BasePP is part of a resource project for Udemy's Compute Shader's course by Nicholas Lever and Penny de Byl: https://www.udemy.com/course/compute-shaders
-
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 //#define USE_EDITOR_SCENE_EVENTS
 #endif
 
 using MustHave.Utils;
+using System;
 using UnityEngine;
+using UnityEngine.Rendering;
+#if UNITY_PIPELINE_URP
+using UnityEngine.Rendering.Universal;
+#endif
+#if UNITY_PIPELINE_HDRP
+using UnityEngine.Rendering.HighDefinition;
+#endif
 #if USE_EDITOR_SCENE_EVENTS
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
@@ -17,16 +22,23 @@ using UnityEditor.SceneManagement;
 namespace MustHave
 {
     [RequireComponent(typeof(Camera))]
-    public class RenderPostProcessor : MonoBehaviour
+    public class ComputeShaderPostProcess : MonoBehaviour
     {
         protected static readonly int SourceTextureID = Shader.PropertyToID("Source");
         protected static readonly int OutputTextureID = Shader.PropertyToID("Output");
 
         public Camera Camera => thisCamera;
+        public RenderTexture OutputTexture => outputTexture;
+        public RenderTexture SourceTexture => sourceTexture;
+        public RenderPipelineType PipelineType { get; set; } = RenderPipelineType.Default;
 
         [SerializeField]
         protected ComputeShader shader = null;
-
+#if UNITY_PIPELINE_URP
+        [SerializeField]
+        protected RenderPassSettings renderPassSettings = new();
+        protected ComputeShaderRenderPass renderPass = null;
+#endif
         protected virtual string MainKernelName => "CSMain";
         protected virtual bool SkipDispatch => false;
 
@@ -41,6 +53,8 @@ namespace MustHave
 
         protected RenderTexture outputTexture = null;
         protected RenderTexture sourceTexture = null;
+        protected RenderTargetIdentifier sourceRenderTarget;
+        protected RenderTargetIdentifier outputRenderTarget;
 
         protected int mainKernelID = -1;
         protected bool initialized = false;
@@ -75,6 +89,8 @@ namespace MustHave
             }
             mainKernelID = shader.FindKernel(MainKernelName);
 
+            PipelineType = RenderUtils.GetRenderPipelineType();
+
             ReleaseTextures();
             CreateTextures();
 
@@ -89,22 +105,22 @@ namespace MustHave
             Init();
         }
 
-        protected void ReleaseTexture(ref RenderTexture textureToClear)
+        protected void ReleaseTexture(ref RenderTexture texture)
         {
-            if (null != textureToClear)
+            if (null != texture)
             {
-                textureToClear.Release();
-                textureToClear = null;
+                texture.Release();
+                texture = null;
             }
         }
 
-        protected void CreateTexture(ref RenderTexture textureToMake)
+        protected void CreateTexture(ref RenderTexture texture)
         {
-            textureToMake = new RenderTexture(textureSize.x, textureSize.y, 0)
+            texture = new RenderTexture(textureSize.x, textureSize.y, 0)
             {
                 enableRandomWrite = true
             };
-            textureToMake.Create();
+            texture.Create();
         }
 
         protected virtual void ReleaseTextures()
@@ -121,14 +137,28 @@ namespace MustHave
             if (shader)
             {
                 shader.GetKernelThreadGroupSizes(mainKernelID, out uint x, out uint y, out _);
-                threadGroups.x = ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
-                threadGroups.y = ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
+                threadGroups.x = Utils.ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
+                threadGroups.y = Utils.ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
             }
             CreateTexture(ref outputTexture);
             CreateTexture(ref sourceTexture);
 
             shader.SetTexture(mainKernelID, SourceTextureID, sourceTexture);
             shader.SetTexture(mainKernelID, OutputTextureID, outputTexture);
+
+            sourceRenderTarget = new RenderTargetIdentifier(sourceTexture);
+            outputRenderTarget = new RenderTargetIdentifier(outputTexture);
+
+#if UNITY_PIPELINE_URP
+            if (renderPass == null)
+            {
+                renderPass = new ComputeShaderRenderPass(renderPassSettings, this);
+            }
+            else
+            {
+                renderPass.Init(renderPassSettings, this);
+            }
+#endif
         }
 
         protected virtual void OnInit() { }
@@ -139,13 +169,33 @@ namespace MustHave
 
         protected virtual void SetupOnRenderImage() { }
 
-        protected virtual void DispatchWithSource(RenderTexture source, RenderTexture destination)
+        protected virtual void SetupOnRenderImage(CommandBuffer cmd) { }
+
+        protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            Graphics.Blit(source, sourceTexture);
+#if UNITY_PIPELINE_URP
+            if (camera == thisCamera)
+            {
+                var cameraData = camera.GetUniversalAdditionalCameraData();
+                if (cameraData)
+                {
+                    //Debug.Log($"{GetType().Name}.OnBeginCameraRendering: {cameraData.scriptableRenderer}");
+                    cameraData.scriptableRenderer?.EnqueuePass(renderPass);
+                }
+            }
+#endif
+        }
 
+        protected virtual void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) { }
+
+        protected virtual void DispatchShader()
+        {
             shader.Dispatch(mainKernelID, threadGroups.x, threadGroups.y, 1);
+        }
 
-            Graphics.Blit(outputTexture, destination);
+        protected virtual void DispatchShader(CommandBuffer cmd)
+        {
+            cmd.DispatchCompute(shader, mainKernelID, threadGroups.x, threadGroups.y, 1);
         }
 
         protected virtual void OnValidate()
@@ -170,12 +220,22 @@ namespace MustHave
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
                 UnityAssetPostprocessor.AllAssetsPostprocessed += OnAllAssetsPostprocessed;
+
+                //UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
             }
 #endif
             if (cameraChangeListener)
             {
                 cameraChangeListener.PropertyChanged -= OnCameraPropertyChange;
                 cameraChangeListener.PropertyChanged += OnCameraPropertyChange;
+            }
+
+            if (PipelineType != RenderPipelineType.Default)
+            {
+                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+                RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+                RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+                RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
             }
         }
 
@@ -189,11 +249,18 @@ namespace MustHave
                 EditorSceneManager.activeSceneChangedInEditMode -= OnActiveSceneChangedInEditMode;
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
+
+                //UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
             }
 #endif
             if (cameraChangeListener)
             {
                 cameraChangeListener.PropertyChanged -= OnCameraPropertyChange;
+            }
+            if (PipelineType != RenderPipelineType.Default)
+            {
+                RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+                RenderPipelineManager.beginCameraRendering -= OnEndCameraRendering;
             }
             ReleaseTextures();
             initialized = false;
@@ -205,13 +272,39 @@ namespace MustHave
             initialized = false;
         }
 
+        public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
+        {
+            if (initialized && shader && !SkipDispatch)
+            {
+                CheckResolution(out _);
+                SetupOnRenderImage(cmd);
+
+                pass.Blit(cmd, colorRenderTarget, sourceRenderTarget);
+
+                DispatchShader(cmd);
+
+                pass.Blit(cmd, outputRenderTarget, colorRenderTarget);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         protected void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
             if (initialized && shader && !SkipDispatch)
             {
                 CheckResolution(out _);
                 SetupOnRenderImage();
-                DispatchWithSource(source, destination);
+
+                Graphics.Blit(source, sourceTexture);
+
+                DispatchShader();
+
+                Graphics.Blit(outputTexture, destination);
             }
             else
             {
