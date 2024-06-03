@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "MustHave.Core",
+        "MustHave.Shared",
         "MustHave.Outline",
         "MustHaveEditor.Core"
     ],
