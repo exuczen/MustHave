@@ -39,12 +39,12 @@ namespace MustHave
                 {
                     pipelineType = RenderPipelineType.CustomSRP;
                 }
-                Debug.Log($"RenderPipelineAsset: {pipeline.GetType().Name} | {pipelineType}");
+                //Debug.Log($"RenderPipelineAsset: {pipeline.GetType().Name} | {pipelineType}");
             }
             else
             {
                 pipelineType = RenderPipelineType.Default;
-                Debug.Log($"Built-in Render Pipeline | {pipelineType}");
+                //Debug.Log($"Built-in Render Pipeline | {pipelineType}");
             }
             return pipelineType;
         }

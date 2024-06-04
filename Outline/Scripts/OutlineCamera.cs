@@ -167,20 +167,20 @@ namespace MustHave
             objectCamera.Setup(this);
         }
 
-        protected override void SetupOnRenderImage()
+        protected override void SetupOnExecute()
         {
-            if (PipelineType != RenderPipelineType.Default)
+            if (PipelineType == RenderPipelineType.Default)
             {
-                throw new System.InvalidOperationException($"PipelineType: {PipelineType}");
+                objectCamera.RenderShapes();
             }
-            objectCamera.RenderShapes();
-
-            shader.SetInt(ShaderData.LineThicknessID, lineThickness);
-        }
-
-        protected override void SetupOnRenderImage(CommandBuffer cmd)
-        {
-            cmd.SetComputeIntParam(shader, ShaderData.LineThicknessID, lineThickness);
+            if (HasCommandBuffer)
+            {
+                cmdBuffer.SetComputeIntParam(shader, ShaderData.LineThicknessID, lineThickness);
+            }
+            else
+            {
+                shader.SetInt(ShaderData.LineThicknessID, lineThickness);
+            }
         }
 
         protected override void OnDestroy()

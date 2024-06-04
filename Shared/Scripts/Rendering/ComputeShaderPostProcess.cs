@@ -2,8 +2,6 @@
 //#define USE_EDITOR_SCENE_EVENTS
 #endif
 
-using MustHave.Utils;
-using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_URP
@@ -32,6 +30,10 @@ namespace MustHave
         public RenderTexture SourceTexture => sourceTexture;
         public RenderPipelineType PipelineType { get; set; } = RenderPipelineType.Default;
 
+        protected bool HasCommandBuffer => cmdBuffer != null;
+
+        private bool CanExecute => initialized && shader && !SkipDispatch;
+
         [SerializeField]
         protected ComputeShader shader = null;
 #if UNITY_PIPELINE_URP
@@ -55,6 +57,8 @@ namespace MustHave
         protected RenderTexture sourceTexture = null;
         protected RenderTargetIdentifier sourceRenderTarget;
         protected RenderTargetIdentifier outputRenderTarget;
+
+        protected CommandBuffer cmdBuffer = null;
 
         protected int mainKernelID = -1;
         protected bool initialized = false;
@@ -134,20 +138,23 @@ namespace MustHave
             textureSize.x = thisCamera.pixelWidth;
             textureSize.y = thisCamera.pixelHeight;
 
-            if (shader)
-            {
-                shader.GetKernelThreadGroupSizes(mainKernelID, out uint x, out uint y, out _);
-                threadGroups.x = Utils.ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
-                threadGroups.y = Utils.ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
-            }
+            shader.GetKernelThreadGroupSizes(mainKernelID, out uint x, out uint y, out _);
+            threadGroups.x = Utils.ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
+            threadGroups.y = Utils.ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
+
             CreateTexture(ref outputTexture);
             CreateTexture(ref sourceTexture);
 
-            shader.SetTexture(mainKernelID, SourceTextureID, sourceTexture);
-            shader.SetTexture(mainKernelID, OutputTextureID, outputTexture);
-
             sourceRenderTarget = new RenderTargetIdentifier(sourceTexture);
             outputRenderTarget = new RenderTargetIdentifier(outputTexture);
+
+            //if (HasCommandBuffer)
+            //{
+            //    cmdBuffer.SetComputeTextureParam(shader, mainKernelID, SourceTextureID, sourceRenderTarget);
+            //    cmdBuffer.SetComputeTextureParam(shader, mainKernelID, OutputTextureID, outputRenderTarget);
+            //}
+            shader.SetTexture(mainKernelID, SourceTextureID, sourceTexture);
+            shader.SetTexture(mainKernelID, OutputTextureID, outputTexture);
 
 #if UNITY_PIPELINE_URP
             if (renderPass == null)
@@ -167,9 +174,7 @@ namespace MustHave
 
         protected virtual void OnScreenSizeChange() { }
 
-        protected virtual void SetupOnRenderImage() { }
-
-        protected virtual void SetupOnRenderImage(CommandBuffer cmd) { }
+        protected virtual void SetupOnExecute() { }
 
         protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
@@ -262,28 +267,29 @@ namespace MustHave
                 RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
                 RenderPipelineManager.beginCameraRendering -= OnEndCameraRendering;
             }
-            ReleaseTextures();
-            initialized = false;
+            OnDisableOrDestroy();
         }
 
         protected virtual void OnDestroy()
         {
-            ReleaseTextures();
-            initialized = false;
+            OnDisableOrDestroy();
         }
 
         public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
         {
-            if (initialized && shader && !SkipDispatch)
+            if (CanExecute)
             {
-                CheckResolution(out _);
-                SetupOnRenderImage(cmd);
+                cmdBuffer = cmd;
+
+                OnExecute();
 
                 pass.Blit(cmd, colorRenderTarget, sourceRenderTarget);
 
                 DispatchShader(cmd);
 
                 pass.Blit(cmd, outputRenderTarget, colorRenderTarget);
+
+                cmdBuffer = null;
 
                 return true;
             }
@@ -295,10 +301,9 @@ namespace MustHave
 
         protected void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (initialized && shader && !SkipDispatch)
+            if (CanExecute)
             {
-                CheckResolution(out _);
-                SetupOnRenderImage();
+                OnExecute();
 
                 Graphics.Blit(source, sourceTexture);
 
@@ -310,6 +315,19 @@ namespace MustHave
             {
                 Graphics.Blit(source, destination);
             }
+        }
+
+        private void OnExecute()
+        {
+            CheckResolution(out _);
+            SetupOnExecute();
+        }
+
+        private void OnDisableOrDestroy()
+        {
+            ReleaseTextures();
+            initialized = false;
+            cmdBuffer = null; // It is released by ComputeShaderRenderPass
         }
 
         private void CheckResolution(out bool changed)
