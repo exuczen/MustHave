@@ -25,6 +25,11 @@
             "name": "com.unity.render-pipelines.high-definition",
             "expression": "0.0",
             "define": "UNITY_PIPELINE_HDRP"
+        },
+        {
+            "name": "com.unity.render-pipelines.core",
+            "expression": "0.0",
+            "define": "UNITY_PIPELINE_CORE"
         }
     ],
     "noEngineReferences": false
