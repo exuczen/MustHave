@@ -130,7 +130,7 @@ namespace MustHave
 
         protected void CreateTexture(ref RenderTexture texture)
         {
-            texture = new RenderTexture(textureSize.x, textureSize.y, 0)
+            texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat)
             {
                 enableRandomWrite = true
             };

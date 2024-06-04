@@ -181,7 +181,7 @@ namespace MustHave
                 {
                     DestroyRenderTexture(renderTexture);
                 }
-                renderTexture = new RenderTexture(width, height, 0)
+                renderTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat)
                 {
                     antiAliasing = 8,
                 };
