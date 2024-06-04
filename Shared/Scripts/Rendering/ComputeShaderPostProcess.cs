@@ -2,6 +2,7 @@
 //#define USE_EDITOR_SCENE_EVENTS
 #endif
 
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_URP
@@ -33,6 +34,10 @@ namespace MustHave
         protected bool HasCommandBuffer => cmdBuffer != null;
 
         private bool CanExecute => initialized && shader && !SkipDispatch;
+        private bool IsCameraPixelSizeValid =>
+            thisCamera.pixelWidth > 0 && thisCamera.pixelWidth <= SystemInfo.maxTextureSize &&
+            thisCamera.pixelHeight > 0 && thisCamera.pixelHeight <= SystemInfo.maxTextureSize &&
+            thisCamera.aspect <= 75f;
 
         [SerializeField]
         protected ComputeShader shader = null;
@@ -85,6 +90,11 @@ namespace MustHave
             if (!thisCamera)
             {
                 Debug.LogError($"{GetType().Name}.Init: Object has no Camera.");
+                return;
+            }
+            if (!IsCameraPixelSizeValid)
+            {
+                Debug.LogError($"{GetType().Name}.Init: Invalid camera pixel size: ({thisCamera.pixelWidth}, {thisCamera.pixelHeight}) OR aspect: {thisCamera.aspect}");
                 return;
             }
             if (!cameraChangeListener)
@@ -178,17 +188,30 @@ namespace MustHave
 
         protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-#if UNITY_PIPELINE_URP
             if (camera == thisCamera)
             {
-                var cameraData = camera.GetUniversalAdditionalCameraData();
-                if (cameraData)
+                switch (PipelineType)
                 {
-                    //Debug.Log($"{GetType().Name}.OnBeginCameraRendering: {cameraData.scriptableRenderer}");
-                    cameraData.scriptableRenderer?.EnqueuePass(renderPass);
+                    case RenderPipelineType.Default:
+                        break;
+#if UNITY_PIPELINE_URP
+                    case RenderPipelineType.URP:
+                        var cameraData = camera.GetUniversalAdditionalCameraData();
+                        if (cameraData)
+                        {
+                            //Debug.Log($"{GetType().Name}.OnBeginCameraRendering: {cameraData.scriptableRenderer}");
+                            cameraData.scriptableRenderer?.EnqueuePass(renderPass);
+                        }
+                        break;
+#endif
+                    case RenderPipelineType.HDRP:
+                        break;
+                    case RenderPipelineType.CustomSRP:
+                        break;
+                    default:
+                        break;
                 }
             }
-#endif
         }
 
         protected virtual void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) { }
@@ -234,7 +257,6 @@ namespace MustHave
                 cameraChangeListener.PropertyChanged -= OnCameraPropertyChange;
                 cameraChangeListener.PropertyChanged += OnCameraPropertyChange;
             }
-
             if (PipelineType != RenderPipelineType.Default)
             {
                 RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
@@ -275,7 +297,17 @@ namespace MustHave
             OnDisableOrDestroy();
         }
 
+#if UNITY_PIPELINE_URP
         public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
+        {
+            return OnExecuteRenderPass(cmd,
+                cmd => pass.Blit(cmd, colorRenderTarget, sourceRenderTarget),
+                cmd => pass.Blit(cmd, outputRenderTarget, colorRenderTarget)
+            );
+        }
+#endif
+
+        protected bool OnExecuteRenderPass(CommandBuffer cmd, Action<CommandBuffer> blitSource, Action<CommandBuffer> blitOutput)
         {
             if (CanExecute)
             {
@@ -283,11 +315,11 @@ namespace MustHave
 
                 OnExecute();
 
-                pass.Blit(cmd, colorRenderTarget, sourceRenderTarget);
+                blitSource(cmd);
 
                 DispatchShader(cmd);
 
-                pass.Blit(cmd, outputRenderTarget, colorRenderTarget);
+                blitOutput(cmd);
 
                 cmdBuffer = null;
 
@@ -336,9 +368,16 @@ namespace MustHave
 
             if (changed)
             {
-                ReleaseTextures();
-                CreateTextures();
-                OnScreenSizeChange();
+                if (IsCameraPixelSizeValid)
+                {
+                    ReleaseTextures();
+                    CreateTextures();
+                    OnScreenSizeChange();
+                }
+                else
+                {
+                    Debug.LogError($"{GetType().Name}.CheckResolution: Invalid camera pixel size: ({thisCamera.pixelWidth}, {thisCamera.scaledPixelHeight}) OR aspect: {thisCamera.aspect}");
+                }
             }
         }
 

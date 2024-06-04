@@ -402,7 +402,7 @@ namespace MustHave
             return true;
         }
 
-        public void OnUpdate(OutlineCamera outlineCamera)
+        public void OnLateUpdate(OutlineCamera outlineCamera)
         {
             foreach (var obj in objects)
             {

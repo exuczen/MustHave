@@ -65,9 +65,9 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool debugShader = false;
 
-        private void Update()
+        private void LateUpdate()
         {
-            objectCamera.OnUpdate(this);
+            objectCamera.OnLateUpdate(this);
         }
 
         protected override void OnEnable()
@@ -264,12 +264,10 @@ namespace MustHave
                 {
                     objectCamera.OnBeginRenderingShapes();
                 }
-#if UNITY_PIPELINE_URP
                 else
                 {
                     base.OnBeginCameraRendering(context, camera);
                 }
-#endif
             }
         }
 
