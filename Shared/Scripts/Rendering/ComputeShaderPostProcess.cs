@@ -108,6 +108,19 @@ namespace MustHave
             ReleaseTextures();
             CreateTextures();
 
+#if UNITY_PIPELINE_URP
+            if (PipelineType == RenderPipelineType.URP)
+            {
+                if (renderPass == null)
+                {
+                    renderPass = new ComputeShaderRenderPass(renderPassSettings, this);
+                }
+                else
+                {
+                    renderPass.Init(renderPassSettings, this);
+                }
+            }
+#endif
             OnInit();
 
             initialized = true;
@@ -165,17 +178,6 @@ namespace MustHave
             //}
             shader.SetTexture(mainKernelID, SourceTextureID, sourceTexture);
             shader.SetTexture(mainKernelID, OutputTextureID, outputTexture);
-
-#if UNITY_PIPELINE_URP
-            if (renderPass == null)
-            {
-                renderPass = new ComputeShaderRenderPass(renderPassSettings, this);
-            }
-            else
-            {
-                renderPass.Init(renderPassSettings, this);
-            }
-#endif
         }
 
         protected virtual void OnInit() { }
@@ -224,6 +226,11 @@ namespace MustHave
         protected virtual void DispatchShader(CommandBuffer cmd)
         {
             cmd.DispatchCompute(shader, mainKernelID, threadGroups.x, threadGroups.y, 1);
+        }
+
+        protected virtual void Update()
+        {
+            CheckResolution(out _);
         }
 
         protected virtual void OnValidate()
@@ -313,10 +320,9 @@ namespace MustHave
             {
                 cmdBuffer = cmd;
 
-                OnExecute();
-
                 blitSource(cmd);
 
+                SetupOnExecute();
                 DispatchShader(cmd);
 
                 blitOutput(cmd);
@@ -335,10 +341,9 @@ namespace MustHave
         {
             if (CanExecute)
             {
-                OnExecute();
-
                 Graphics.Blit(source, sourceTexture);
 
+                SetupOnExecute();
                 DispatchShader();
 
                 Graphics.Blit(outputTexture, destination);
@@ -347,12 +352,6 @@ namespace MustHave
             {
                 Graphics.Blit(source, destination);
             }
-        }
-
-        private void OnExecute()
-        {
-            CheckResolution(out _);
-            SetupOnExecute();
         }
 
         private void OnDisableOrDestroy()
@@ -396,6 +395,7 @@ namespace MustHave
         private void OnAllAssetsPostprocessed()
         {
             ReInit();
+            UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
         }
 #endif
     }

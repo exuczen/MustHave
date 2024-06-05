@@ -171,7 +171,7 @@ namespace MustHave
 
         protected override void SetupOnExecute()
         {
-            if (PipelineType == RenderPipelineType.Default)
+            if (PipelineType == RenderPipelineType.Default && !HasCommandBuffer)
             {
                 objectCamera.RenderShapes();
             }
@@ -275,9 +275,16 @@ namespace MustHave
 
         protected override void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            if (objectCamera && camera == objectCamera.ShapeCamera)
+            if (objectCamera)
             {
-                objectCamera.OnEndRenderingShapes();
+                if (camera == objectCamera.ShapeCamera)
+                {
+                    objectCamera.OnEndRenderingShapes();
+                }
+                else
+                {
+                    base.OnEndCameraRendering(context, camera);
+                }
             }
         }
     }
