@@ -2,7 +2,9 @@
 //#define USE_EDITOR_SCENE_EVENTS
 #endif
 
+using MustHave.Utils;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_URP
@@ -117,7 +119,7 @@ namespace MustHave
                 }
                 else
                 {
-                    renderPass.Init(renderPassSettings, this);
+                    renderPass.Setup(renderPassSettings, this);
                 }
             }
 #endif
@@ -188,35 +190,52 @@ namespace MustHave
 
         protected virtual void SetupOnExecute() { }
 
-        protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
-        {
-            if (camera == thisCamera)
-            {
-                switch (PipelineType)
-                {
-                    case RenderPipelineType.Default:
-                        break;
-#if UNITY_PIPELINE_URP
-                    case RenderPipelineType.URP:
-                        var cameraData = camera.GetUniversalAdditionalCameraData();
-                        if (cameraData)
-                        {
-                            //Debug.Log($"{GetType().Name}.OnBeginCameraRendering: {cameraData.scriptableRenderer}");
-                            cameraData.scriptableRenderer?.EnqueuePass(renderPass);
-                        }
-                        break;
-#endif
-                    case RenderPipelineType.HDRP:
-                        break;
-                    case RenderPipelineType.CustomSRP:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
 
         protected virtual void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) { }
+
+        protected virtual void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+#if UNITY_PIPELINE_URP
+            if (PipelineType != RenderPipelineType.URP)
+            {
+                return;
+            }
+            var cameraData = thisCamera.GetUniversalAdditionalCameraData();
+            if (cameraData)
+            {
+                //Debug.Log($"{GetType().Name}.OnBeginContextRendering: {cameraData.scriptableRenderer}");
+                renderPass.Setup(renderPassSettings, this);
+                cameraData.scriptableRenderer?.EnqueuePass(renderPass);
+            }
+#endif
+        }
+
+        protected virtual void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+#if UNITY_EDITOR
+            if (SceneUtils.GetCurrentSceneViewCamera())
+            {
+                return;
+            }
+#endif
+            if (PipelineType != RenderPipelineType.CustomSRP)
+            {
+                return;
+            }
+            CommandBuffer cmd = CommandBufferPool.Get();
+
+            cmd.Blit(BuiltinRenderTextureType.CameraTarget, sourceRenderTarget);
+            cmd.Blit(sourceRenderTarget, BuiltinRenderTextureType.CameraTarget);
+
+            OnExecuteRenderPass(cmd, BuiltinRenderTextureType.CameraTarget);
+
+            context.ExecuteCommandBuffer(cmd);
+            context.Submit();
+
+            cmd.Clear();
+            CommandBufferPool.Release(cmd);
+        }
 
         protected virtual void DispatchShader()
         {
@@ -272,6 +291,10 @@ namespace MustHave
                 RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
                 RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
                 RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+                RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
+                RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
+                RenderPipelineManager.endContextRendering -= OnEndContextRendering;
+                RenderPipelineManager.endContextRendering += OnEndContextRendering;
             }
         }
 
@@ -295,6 +318,8 @@ namespace MustHave
             {
                 RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
                 RenderPipelineManager.beginCameraRendering -= OnEndCameraRendering;
+                RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
+                RenderPipelineManager.endContextRendering -= OnEndContextRendering;
             }
             OnDisableOrDestroy();
         }
@@ -313,6 +338,13 @@ namespace MustHave
             );
         }
 #endif
+        protected bool OnExecuteRenderPass(CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
+        {
+            return OnExecuteRenderPass(cmd,
+                cmd => cmd.Blit(colorRenderTarget, sourceRenderTarget),
+                cmd => cmd.Blit(outputRenderTarget, colorRenderTarget)
+            );
+        }
 
         protected bool OnExecuteRenderPass(CommandBuffer cmd, Action<CommandBuffer> blitSource, Action<CommandBuffer> blitOutput)
         {

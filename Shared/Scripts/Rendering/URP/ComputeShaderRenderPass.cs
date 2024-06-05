@@ -19,10 +19,10 @@ namespace MustHave
 
         public ComputeShaderRenderPass(RenderPassSettings settings, ComputeShaderPostProcess postProcess)
         {
-            Init(settings, postProcess);
+            Setup(settings, postProcess);
         }
 
-        public void Init(RenderPassSettings settings, ComputeShaderPostProcess postProcess)
+        public void Setup(RenderPassSettings settings, ComputeShaderPostProcess postProcess)
         {
             renderPassEvent = settings.RenderPassEvent;
 
