@@ -13,6 +13,13 @@ namespace MustHave.Utils
     {
         public static bool IsLoadingScene { get; private set; }
 
+#if UNITY_EDITOR
+        public static Camera GetCurrentSceneViewCamera()
+        {
+            var sceneView = UnityEditor.SceneView.currentDrawingSceneView;
+            return sceneView ? sceneView.camera : null;
+        }
+#endif
         public static bool IsActiveSceneLoadedAndValid()
         {
             var activeScene = SceneManager.GetActiveScene();
@@ -52,14 +59,14 @@ namespace MustHave.Utils
             {
                 temp = new GameObject();
                 UnityEngine.Object.DontDestroyOnLoad(temp);
-                Scene scene = temp.scene;
+                var scene = temp.scene;
                 UnityEngine.Object.DestroyImmediate(temp);
                 temp = null;
                 return scene;
             }
             finally
             {
-                if (temp != null)
+                if (temp)
                 {
                     UnityEngine.Object.DestroyImmediate(temp);
                 }
@@ -68,20 +75,22 @@ namespace MustHave.Utils
 
         public static Canvas FindCanvas(Transform excludeCanvasTransform)
         {
-            List<GameObject> rootGameObjects = new List<GameObject>();
-            Scene scene = SceneManager.GetActiveScene();
+            var rootGameObjects = new List<GameObject>();
+            var scene = SceneManager.GetActiveScene();
             scene.GetRootGameObjects(rootGameObjects);
             Canvas sceneCanvas = null;
             rootGameObjects.Find(root => root.transform != excludeCanvasTransform && (sceneCanvas = root.GetComponent<Canvas>()) != null);
             if (!sceneCanvas)
+            {
                 rootGameObjects.Find(root => (sceneCanvas = root.GetComponentInChildren<Canvas>()) != null);
+            }
             return sceneCanvas;
         }
 
         public static T FindObjectOfType<T>() where T : Component
         {
-            Scene scene = SceneManager.GetActiveScene();
-            List<GameObject> roots = scene.GetRootGameObjects().ToList();
+            var scene = SceneManager.GetActiveScene();
+            var roots = scene.GetRootGameObjects().ToList();
             foreach (GameObject root in roots)
             {
                 T component = root.GetComponentInChildren<T>(true);
@@ -95,9 +104,9 @@ namespace MustHave.Utils
 
         public static List<T> FindObjectsOfType<T>(bool firstDepthSearch = false) where T : Component
         {
-            List<T> results = new List<T>();
-            Scene scene = SceneManager.GetActiveScene();
-            List<GameObject> roots = scene.GetRootGameObjects().ToList();
+            var results = new List<T>();
+            var scene = SceneManager.GetActiveScene();
+            var roots = scene.GetRootGameObjects().ToList();
             if (firstDepthSearch)
             {
                 foreach (GameObject root in roots)
@@ -119,13 +128,15 @@ namespace MustHave.Utils
 
         public static T FindRootObjectOfType<T>() where T : Component
         {
-            Scene scene = SceneManager.GetActiveScene();
-            GameObject[] roots = scene.GetRootGameObjects();
+            var scene = SceneManager.GetActiveScene();
+            var roots = scene.GetRootGameObjects();
             foreach (GameObject root in roots)
             {
                 T component = root.GetComponent<T>();
                 if (component)
+                {
                     return component;
+                }
             }
             return null;
         }
