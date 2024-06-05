@@ -237,6 +237,10 @@ namespace MustHave
         protected virtual void OnEnable()
         {
             Init();
+            if (!initialized)
+            {
+                return;
+            }
 #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
@@ -248,8 +252,6 @@ namespace MustHave
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
                 UnityAssetPostprocessor.AllAssetsPostprocessed += OnAllAssetsPostprocessed;
-
-                //UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
             }
 #endif
             if (cameraChangeListener)
@@ -276,8 +278,6 @@ namespace MustHave
                 EditorSceneManager.activeSceneChangedInEditMode -= OnActiveSceneChangedInEditMode;
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
-
-                //UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
             }
 #endif
             if (cameraChangeListener)

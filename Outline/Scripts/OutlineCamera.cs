@@ -101,7 +101,9 @@ namespace MustHave
             }
             base.OnEnable();
 
-            objectCamera.enabled = true;
+            enabled = initialized;
+
+            objectCamera.SetGameObjectActive(initialized);
         }
 
         protected override void OnDisable()
@@ -110,15 +112,15 @@ namespace MustHave
 
             if (objectCamera)
             {
-                objectCamera.enabled = false;
+                objectCamera.SetGameObjectActive(false);
             }
         }
 
         protected override void OnValidate()
         {
-            if (objectCamera)
+            if (objectCamera && initialized)
             {
-                objectCamera.Setup(null);
+                objectCamera.Setup(this, false);
             }
         }
 

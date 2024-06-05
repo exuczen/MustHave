@@ -90,7 +90,7 @@ namespace MustHave
             circleInstanceBuffer = null;
         }
 
-        public void Setup(OutlineCamera outlineCamera)
+        public void Setup(OutlineCamera outlineCamera, bool copySettings = true)
         {
 #if UNITY_EDITOR
             if (!layerAdded)
@@ -105,7 +105,7 @@ namespace MustHave
 #endif
             shapeCamera = GetComponent<Camera>();
 
-            if (outlineCamera)
+            if (copySettings)
             {
                 var parentCamera = outlineCamera.Camera;
                 shapeCamera.CopyFrom(parentCamera);
@@ -118,10 +118,10 @@ namespace MustHave
             shapeCamera.backgroundColor = Color.clear;
             shapeCamera.cullingMask = Layer.OutlineMask;
             shapeCamera.allowMSAA = false;
-            shapeCamera.enabled = outlineCamera ? outlineCamera.PipelineType != RenderPipelineType.Default : false;
+            shapeCamera.enabled = outlineCamera.PipelineType != RenderPipelineType.Default;
             shapeCamera.depthTextureMode = DepthTextureMode.Depth;
 
-            if (outlineCamera)
+            if (copySettings)
             {
                 circleCamera.CopyFrom(shapeCamera);
             }
