@@ -249,7 +249,7 @@ namespace MustHave
 
         private RenderTexture CreateTexture(Vector2Int size, string name = "")
         {
-            var texture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGBFloat)
+            var texture = new RenderTexture(size.x, size.y, 0)
             {
                 name = name,
                 enableRandomWrite = true

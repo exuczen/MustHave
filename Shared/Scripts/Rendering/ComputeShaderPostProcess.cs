@@ -188,6 +188,8 @@ namespace MustHave
 
         protected virtual void OnScreenSizeChange() { }
 
+        protected virtual void OnLateUpdate() { }
+
         protected virtual void SetupOnExecute() { }
 
         protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
@@ -223,18 +225,16 @@ namespace MustHave
             {
                 return;
             }
-            CommandBuffer cmd = CommandBufferPool.Get();
+            var cameraTarget = BuiltinRenderTextureType.CameraTarget;
 
-            cmd.Blit(BuiltinRenderTextureType.CameraTarget, sourceRenderTarget);
-            cmd.Blit(sourceRenderTarget, BuiltinRenderTextureType.CameraTarget);
-
-            OnExecuteRenderPass(cmd, BuiltinRenderTextureType.CameraTarget);
-
-            context.ExecuteCommandBuffer(cmd);
-            context.Submit();
-
-            cmd.Clear();
-            CommandBufferPool.Release(cmd);
+            OnExecuteRenderPass(context,
+                cmd => {
+                    cmd.Blit(cameraTarget, sourceRenderTarget);
+                    cmd.Blit(sourceRenderTarget, cameraTarget);
+                    cmd.Blit(cameraTarget, sourceRenderTarget);
+                },
+                cmd => cmd.Blit(outputRenderTarget, cameraTarget)
+            );
         }
 
         protected virtual void DispatchShader()
@@ -247,9 +247,10 @@ namespace MustHave
             cmd.DispatchCompute(shader, mainKernelID, threadGroups.x, threadGroups.y, 1);
         }
 
-        protected virtual void Update()
+        protected virtual void LateUpdate()
         {
             CheckResolution(out _);
+            OnLateUpdate();
         }
 
         protected virtual void OnValidate()
@@ -330,27 +331,27 @@ namespace MustHave
         }
 
 #if UNITY_PIPELINE_URP
-        public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
+        public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, ScriptableRenderContext context, RenderTargetIdentifier colorRenderTarget)
         {
-            return OnExecuteRenderPass(cmd,
+            return OnExecuteRenderPass(context,
                 cmd => pass.Blit(cmd, colorRenderTarget, sourceRenderTarget),
                 cmd => pass.Blit(cmd, outputRenderTarget, colorRenderTarget)
             );
         }
 #endif
-        protected bool OnExecuteRenderPass(CommandBuffer cmd, RenderTargetIdentifier colorRenderTarget)
+        protected bool OnExecuteRenderPass(ScriptableRenderContext context, RenderTargetIdentifier colorRenderTarget)
         {
-            return OnExecuteRenderPass(cmd,
+            return OnExecuteRenderPass(context,
                 cmd => cmd.Blit(colorRenderTarget, sourceRenderTarget),
                 cmd => cmd.Blit(outputRenderTarget, colorRenderTarget)
             );
         }
 
-        protected bool OnExecuteRenderPass(CommandBuffer cmd, Action<CommandBuffer> blitSource, Action<CommandBuffer> blitOutput)
+        protected bool OnExecuteRenderPass(ScriptableRenderContext context, Action<CommandBuffer> blitSource, Action<CommandBuffer> blitOutput)
         {
             if (CanExecute)
             {
-                cmdBuffer = cmd;
+                var cmd = cmdBuffer = CommandBufferPool.Get();
 
                 blitSource(cmd);
 
@@ -358,6 +359,11 @@ namespace MustHave
                 DispatchShader(cmd);
 
                 blitOutput(cmd);
+
+                context.ExecuteCommandBuffer(cmd);
+                context.Submit();
+
+                CommandBufferPool.Release(cmd);
 
                 cmdBuffer = null;
 

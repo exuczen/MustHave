@@ -65,11 +65,6 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool debugShader = false;
 
-        private void LateUpdate()
-        {
-            objectCamera.OnLateUpdate(this);
-        }
-
         protected override void OnEnable()
         {
             if (!objectCamera)
@@ -175,14 +170,13 @@ namespace MustHave
             {
                 objectCamera.RenderShapes();
             }
-            if (HasCommandBuffer)
-            {
-                cmdBuffer.SetComputeIntParam(shader, ShaderData.LineThicknessID, lineThickness);
-            }
-            else
-            {
-                shader.SetInt(ShaderData.LineThicknessID, lineThickness);
-            }
+        }
+
+        protected override void OnLateUpdate()
+        {
+            objectCamera.OnLateUpdate(this);
+
+            shader.SetInt(ShaderData.LineThicknessID, lineThickness);
         }
 
         protected override void OnDestroy()
