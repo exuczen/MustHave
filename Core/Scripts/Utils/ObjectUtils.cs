@@ -6,6 +6,24 @@ namespace MustHave.Utils
 {
     public struct ObjectUtils
     {
+        public static void DestroyComponent<T>(T component) where T : Component
+        {
+            DestroyComponentOrGameObject(component, c => c);
+        }
+
+        public static void DestroyGameObject<T>(T component) where T : Component
+        {
+            DestroyComponentOrGameObject(component, c => c.gameObject);
+        }
+
+        public static void DestroyComponentOrGameObject<T>(T component, Func<T, Object> getObject) where T : Component
+        {
+            if (component && component.gameObject)
+            {
+                Destroy(getObject(component));
+            }
+        }
+
         public static void DestroyComponent<T>(ref T component) where T : Component
         {
             DestroyComponentOrGameObject(ref component, c => c);
@@ -35,6 +53,7 @@ namespace MustHave.Utils
                 }
                 else if (SceneUtils.IsActiveSceneLoadedAndValid())
                 {
+                    Debug.Log("IsActiveSceneLoadedAndValid");
                     Object.DestroyImmediate(obj);
                 }
             }

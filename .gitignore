@@ -69,3 +69,4 @@ Shared/Scripts/Rendering/RenderPipelineType.cs.meta
 Shared/Scripts/Rendering/RenderUtils.cs.meta
 Shared/Scripts/Rendering/URP/RenderPassSettings.cs.meta
 Shared/Scripts/Rendering/URP/ComputeShaderRenderPass.cs.meta
+Shared/Scripts/Camera/CameraExtenstionMethods.cs.meta

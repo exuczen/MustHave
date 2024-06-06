@@ -2,7 +2,7 @@
 
 namespace MustHave
 {
-    public static class CameraExtensionMethods
+    public static partial class CameraExtensionMethods
     {
         public static void SetupViewForRender(this Camera camera, BoxCollider boxCollider, Transform cameraPivot, float normalizedOffset = 0.1f)
         {

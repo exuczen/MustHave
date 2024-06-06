@@ -11,6 +11,12 @@ namespace MustHave
 {
     public struct RenderUtils
     {
+#if UNITY_PIPELINE_URP
+        public static bool UniversalRenderPipelineInstalled => true;
+#else
+        public static bool UniversalRenderPipelineInstalled => false;
+#endif
+
         public static RenderPipelineType GetRenderPipelineType()
         {
             RenderPipelineType pipelineType;
