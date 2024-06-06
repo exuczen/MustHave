@@ -53,7 +53,6 @@ namespace MustHave.Utils
                 }
                 else if (SceneUtils.IsActiveSceneLoadedAndValid())
                 {
-                    Debug.Log("IsActiveSceneLoadedAndValid");
                     Object.DestroyImmediate(obj);
                 }
             }

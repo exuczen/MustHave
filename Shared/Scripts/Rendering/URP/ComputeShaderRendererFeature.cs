@@ -1,24 +1,19 @@
 ﻿#if UNITY_PIPELINE_URP
-using UnityEngine;
+using System;
 using UnityEngine.Rendering.Universal;
 
 namespace MustHave
 {
     public class ComputeShaderRendererFeature : ScriptableRendererFeature
     {
-        private ComputeShaderRenderPass RenderPass { get; set; }
-
-        [SerializeField]
-        private RenderPassSettings settings = new();
-
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            renderer.EnqueuePass(RenderPass);
+            throw new NotImplementedException("ComputeShaderRenderPass is created and added to render queue by ComputeShaderPostProcess");
         }
 
         public override void Create()
         {
-            RenderPass = new(settings, null);
+            throw new NotImplementedException("ComputeShaderRenderPass is created and added to render queue by ComputeShaderPostProcess");
         }
     }
 }

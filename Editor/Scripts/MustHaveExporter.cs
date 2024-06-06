@@ -126,8 +126,14 @@ namespace MustHave
 
         public static void ExportMustHavePackage(PackageName enumName)
         {
-            //TODO: Remove UniversalAdditionalCameraData from OutlineObjectCamera prefab before export
-
+            if (RenderUtils.UniversalRenderPipelineInstalled && enumName == PackageName.Outline)
+            {
+                var prefabPath = "Assets/Packages/MustHave/Outline/Prefabs/Resources/OutlineObjectCamera.prefab";
+                AssetUtils.ModifyPrefab(prefab => {
+                    var outlineObjectCamera = prefab.GetComponent<OutlineObjectCamera>();
+                    outlineObjectCamera.DestroyUniversalAdditionalCameraData();
+                }, prefabPath);
+            }
             var assetPaths = new string[] {
                 $"Assets/Packages/MustHave/{enumName}",
                 "Assets/Packages/MustHave/Shared/Scripts",

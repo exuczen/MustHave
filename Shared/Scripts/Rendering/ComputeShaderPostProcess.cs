@@ -113,6 +113,8 @@ namespace MustHave
 #if UNITY_PIPELINE_URP
             if (PipelineType == RenderPipelineType.URP)
             {
+                thisCamera.AddUniversalAdditionalCameraData();
+
                 if (renderPass == null)
                 {
                     renderPass = new ComputeShaderRenderPass(renderPassSettings, this);

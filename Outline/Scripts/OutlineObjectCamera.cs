@@ -81,6 +81,17 @@ namespace MustHave
             public Vector2 scale;
         }
 
+        public void DestroyUniversalAdditionalCameraData()
+        {
+#if UNITY_PIPELINE_URP
+            var componens = GetComponentsInChildren<UniversalAdditionalCameraData>();
+            foreach (var cameraData in componens)
+            {
+                ObjectUtils.DestroyComponent(cameraData);
+            }
+#endif
+        }
+
         public void CreateRuntimeAssets(Vector2Int texSize)
         {
             CreateTextures(texSize);
@@ -178,12 +189,10 @@ namespace MustHave
 #if UNITY_PIPELINE_URP
         private void SetupURPCamera(Camera camera)
         {
-            var cameraData = camera.GetUniversalAdditionalCameraData();
-            if (cameraData)
-            {
-                cameraData.requiresColorOption = CameraOverrideOption.On;
-                cameraData.requiresDepthOption = CameraOverrideOption.On;
-            }
+            var cameraData = camera.GetOrAddUniversalAdditionalCameraData();
+
+            cameraData.requiresColorOption = CameraOverrideOption.On;
+            cameraData.requiresDepthOption = CameraOverrideOption.On;
         }
 #endif
 
