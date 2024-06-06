@@ -353,8 +353,11 @@ namespace MustHave
         {
             if (CanExecute)
             {
+#if UNITY_PIPELINE_CORE
                 var cmd = cmdBuffer = CommandBufferPool.Get();
-
+#else
+                var cmd = cmdBuffer = new CommandBuffer();
+#endif
                 blitSource(cmd);
 
                 SetupOnExecute();
@@ -365,8 +368,11 @@ namespace MustHave
                 context.ExecuteCommandBuffer(cmd);
                 context.Submit();
 
+#if UNITY_PIPELINE_CORE
                 CommandBufferPool.Release(cmd);
-
+#else
+                cmd.Release();
+#endif
                 cmdBuffer = null;
 
                 return true;

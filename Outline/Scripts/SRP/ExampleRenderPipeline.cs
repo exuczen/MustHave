@@ -22,11 +22,7 @@ namespace MustHave
             // https://docs.unity3d.com/ScriptReference/Rendering.RenderPipeline.BeginContextRendering.html - Required by MustHave.OutlineCamera.
             BeginContextRendering(context, cameras);
 
-            // Create and schedule a command to clear the current render target
-            CommandBuffer cmd = CommandBufferPool.Get();
-            cmd.ClearRenderTarget(true, true, Color.clear);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+            ClearRenderTarget(context);
 
             foreach (Camera camera in cameras)
             {
@@ -53,6 +49,22 @@ namespace MustHave
         }
 
         protected override void Render(ScriptableRenderContext context, Camera[] cameras) { }
+
+        private void ClearRenderTarget(ScriptableRenderContext context)
+        {
+#if UNITY_PIPELINE_CORE
+            var cmd = CommandBufferPool.Get();
+#else
+            var cmd = new CommandBuffer();
+#endif
+            cmd.ClearRenderTarget(true, true, Color.clear);
+            context.ExecuteCommandBuffer(cmd);
+#if UNITY_PIPELINE_CORE
+            CommandBufferPool.Release(cmd);
+#else
+            cmd.Release();
+#endif
+        }
 
         /// <summary>
         /// Default implementation of MustHave.OutlineObjectCamera rendering - it needs to stay that way.
