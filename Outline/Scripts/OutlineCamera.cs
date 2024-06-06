@@ -174,7 +174,9 @@ namespace MustHave
 
         protected override void OnLateUpdate()
         {
-            objectCamera.OnLateUpdate(this);
+            objectCamera.OnLateUpdate();
+
+            objectCamera.RenderCircles(LineThickness);
 
             shader.SetInt(ShaderData.LineThicknessID, lineThickness);
         }

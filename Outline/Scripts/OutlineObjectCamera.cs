@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
+using UnityEngine.Rendering;
+#if UNITY_PIPELINE_URP
+using UnityEngine.Rendering.Universal;
+#endif
 
 namespace MustHave
 {
@@ -31,6 +36,7 @@ namespace MustHave
         public RenderTexture CircleTexture => circleTexture;
         public Material OutlineShapeMaterial => outlineShapeMaterial;
         public Camera ShapeCamera => shapeCamera;
+        public Camera CircleCamera => circleCamera;
         public int ObjectsCount => objects.Count;
 
         private int RenderersCount => Mathf.Min(RenderersCapacity, renderersData.Count);
@@ -63,6 +69,9 @@ namespace MustHave
         private GraphicsBuffer circleInstanceBuffer = null;
         private MaterialPropertyBlock circlePropertyBlock = null;
         private RenderParams circleRenderParams = default;
+        //private GraphicsBuffer circleCommandBuffer = null;
+        //private IndirectDrawIndexedArgs[] circleCommandData = null;
+        //private Matrix4x4[] circleMatrices = null;
 
         private struct InstanceData
         {
@@ -88,6 +97,8 @@ namespace MustHave
 
             circleInstanceBuffer?.Release();
             circleInstanceBuffer = null;
+            //circleCommandBuffer?.Release();
+            //circleCommandBuffer = null;
         }
 
         public void Setup(OutlineCamera outlineCamera, bool copySettings = true)
@@ -103,11 +114,11 @@ namespace MustHave
                 }
             }
 #endif
+            var parentCamera = outlineCamera.Camera;
             shapeCamera = GetComponent<Camera>();
 
             if (copySettings)
             {
-                var parentCamera = outlineCamera.Camera;
                 shapeCamera.CopyFrom(parentCamera);
                 shapeCamera.fieldOfView = GetExtendedFieldOfView(parentCamera, OutlineCamera.LineMaxThickness);
                 shapeCamera.orthographicSize = GetExtendedOrthoSize(parentCamera, OutlineCamera.LineMaxThickness);
@@ -120,6 +131,7 @@ namespace MustHave
             shapeCamera.allowMSAA = false;
             shapeCamera.enabled = outlineCamera.PipelineType != RenderPipelineType.Default;
             shapeCamera.depthTextureMode = DepthTextureMode.Depth;
+            shapeCamera.nearClipPlane = Mathf.Min(parentCamera.nearClipPlane, 0.001f);
 
             if (copySettings)
             {
@@ -129,6 +141,14 @@ namespace MustHave
             circleCamera.orthographic = true;
             circleCamera.cullingMask = Layer.OutlineMask;
             circleCamera.enabled = true;
+
+#if UNITY_PIPELINE_URP
+            if (outlineCamera.PipelineType == RenderPipelineType.URP)
+            {
+                SetupURPCamera(shapeCamera);
+                SetupURPCamera(circleCamera);
+            }
+#endif
         }
 
         public void AddOutlineObject(OutlineObject obj)
@@ -154,6 +174,18 @@ namespace MustHave
                 shapeTexture.Clear();
             }
         }
+
+#if UNITY_PIPELINE_URP
+        private void SetupURPCamera(Camera camera)
+        {
+            var cameraData = camera.GetUniversalAdditionalCameraData();
+            if (cameraData)
+            {
+                cameraData.requiresColorOption = CameraOverrideOption.On;
+                cameraData.requiresDepthOption = CameraOverrideOption.On;
+            }
+        }
+#endif
 
         private float GetExtendedOrthoSize(Camera parentCamera, int pixelOffset)
         {
@@ -234,7 +266,7 @@ namespace MustHave
         private void InitCircleInstancing()
         {
             circleInstanceBuffer?.Release();
-            circleInstanceBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, circleInstanceData.Length, Marshal.SizeOf<InstanceData>());
+            circleInstanceBuffer = new GraphicsBuffer(Target.Structured, circleInstanceData.Length, Marshal.SizeOf<InstanceData>());
             circlePropertyBlock = new MaterialPropertyBlock();
             circlePropertyBlock.SetBuffer("_InstanceBuffer", circleInstanceBuffer);
             circleRenderParams = new RenderParams(circleSpriteMaterial)
@@ -245,6 +277,9 @@ namespace MustHave
                 //renderingLayerMask = (uint)Layer.OutlineMask,
                 worldBounds = new Bounds(Vector3.zero, Vector3.one)
             };
+            //circleCommandBuffer = new GraphicsBuffer(Target.IndirectArguments, 1, IndirectDrawIndexedArgs.size);
+            //circleCommandData = new IndirectDrawIndexedArgs[1];
+            //circleMatrices = new Matrix4x4[RenderersCapacity];
         }
 
         private RenderTexture CreateTexture(Vector2Int size, string name = "")
@@ -326,7 +361,7 @@ namespace MustHave
             OnEndRenderingShapes();
         }
 
-        public void RenderCircles(int radius)
+        public void RenderCircles(int radius/*, CommandBuffer cmd = null*/)
         {
             circleTexture.Clear();
 
@@ -362,11 +397,26 @@ namespace MustHave
                 circleRenderParams.material.SetFloat("_MinDepth", minDepth);
                 circleRenderParams.worldBounds = new Bounds(circlesCamTransform.position, Vector3.one);
 
-                Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
-                //Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleInstanceData, count);
-                //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
-                //    circleRenderParams.worldBounds, count, circlePropertyBlock,
-                //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+                //circleCommandData[0].indexCountPerInstance = quadMeshFilter.sharedMesh.GetIndexCount(0);
+                //circleCommandData[0].instanceCount = (uint)count;
+                //circleCommandBuffer.SetData(circleCommandData);
+
+                //if (cmd != null)
+                //{
+                //    //cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleMatrices, count, circlePropertyBlock);
+                //    //cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
+                //    //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
+                //}
+                //else
+                {
+                    Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
+                    //Graphics.RenderMeshIndirect(circleRenderParams, quadMeshFilter.sharedMesh, circleCommandBuffer);
+                    //Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleInstanceData, count);
+                    //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
+                    //    circleRenderParams.worldBounds, count, circlePropertyBlock,
+                    //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+                }
+
             }
         }
 
@@ -402,7 +452,7 @@ namespace MustHave
             return true;
         }
 
-        public void OnLateUpdate(OutlineCamera outlineCamera)
+        public void OnLateUpdate(/*OutlineCamera outlineCamera*/)
         {
             foreach (var obj in objects)
             {
@@ -410,7 +460,6 @@ namespace MustHave
             }
             SortRenderers();
             SetSortedRenderersDepth();
-            RenderCircles(outlineCamera.LineThickness);
         }
 
         private void OnDrawGizmos()

@@ -16,6 +16,7 @@
 			}
 			//Blend SrcAlpha OneMinusSrcAlpha
 			Blend Off
+			Cull Back
 		
 			CGPROGRAM
 			#pragma multi_compile_instancing
@@ -23,9 +24,11 @@
 			#pragma vertex vert
 			#pragma fragment frag
 
-			#include "UnityCG.cginc"
-
+			#define UNITY_INDIRECT_DRAW_ARGS IndirectDrawIndexedArgs
 			#define EPSILON 0.00001f
+
+			#include "UnityCG.cginc"
+			#include "UnityIndirect.cginc"
 
 			struct InstanceData
 			{
@@ -59,6 +62,9 @@
 		
 			v2f vert(appdata v, uint vertexID: SV_VertexID, uint instanceID : SV_InstanceID)
 			{
+				//InitIndirectDrawArgs(0);
+				//instanceID = GetIndirectInstanceID(instanceID);
+
 				v2f o; //= (v2f)0;
 
 				InstanceData instance = _InstanceBuffer[instanceID];

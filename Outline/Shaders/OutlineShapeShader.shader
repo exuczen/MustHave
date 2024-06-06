@@ -8,9 +8,11 @@ Shader "MustHave/OutlineShapeShader"
     {
         Tags
         { 
-            "RenderType" = "Opaque"
+            "Queue" = "Transparent"
+			"RenderType" = "Opaque"
         }
         Blend Off
+        Cull Back
 
         Pass
         {
