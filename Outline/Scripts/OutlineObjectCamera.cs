@@ -31,7 +31,8 @@ namespace MustHave
             }
         }
 
-        public ComputeShader ComputeShader => computeShader;
+        public ComputeShader ComputeShader => shaderSettings.Shader;
+        public OutlineShaderSettings ShaderSettings => shaderSettings;
         public RenderTexture ShapeTexture => shapeTexture;
         public RenderTexture CircleTexture => circleTexture;
         public Material OutlineShapeMaterial => outlineShapeMaterial;
@@ -42,7 +43,7 @@ namespace MustHave
         private int RenderersCount => Mathf.Min(RenderersCapacity, renderersData.Count);
 
         [SerializeField]
-        private ComputeShader computeShader = null;
+        private OutlineShaderSettings shaderSettings = null;
         [SerializeField]
         private Material outlineShapeMaterial = null;
         [SerializeField]

@@ -430,12 +430,12 @@ namespace MustHave
 #if USE_EDITOR_SCENE_EVENTS
         protected virtual void OnActiveSceneChangedInEditMode(Scene prevScene, Scene scene)
         {
-            Debug.Log($"{GetType().Name}.OnActiveSceneChangedInEditMode");
+            Debug.Log($"{GetType().Name}.OnActiveSceneChangedInEditMode: {scene.name}");
         }
 
         protected virtual void OnSceneOpened(Scene scene, OpenSceneMode mode)
         {
-            Debug.Log($"{GetType().Name}.OnSceneOpened");
+            Debug.Log($"{GetType().Name}.OnSceneOpened: {scene.name} | {mode}");
         }
 #endif
         private void OnAllAssetsPostprocessed()

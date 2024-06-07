@@ -6,29 +6,26 @@ namespace MustHave
     [CustomEditor(typeof(OutlineCamera))]
     public class OutlineCameraEditor : Editor
     {
+        private OutlineShaderSettingsEditor shaderSettingsEditor = null;
+
+        private void OnEnable()
+        {
+            var outlineCamera = target as OutlineCamera;
+            if (outlineCamera)
+            {
+                Editor editor = shaderSettingsEditor;
+                CreateCachedEditor(outlineCamera.ShaderSettings, typeof(OutlineShaderSettingsEditor), ref editor);
+                shaderSettingsEditor = editor as OutlineShaderSettingsEditor;
+            }
+        }
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
-            var camera = target as OutlineCamera;
-
-            EditorGUI.BeginChangeCheck();
-
-            camera.DebugShader = EditorGUILayout.Toggle("Debug Shader", camera.DebugShader);
-
-            var shaderDebugMode = camera.ShaderDebugMode;
-
-            if (camera.DebugShader)
+            if (shaderSettingsEditor)
             {
-                shaderDebugMode = (OutlineCamera.DebugShaderMode)EditorGUILayout.EnumPopup("Debug Mode", shaderDebugMode);
-            }
-            if (EditorGUI.EndChangeCheck())
-            {
-                if (camera.DebugShader)
-                {
-                    camera.ShaderDebugMode = shaderDebugMode;
-                }
-                EditorUtils.SetSceneOrObjectDirty(target);
+                shaderSettingsEditor.OnInspectorGUI(false, out _);
             }
         }
     }

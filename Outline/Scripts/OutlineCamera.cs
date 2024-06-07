@@ -16,30 +16,10 @@ namespace MustHave
             get => lineThickness;
             set => lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
         }
-        public DebugShaderMode ShaderDebugMode { get => debugShaderMode; set => SetDebugShaderMode(value); }
-        public bool DebugShader
-        {
-            get => debugShader;
-            set
-            {
-                debugShader = value;
 
-                if (!debugShader)
-                {
-                    ShaderDebugMode = DebugShaderMode.DEBUG_NONE;
-                }
-            }
-        }
+        public OutlineShaderSettings ShaderSettings => objectCamera.ShaderSettings;
 
         protected override bool SkipDispatch => objectCamera.ObjectsCount == 0;
-
-        public enum DebugShaderMode
-        {
-            DEBUG_NONE,
-            DEBUG_SHAPES,
-            DEBUG_CIRCLES,
-            DEBUG_DEPTH
-        }
 
         private readonly struct ShaderData
         {
@@ -55,15 +35,6 @@ namespace MustHave
 
         [SerializeField, Range(1, LineMaxThickness)]
         private int lineThickness = 5;
-
-        [SerializeField, HideInInspector]
-        private DebugShaderMode debugShaderMode = default;
-
-        [SerializeField, HideInInspector]
-        private DebugShaderMode debugShaderModeOnInit = default;
-
-        [SerializeField, HideInInspector]
-        private bool debugShader = false;
 
         protected override void OnEnable()
         {
@@ -125,7 +96,7 @@ namespace MustHave
 
             if (SceneUtils.IsActiveSceneLoadedAndValid())
             {
-                SetDebugShaderMode(debugShaderModeOnInit = debugShaderMode);
+                ShaderSettings.SetDebugModeOnInit();
             }
         }
 
@@ -185,10 +156,10 @@ namespace MustHave
         {
             base.OnDestroy();
 
+            ShaderSettings.SetDebugModeFromInit();
+
             ObjectUtils.DestroyGameObject(ref objectCamera);
             ObjectUtils.DestroyComponent(ref cameraChangeListener);
-
-            SetDebugShaderMode(debugShaderModeOnInit);
         }
 
         private Vector2Int GetShapeTexSize(out Vector2Int shapeTexOffset)
@@ -219,40 +190,7 @@ namespace MustHave
             return extendedSize;
         }
 
-        private void SetDebugShaderMode(DebugShaderMode debugMode)
-        {
-            if (!shader)
-            {
-                return;
-            }
-            //var prevKeyword = new LocalKeyword(shader, debugShaderMode.ToString());
-            var keyword = new LocalKeyword(shader, debugMode.ToString());
 
-            /* Disabled keyword validity check on purpose - there are scenarios, where skipping 
-             * invalid keyword causes missing kernel errors after shader recompilation.
-             * Using string keyword names instead of LocalKeyword struct for the same reason.  */
-
-            //if (!keyword.isValid || !prevKeyword.isValid)
-            //{
-            //    if (!keyword.isValid)
-            //    {
-            //        Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {keyword}");
-            //    }
-            //    if (!prevKeyword.isValid)
-            //    {
-            //        Debug.LogError($"{GetType().Name}.SetDebugShaderMode: Invalid keyword: {prevKeyword}");
-            //    }
-            //    return;
-            //}
-            if (debugShaderMode == debugMode && shader.IsKeywordEnabled(keyword))
-            {
-                return;
-            }
-            //Debug.Log($"{GetType().Name}.SetDebugShaderMode: {debugMode}");
-            shader.DisableKeyword(debugShaderMode.ToString());
-            debugShaderMode = debugMode;
-            shader.EnableKeyword(debugShaderMode.ToString());
-        }
 
         protected override void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {

@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe6b8360142b7be4da3061083850c811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  computeShader: {fileID: 7200000, guid: edeab9fbf91b47440acec1d336c452fb, type: 3}
+  shaderSettings: {fileID: 11400000, guid: 6595e3d78caa469429ce9c71e83d7bd9, type: 2}
   outlineShapeMaterial: {fileID: 2100000, guid: d0ce2205e75561443ac5b4c85828e04d,
     type: 2}
   circleSpriteMaterial: {fileID: 2100000, guid: 11918368331216c4384cdb79fd7f52c0,
