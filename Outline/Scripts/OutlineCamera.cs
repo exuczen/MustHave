@@ -18,6 +18,7 @@ namespace MustHave
         }
 
         public OutlineShaderSettings ShaderSettings => objectCamera.ShaderSettings;
+        public bool ShaderSettingsExpanded { get => shaderSettingsExpanded; set => shaderSettingsExpanded = value; }
 
         protected override bool SkipDispatch => objectCamera.ObjectsCount == 0;
 
@@ -35,6 +36,9 @@ namespace MustHave
 
         [SerializeField, Range(1, LineMaxThickness)]
         private int lineThickness = 5;
+
+        [SerializeField, HideInInspector]
+        private bool shaderSettingsExpanded = true;
 
         protected override void OnEnable()
         {

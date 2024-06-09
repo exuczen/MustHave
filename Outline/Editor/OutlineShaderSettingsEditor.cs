@@ -40,10 +40,14 @@ namespace MustHave
 
             if (modified)
             {
-                settings.SetDebugMode(debugMode);
-
-                if (!Application.isPlaying)
+                if (Application.isPlaying)
                 {
+                    settings.SetDebugMode(debugMode);
+                }
+                else
+                {
+                    settings.SetDebugModeOnInit(debugMode);
+
                     EditorUtils.SetSceneOrObjectDirty(target);
                 }
             }

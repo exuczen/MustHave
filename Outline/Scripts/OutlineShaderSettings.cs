@@ -31,6 +31,11 @@ namespace MustHave
 
         public void SetDebugModeOnInit()
         {
+            SetDebugModeOnInit(debugMode);
+        }
+
+        public void SetDebugModeOnInit(DebugMode debugMode)
+        {
             debugEnabledOnInit = debugEnabled;
 
             SetDebugMode(debugModeOnInit = debugMode);

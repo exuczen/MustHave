@@ -25,7 +25,20 @@ namespace MustHave
 
             if (shaderSettingsEditor)
             {
-                shaderSettingsEditor.OnInspectorGUI(false, out _);
+                var outlineCamera = target as OutlineCamera;
+
+                outlineCamera.ShaderSettingsExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(outlineCamera.ShaderSettingsExpanded, "Shader Settings");
+
+                if (outlineCamera.ShaderSettingsExpanded)
+                {
+                    EditorGUI.indentLevel++;
+
+                    EditorGUILayout.ObjectField("Shader Settings", outlineCamera.ShaderSettings, typeof(OutlineShaderSettings), true);
+                    shaderSettingsEditor.OnInspectorGUI(false, out _);
+
+                    EditorGUI.indentLevel--;
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
             }
         }
     }

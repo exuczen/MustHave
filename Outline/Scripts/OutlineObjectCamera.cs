@@ -123,6 +123,11 @@ namespace MustHave
                 if (layerAdded)
                 {
                     Layer.Refresh();
+
+                    if (!Application.isPlaying)
+                    {
+                        UnityEditor.EditorUtility.SetDirty(this);
+                    }
                 }
             }
 #endif
