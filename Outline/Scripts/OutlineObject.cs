@@ -8,8 +8,18 @@ namespace MustHave
     [ExecuteInEditMode]
     public class OutlineObject : MonoBehaviour
     {
+        private static class ShaderData
+        {
+            public static readonly int ColorID = Shader.PropertyToID("_Color");
+            public static readonly int OneMinusDepthID = Shader.PropertyToID("_OneMinusDepth");
+            public static readonly int DepthID = Shader.PropertyToID("_Depth");
+            public static readonly int MinDepthID = Shader.PropertyToID("_MinDepth");
+        }
+
         public Color32 Color32 { get => color; set => color = value; }
         public Color Color { get => color; set => color = value; }
+        public float Depth { get; set; }
+        public float CameraDistanceSqr => cameraDistanceSqr;
 
         [SerializeField]
         private Color color = Color.white;
@@ -21,11 +31,34 @@ namespace MustHave
 
         private OutlineObjectCamera objectCamera = null;
 
-        public void SetRenderersColor()
+        private float cameraDistanceSqr;
+
+        public void GetDistanceFromCamera(Vector3 camPos)
         {
+            cameraDistanceSqr = (transform.position - camPos).sqrMagnitude;
+        }
+
+        public void SetupRenderers(Material material, int layer, float minDepth)
+        {
+            material.SetColor(ShaderData.ColorID, Color);
+            material.SetFloat(ShaderData.DepthID, Depth);
+            material.SetFloat(ShaderData.MinDepthID, minDepth);
+
             foreach (var data in renderersData)
             {
-                data.Color = color;
+                data.Setup(material, layer);
+            }
+        }
+
+        public void SetColorWithDepth(float depth, float minDepth)
+        {
+            Depth = depth;
+            Color = GetColorWithAlphaDepth(depth, minDepth);
+
+            foreach (var data in renderersData)
+            {
+                data.Color = Color;
+                data.Depth = Depth;
             }
         }
 
@@ -42,7 +75,7 @@ namespace MustHave
             }
         }
 
-        public void Restore()
+        public void RestoreRenderers()
         {
             foreach (var data in renderersData)
             {
@@ -58,6 +91,13 @@ namespace MustHave
             }
         }
 
+        private Color GetColorWithAlphaDepth(float depth, float minDepth)
+        {
+            var color = Color;
+            color.a = Mathf.Clamp01(1f - depth + minDepth);
+            return color;
+        }
+
         private void OnEnable()
         {
             GetComponentsInChildren(renderers);
@@ -67,7 +107,7 @@ namespace MustHave
                 data.SetRenderer(renderer);
                 renderersData.Add(data);
             }
-            var camera = MustHave.CameraUtils.MainOrCurrent;
+            var camera = CameraUtils.MainOrCurrent;
             if (camera)
             {
                 var outlineCamera = camera.GetComponent<OutlineCamera>();

@@ -266,10 +266,10 @@ namespace MustHave
 
         private void CreateMissingShapeMaterials(int excess)
         {
-            int matIndex = Mathf.Clamp(renderersData.Count - 1, 0, shapeMaterials.Length - 1);
+            int matIndex = Mathf.Clamp(objects.Count - 1, 0, shapeMaterials.Length - 1);
             if (!shapeMaterials[matIndex])
             {
-                matIndex = Mathf.Clamp(renderersData.Count + excess - 1, 0, shapeMaterials.Length - 1);
+                matIndex = Mathf.Clamp(objects.Count + excess - 1, 0, shapeMaterials.Length - 1);
                 while (matIndex >= 0 && !shapeMaterials[matIndex])
                 {
                     //Debug.Log($"{GetType().Name}.CreateMissingShapeMaterials: {matIndex}");
@@ -317,25 +317,29 @@ namespace MustHave
             }
         }
 
-        private void SortRenderers()
+        private void SortOutlineObjects()
         {
-            foreach (var data in renderersData)
+            foreach (var obj in objects)
             {
-                data.GetDistanceFromCamera(shapeCamera.transform.position);
+                obj.GetDistanceFromCamera(shapeCamera.transform.position);
             }
-            renderersData.Sort((a, b) => a.CameraDistanceSqr.CompareTo(b.CameraDistanceSqr));
+            objects.Sort((a, b) => a.CameraDistanceSqr.CompareTo(b.CameraDistanceSqr));
         }
 
-        private void SetSortedRenderersDepth()
+        private void SetSortedObjectsColorWithDepth()
         {
-            int count = renderersData.Count;
+            int count = objects.Count;
             if (count <= 0)
             {
                 return;
             }
+            float minDepth = 1f / count;
+
             for (int i = 1; i <= count; i++)
             {
-                renderersData[i - 1].Depth = (float)i / count;
+                float depth = (float)i / count;
+
+                objects[i - 1].SetColorWithDepth(depth, minDepth);
             }
         }
 
@@ -343,7 +347,7 @@ namespace MustHave
         {
             shapeTexture.Clear();
 
-            int count = RenderersCount;
+            int count = ObjectsCount;
             if (count <= 0)
             {
                 return;
@@ -352,10 +356,10 @@ namespace MustHave
 
             float minDepth = 1f / count;
 
-            // At this point renderers are sorted by distance from camera
+            // At this point objects are sorted by distance from camera
             for (int i = 0; i < count; i++)
             {
-                renderersData[i].Setup(shapeMaterials[i], Layer.OutlineLayer, minDepth);
+                objects[i].SetupRenderers(shapeMaterials[i], Layer.OutlineLayer, minDepth);
             }
         }
 
@@ -394,13 +398,13 @@ namespace MustHave
 
             float scale = 2f * (radius + 1) / circleCamera.pixelHeight;
             var scaleXY = scale * Vector2.one;
-            float minDepth = 1f / count;
+            float minDepth = objects.Count > 0 ? 1f / objects.Count : 0f;
 
-            // At this point renderers are sorted by distance from camera
+            // At this point renderers have Color and Depth values from outline objects sorted by distance from camera
             int j = 0;
             for (int i = 0; i < count; i++)
             {
-                if (SetCircleInstanceData(j, scaleXY, minDepth))
+                if (SetCircleInstanceData(j, scaleXY))
                 {
                     j++;
                 }
@@ -435,7 +439,7 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(int i, Vector2 scale, float minDepth)
+        private bool SetCircleInstanceData(int i, Vector2 scale)
         {
             var data = renderersData[i];
             var renderer = data.Renderer;
@@ -455,13 +459,12 @@ namespace MustHave
                 y = (viewPoint.y - 0.5f) * 2f,
                 z = data.Depth
             };
-            var color = data.GetColorWithAlphaDepth(minDepth);
             //Debug.Log($"{GetType().Name}.{i} | {data.CameraDistanceSqr} | {clipPoint.z}");
             circleInstanceData[i] = new InstanceData()
             {
                 objectToWorld = Matrix4x4.identity,
                 clipPosition = clipPoint,
-                color = color,
+                color = data.Color,
                 scale = scale
             };
             return true;
@@ -469,12 +472,8 @@ namespace MustHave
 
         public void OnLateUpdate(/*OutlineCamera outlineCamera*/)
         {
-            foreach (var obj in objects)
-            {
-                obj.SetRenderersColor();
-            }
-            SortRenderers();
-            SetSortedRenderersDepth();
+            SortOutlineObjects();
+            SetSortedObjectsColorWithDepth();
         }
 
         private void OnDrawGizmos()
