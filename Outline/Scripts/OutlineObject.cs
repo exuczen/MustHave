@@ -107,7 +107,7 @@ namespace MustHave
                 data.SetRenderer(renderer);
                 renderersData.Add(data);
             }
-            var camera = CameraUtils.MainOrCurrent;
+            var camera = IOutlineCameraSingleton.Instance;
             if (camera)
             {
                 var outlineCamera = camera.GetComponent<OutlineCamera>();

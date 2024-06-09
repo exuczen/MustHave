@@ -4,8 +4,10 @@ using UnityEngine.Rendering;
 
 namespace MustHave
 {
+    public interface IOutlineCameraSingleton : IMonoSingleton<OutlineCamera> { }
+
     [ExecuteInEditMode]
-    public class OutlineCamera : ComputeShaderPostProcess
+    public class OutlineCamera : ComputeShaderPostProcess, IOutlineCameraSingleton
     {
         public const int LineMaxThickness = 100;
 
@@ -17,7 +19,7 @@ namespace MustHave
             set => lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
         }
 
-        public OutlineShaderSettings ShaderSettings => objectCamera.ShaderSettings;
+        public OutlineShaderSettings ShaderSettings => objectCamera ? objectCamera.ShaderSettings : null;
         public bool ShaderSettingsExpanded { get => shaderSettingsExpanded; set => shaderSettingsExpanded = value; }
 
         protected override bool SkipDispatch => objectCamera.ObjectsCount == 0;
@@ -40,8 +42,18 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool shaderSettingsExpanded = true;
 
+        protected void Awake()
+        {
+            IOutlineCameraSingleton.SetInstanceOnAwake(this);
+        }
+
         protected override void OnEnable()
         {
+            if (IOutlineCameraSingleton.Instance != this)
+            {
+                enabled = false;
+                return;
+            }
             if (!objectCamera)
             {
                 objectCamera = GetComponentInChildren<OutlineObjectCamera>();
@@ -160,7 +172,11 @@ namespace MustHave
         {
             base.OnDestroy();
 
-            ShaderSettings.SetDebugModeFromInit();
+            if (ShaderSettings)
+            {
+                ShaderSettings.SetDebugModeFromInit();
+            }
+            IOutlineCameraSingleton.ClearInstanceOnDestroy(this);
 
             ObjectUtils.DestroyGameObject(ref objectCamera);
             ObjectUtils.DestroyComponent(ref cameraChangeListener);
