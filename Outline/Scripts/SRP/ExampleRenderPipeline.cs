@@ -52,18 +52,7 @@ namespace MustHave
 
         private void ClearRenderTarget(ScriptableRenderContext context)
         {
-#if UNITY_PIPELINE_CORE
-            var cmd = CommandBufferPool.Get();
-#else
-            var cmd = new CommandBuffer();
-#endif
-            cmd.ClearRenderTarget(true, true, Color.clear);
-            context.ExecuteCommandBuffer(cmd);
-#if UNITY_PIPELINE_CORE
-            CommandBufferPool.Release(cmd);
-#else
-            cmd.Release();
-#endif
+            context.ExecuteCommandBuffer(cmd => cmd.ClearRenderTarget(true, true, Color.clear), false);
         }
 
         /// <summary>
@@ -71,6 +60,7 @@ namespace MustHave
         /// </summary>
         /// <param name="context"></param>
         /// <param name="camera"></param>
+        /// <param name="lightMode">SRPDefaultUnlit</param>
         private void RenderWithMustHaveOutlineObjectCamera(ScriptableRenderContext context, Camera camera, string lightMode = "SRPDefaultUnlit")
         {
             // Get the culling parameters from the current Camera
@@ -86,7 +76,10 @@ namespace MustHave
             var shaderTagId = new ShaderTagId(lightMode);
 
             // Tell Unity how to sort the geometry, based on the current Camera
-            var sortingSettings = new SortingSettings(camera);
+            var sortingSettings = new SortingSettings(camera)
+            {
+                criteria = SortingCriteria.BackToFront
+            };
 
             // Create a DrawingSettings struct that describes which geometry to draw and how to draw it
             var drawingSettings = new DrawingSettings(shaderTagId, sortingSettings);

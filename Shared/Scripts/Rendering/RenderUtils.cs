@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_URP
@@ -55,29 +56,26 @@ namespace MustHave
             return pipelineType;
         }
 
-        public static void Render(ScriptableRenderContext context, Camera camera, RenderPipelineType pipelineType)
-        {
-            switch (pipelineType)
-            {
-                case RenderPipelineType.Default:
-                    throw new System.InvalidOperationException();
-#if UNITY_PIPELINE_URP
-                case RenderPipelineType.URP:
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS0618 // Type or member is obsolete
-                    UniversalRenderPipeline.RenderSingleCamera(context, camera);
-#pragma warning restore CS0618 // Type or member is obsolete
-#pragma warning restore IDE0079 // Remove unnecessary suppression
-                    break;
-#endif
-#if UNITY_PIPELINE_HDRP
-                case RenderPipelineType.HDRP:
-                    throw new System.NotImplementedException();
-#endif
-                case RenderPipelineType.CustomSRP:
-                default:
-                    throw new System.InvalidOperationException();
-            }
-        }
+//        public static void ExecuteCommandBuffer(ScriptableRenderContext context, Action<CommandBuffer> renderAction, bool submitContext = true)
+//        {
+//#if UNITY_PIPELINE_CORE
+//            var cmd = CommandBufferPool.Get();
+//#else
+//            var cmd = cmdBuffer = new CommandBuffer();
+//#endif
+//            renderAction(cmd);
+
+//            context.ExecuteCommandBuffer(cmd);
+
+//            if (submitContext)
+//            {
+//                context.Submit();
+//            }
+//#if UNITY_PIPELINE_CORE
+//            CommandBufferPool.Release(cmd);
+//#else
+//            cmd.Release();
+//#endif
+//        }
     }
 }

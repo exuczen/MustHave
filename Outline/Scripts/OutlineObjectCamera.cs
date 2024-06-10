@@ -435,7 +435,6 @@ namespace MustHave
                     //    circleRenderParams.worldBounds, count, circlePropertyBlock,
                     //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
                 }
-
             }
         }
 

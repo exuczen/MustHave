@@ -107,15 +107,11 @@ namespace MustHave
                 data.SetRenderer(renderer);
                 renderersData.Add(data);
             }
-            var camera = IOutlineCameraSingleton.Instance;
-            if (camera)
+            var outlineCamera = IOutlineCameraSingleton.Instance;
+            if (outlineCamera)
             {
-                var outlineCamera = camera.GetComponent<OutlineCamera>();
-                if (outlineCamera)
-                {
-                    objectCamera = outlineCamera.ObjectCamera;
-                    objectCamera.AddOutlineObject(this);
-                }
+                objectCamera = outlineCamera.ObjectCamera;
+                objectCamera.AddOutlineObject(this);
             }
         }
 

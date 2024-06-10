@@ -353,28 +353,18 @@ namespace MustHave
         {
             if (CanExecute)
             {
-#if UNITY_PIPELINE_CORE
-                var cmd = cmdBuffer = CommandBufferPool.Get();
-#else
-                var cmd = cmdBuffer = new CommandBuffer();
-#endif
-                blitSource(cmd);
+                context.ExecuteCommandBuffer(cmd => {
+                    cmdBuffer = cmd;
 
-                SetupOnExecute();
-                DispatchShader(cmd);
+                    blitSource(cmd);
 
-                blitOutput(cmd);
+                    SetupOnExecute();
+                    DispatchShader(cmd);
 
-                context.ExecuteCommandBuffer(cmd);
-                context.Submit();
+                    blitOutput(cmd);
 
-#if UNITY_PIPELINE_CORE
-                CommandBufferPool.Release(cmd);
-#else
-                cmd.Release();
-#endif
-                cmdBuffer = null;
-
+                    cmdBuffer = null;
+                });
                 return true;
             }
             else
