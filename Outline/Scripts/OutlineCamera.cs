@@ -1,4 +1,5 @@
 ﻿using MustHave.Utils;
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -151,12 +152,13 @@ namespace MustHave
             objectCamera.Setup(this);
         }
 
-        protected override void SetupOnExecute()
+        protected override void SetupOnRenderImage()
         {
-            if (PipelineType == RenderPipelineType.Default && !HasCommandBuffer)
+            if (PipelineType != RenderPipelineType.Default)
             {
-                objectCamera.RenderShapes();
+                throw new InvalidOperationException($"RenderPipelineType: {PipelineType}");
             }
+            objectCamera.RenderShapes();
         }
 
         protected override void OnLateUpdate()

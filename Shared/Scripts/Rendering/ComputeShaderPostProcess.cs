@@ -192,7 +192,9 @@ namespace MustHave
 
         protected virtual void OnLateUpdate() { }
 
-        protected virtual void SetupOnExecute() { }
+        protected virtual void SetupOnRenderImage() { }
+
+        protected virtual void SetupOnExecute(CommandBuffer cmd) { }
 
         protected virtual void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
 
@@ -358,7 +360,7 @@ namespace MustHave
 
                     blitSource(cmd);
 
-                    SetupOnExecute();
+                    SetupOnExecute(cmd);
                     DispatchShader(cmd);
 
                     blitOutput(cmd);
@@ -379,7 +381,7 @@ namespace MustHave
             {
                 Graphics.Blit(source, sourceTexture);
 
-                SetupOnExecute();
+                SetupOnRenderImage();
                 DispatchShader();
 
                 Graphics.Blit(outputTexture, destination);
