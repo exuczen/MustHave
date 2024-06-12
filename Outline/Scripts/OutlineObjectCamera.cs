@@ -38,9 +38,9 @@ namespace MustHave
         public Material OutlineShapeMaterial => outlineShapeMaterial;
         public Camera ShapeCamera => shapeCamera;
         public Camera CircleCamera => circleCamera;
-        public int ObjectsCount => objects.Count;
+        public int ObjectsCount => Mathf.Min(RenderersCapacity, objects.Count);
 
-        private int RenderersCount => Mathf.Min(RenderersCapacity, renderersData.Count);
+        public int RenderersCount => Mathf.Min(RenderersCapacity, renderersData.Count);
 
         [SerializeField]
         private OutlineShaderSettings shaderSettings = null;
@@ -384,8 +384,8 @@ namespace MustHave
         {
             circleTexture.Clear();
 
-            int count = RenderersCount;
-            if (count <= 0)
+            int objectsCount = ObjectsCount;
+            if (objectsCount <= 0)
             {
                 return;
             }
@@ -398,18 +398,21 @@ namespace MustHave
 
             float scale = 2f * (radius + 1) / circleCamera.pixelHeight;
             var scaleXY = scale * Vector2.one;
-            float minDepth = objects.Count > 0 ? 1f / objects.Count : 0f;
+            float minDepth = objectsCount > 0 ? 1f / objectsCount : 0f;
 
+            // At this point objects are sorted by distance from camera
             // At this point renderers have Color and Depth values from outline objects sorted by distance from camera
             int j = 0;
-            for (int i = 0; i < count; i++)
+            for (int i = objectsCount - 1; i >= 0; i--)
             {
-                if (SetCircleInstanceData(j, scaleXY))
-                {
-                    j++;
-                }
+                objects[i].ForEachRendererData(data => {
+                    if (SetCircleInstanceData(data, j, scaleXY))
+                    {
+                        j++;
+                    }
+                });
             }
-            count = j;
+            int count = j;
             if (count > 0)
             {
                 circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
@@ -438,9 +441,8 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(int i, Vector2 scale)
+        private bool SetCircleInstanceData(RendererData data, int i, Vector2 scale)
         {
-            var data = renderersData[i];
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
             var viewPoint = shapeCamera.WorldToViewportPoint(center);
