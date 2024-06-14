@@ -1,4 +1,5 @@
 ﻿using MustHave.Utils;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -53,10 +54,13 @@ namespace MustHave
         private MeshFilter quadMeshFilter = null;
         [SerializeField]
         private Camera circleCamera = null;
+        [SerializeField, HideInInspector]
+        private ColorSpace colorSpace = ColorSpace.Uninitialized;
 #if UNITY_EDITOR
         [SerializeField]
         private bool layerAdded = false;
 #endif
+
         private Camera shapeCamera = null;
 
         private RenderTexture shapeTexture = null;
@@ -116,6 +120,8 @@ namespace MustHave
         public void Setup(OutlineCamera outlineCamera, bool copySettings = true)
         {
 #if UNITY_EDITOR
+            bool setDirty = false;
+
             if (!layerAdded)
             {
                 layerAdded = UnityUtils.AddLayer(Layer.OutlineLayerName, out bool layerExists) || layerExists;
@@ -124,11 +130,18 @@ namespace MustHave
                 {
                     Layer.Refresh();
 
-                    if (!Application.isPlaying)
-                    {
-                        UnityEditor.EditorUtility.SetDirty(this);
-                    }
+                    setDirty = true;
                 }
+            }
+            if (colorSpace != UnityEditor.PlayerSettings.colorSpace)
+            {
+                colorSpace = UnityEditor.PlayerSettings.colorSpace;
+
+                setDirty = true;
+            }
+            if (setDirty && !Application.isPlaying)
+            {
+                UnityEditor.EditorUtility.SetDirty(this);
             }
 #endif
             var parentCamera = outlineCamera.Camera;
@@ -417,13 +430,15 @@ namespace MustHave
             var scaleXY = scale * Vector2.one;
             float minDepth = objectsCount > 0 ? 1f / objectsCount : 0f;
 
+            var getColor = Utils.ColorUtils.GetColorFromColorSpaceFunc(colorSpace);
+
             // At this point objects are sorted by distance from camera
             // At this point renderers have Color and Depth values from outline objects sorted by distance from camera
             int j = 0;
             for (int i = objectsCount - 1; i >= 0; i--)
             {
                 objects[i].ForEachRendererData((obj, data) => {
-                    if (SetCircleInstanceData(obj, data, j, scaleXY))
+                    if (SetCircleInstanceData(obj, data, j, scaleXY, getColor))
                     {
                         j++;
                     }
@@ -458,7 +473,7 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(OutlineObject obj, RendererData data, int i, Vector2 scale)
+        private bool SetCircleInstanceData(OutlineObject obj, RendererData data, int i, Vector2 scale, Func<Color, Color> getColor)
         {
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
@@ -482,7 +497,7 @@ namespace MustHave
             {
                 objectToWorld = Matrix4x4.identity,
                 clipPosition = clipPoint,
-                color = obj.Color,
+                color = getColor(obj.Color),
                 scale = scale
             };
             return true;

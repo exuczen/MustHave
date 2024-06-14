@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MustHave.Utils
 {
@@ -24,6 +25,18 @@ namespace MustHave.Utils
 
     public struct ColorUtils
     {
+        public static Func<Color, Color> GetColorFromColorSpaceFunc(ColorSpace colorSpace)
+        {
+            Func<Color, Color> getColor = colorSpace switch
+            {
+                ColorSpace.Uninitialized => color => color,
+                ColorSpace.Gamma => color => color,
+                ColorSpace.Linear => color => color.linear,
+                _ => color => color,
+            };
+            return getColor;
+        }
+
         public static Color32 Color32FromRGBA(int rgba)
         {
             //int debugRGBA = rgba;
