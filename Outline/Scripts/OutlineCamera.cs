@@ -86,7 +86,27 @@ namespace MustHave
 
             enabled = initialized;
 
-            objectCamera.SetGameObjectActive(initialized);
+#if UNITY_EDITOR
+            if (PipelineType == RenderPipelineType.HDRP)
+            {
+                // Hack for internal UnityEngine.Rendering.HighDefinition MissingReferenceException:
+                // The object of type 'HDAdditionalCameraData' has been destroyed but you are still trying to access it.
+                // UpdateDebugCameraName is added to UnityEditor.EditorApplication.hierarchyChanged event and called
+                // after the runtime's game object has been destroyed on exiting play mode and entering edit mode.
+
+                objectCamera.SetGameObjectActive(initialized && Application.isPlaying);
+
+                if (initialized && !Application.isPlaying)
+                {
+                    UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
+                    UnityEditor.EditorApplication.update += SetObjectCameraActiveOnEditorUpdate;
+                }
+            }
+            else
+#endif
+            {
+                objectCamera.SetGameObjectActive(initialized);
+            }
         }
 
         protected override void OnDisable()
@@ -243,5 +263,17 @@ namespace MustHave
                 }
             }
         }
+
+#if UNITY_EDITOR
+        private void SetObjectCameraActiveOnEditorUpdate()
+        {
+            UnityEditor.EditorApplication.update -= SetObjectCameraActiveOnEditorUpdate;
+
+            if (objectCamera)
+            {
+                objectCamera.SetGameObjectActive(true);
+            }
+        }
+#endif
     }
 }
