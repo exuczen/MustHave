@@ -5,8 +5,6 @@ namespace MustHave
     public class RendererData
     {
         public Renderer Renderer => renderer;
-        public Color Color { get; set; } = Color.white;
-        public float Depth { get; set; }
 
         private Renderer renderer;
         private Material sharedMaterial;

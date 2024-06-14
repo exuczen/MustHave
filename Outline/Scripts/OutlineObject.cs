@@ -54,12 +54,6 @@ namespace MustHave
         {
             Depth = depth;
             Color = GetColorWithAlphaDepth(depth, minDepth);
-
-            foreach (var data in renderersData)
-            {
-                data.Color = Color;
-                data.Depth = Depth;
-            }
         }
 
         public void DrawBBoxGizmo()
@@ -83,11 +77,11 @@ namespace MustHave
             }
         }
 
-        public void ForEachRendererData(Action<RendererData> action)
+        public void ForEachRendererData(Action<OutlineObject, RendererData> action)
         {
             foreach (var data in renderersData)
             {
-                action(data);
+                action(this, data);
             }
         }
 

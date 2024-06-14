@@ -43,8 +43,6 @@ namespace MustHave
         public Camera CircleCamera => circleCamera;
         public int ObjectsCount => Mathf.Min(RenderersCapacity, objects.Count);
 
-        public int RenderersCount => Mathf.Min(RenderersCapacity, renderersData.Count);
-
         [SerializeField]
         private OutlineShaderSettings shaderSettings = null;
         [SerializeField]
@@ -65,7 +63,6 @@ namespace MustHave
         private RenderTexture circleTexture = null;
 
         private readonly List<OutlineObject> objects = new();
-        private readonly List<RendererData> renderersData = new();
 
         private readonly InstanceData[] circleInstanceData = new InstanceData[RenderersCapacity];
         private readonly Material[] shapeMaterials = new Material[RenderersCapacity];
@@ -171,18 +168,13 @@ namespace MustHave
             if (!objects.Contains(obj))
             {
                 objects.Add(obj);
-                obj.ForEachRendererData(data => {
-                    renderersData.Add(data);
-                });
             }
         }
 
         public void RemoveOutlineObject(OutlineObject obj)
         {
             objects.Remove(obj);
-            obj.ForEachRendererData(data => {
-                renderersData.Remove(data);
-            });
+
             if (objects.Count == 0)
             {
                 circleTexture.Clear();
@@ -390,9 +382,9 @@ namespace MustHave
 
         public void OnEndRenderingShapes()
         {
-            foreach (var data in renderersData)
+            foreach (var obj in objects)
             {
-                data.Restore();
+                obj.RestoreRenderers();
             }
         }
 
@@ -430,8 +422,8 @@ namespace MustHave
             int j = 0;
             for (int i = objectsCount - 1; i >= 0; i--)
             {
-                objects[i].ForEachRendererData(data => {
-                    if (SetCircleInstanceData(data, j, scaleXY))
+                objects[i].ForEachRendererData((obj, data) => {
+                    if (SetCircleInstanceData(obj, data, j, scaleXY))
                     {
                         j++;
                     }
@@ -466,7 +458,7 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(RendererData data, int i, Vector2 scale)
+        private bool SetCircleInstanceData(OutlineObject obj, RendererData data, int i, Vector2 scale)
         {
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
@@ -483,14 +475,14 @@ namespace MustHave
             {
                 x = (viewPoint.x - 0.5f) * 2f,
                 y = (viewPoint.y - 0.5f) * 2f,
-                z = data.Depth
+                z = obj.Depth
             };
             //Debug.Log($"{GetType().Name}.{i} | {data.CameraDistanceSqr} | {clipPoint.z}");
             circleInstanceData[i] = new InstanceData()
             {
                 objectToWorld = Matrix4x4.identity,
                 clipPosition = clipPoint,
-                color = data.Color,
+                color = obj.Color,
                 scale = scale
             };
             return true;
