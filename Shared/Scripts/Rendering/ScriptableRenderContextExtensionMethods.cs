@@ -10,7 +10,7 @@ namespace MustHave
 #if UNITY_PIPELINE_CORE
             var cmd = CommandBufferPool.Get();
 #else
-            var cmd = cmdBuffer = new CommandBuffer();
+            var cmd = new CommandBuffer();
 #endif
             renderAction(cmd);
 

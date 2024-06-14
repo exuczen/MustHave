@@ -225,7 +225,8 @@ namespace MustHave
                 return;
             }
 #endif
-            if (PipelineType != RenderPipelineType.CustomSRP)
+            if (PipelineType != RenderPipelineType.CustomSRP &&
+                PipelineType != RenderPipelineType.HDRP)
             {
                 return;
             }
@@ -283,6 +284,9 @@ namespace MustHave
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
                 UnityAssetPostprocessor.AllAssetsPostprocessed += OnAllAssetsPostprocessed;
+
+                UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+                UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             }
 #endif
             if (cameraChangeListener)
@@ -313,6 +317,8 @@ namespace MustHave
                 EditorSceneManager.activeSceneChangedInEditMode -= OnActiveSceneChangedInEditMode;
 #endif
                 UnityAssetPostprocessor.AllAssetsPostprocessed -= OnAllAssetsPostprocessed;
+
+                UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             }
 #endif
             if (cameraChangeListener)
@@ -333,6 +339,10 @@ namespace MustHave
         {
             OnDisableOrDestroy();
         }
+
+#if UNITY_EDITOR
+        protected virtual void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange stateChange) { }
+#endif
 
 #if UNITY_PIPELINE_URP
         public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, ScriptableRenderContext context, RenderTargetIdentifier colorRenderTarget)

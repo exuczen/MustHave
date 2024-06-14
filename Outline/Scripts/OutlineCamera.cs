@@ -197,10 +197,10 @@ namespace MustHave
         {
             base.OnDestroy();
 
-            if (ShaderSettings)
-            {
-                ShaderSettings.SetDebugModeFromInit();
-            }
+            //if (ShaderSettings)
+            //{
+            //    ShaderSettings.SetDebugModeFromInit();
+            //}
             IOutlineCameraSingleton.ClearInstanceOnDestroy(this);
 
             ObjectUtils.DestroyGameObject(ref objectCamera);
@@ -268,6 +268,15 @@ namespace MustHave
         }
 
 #if UNITY_EDITOR
+        protected override void OnPlayModeStateChanged(PlayModeStateChange stateChange)
+        {
+            if (stateChange == PlayModeStateChange.EnteredEditMode && ShaderSettings)
+            {
+                ShaderSettings.SetDebugModeFromInit();
+                EditorApplication.QueuePlayerLoopUpdate();
+            }
+        }
+
         private void SetObjectCameraActiveOnEditorUpdate()
         {
             EditorApplication.update -= SetObjectCameraActiveOnEditorUpdate;
