@@ -1,5 +1,8 @@
 ﻿using MustHave.Utils;
 using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -65,7 +68,7 @@ namespace MustHave
                     if (objectCameraPrefab)
                     {
 #if UNITY_EDITOR
-                        objectCamera = UnityEditor.PrefabUtility.InstantiatePrefab(objectCameraPrefab, transform) as OutlineObjectCamera;
+                        objectCamera = PrefabUtility.InstantiatePrefab(objectCameraPrefab, transform) as OutlineObjectCamera;
 #else
                         objectCamera = Instantiate(objectCameraPrefab, transform);
 #endif
@@ -98,8 +101,8 @@ namespace MustHave
 
                 if (initialized && !Application.isPlaying)
                 {
-                    UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
-                    UnityEditor.EditorApplication.update += SetObjectCameraActiveOnEditorUpdate;
+                    EditorApplication.QueuePlayerLoopUpdate();
+                    EditorApplication.update += SetObjectCameraActiveOnEditorUpdate;
                 }
             }
             else
@@ -267,7 +270,7 @@ namespace MustHave
 #if UNITY_EDITOR
         private void SetObjectCameraActiveOnEditorUpdate()
         {
-            UnityEditor.EditorApplication.update -= SetObjectCameraActiveOnEditorUpdate;
+            EditorApplication.update -= SetObjectCameraActiveOnEditorUpdate;
 
             if (objectCamera)
             {
