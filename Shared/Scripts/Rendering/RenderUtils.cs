@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_URP
@@ -18,15 +17,23 @@ namespace MustHave
         public static bool UniversalRenderPipelineInstalled => false;
 #endif
 
-        public static RenderPipelineType GetRenderPipelineType()
+        public static RenderPipelineAsset GetRenderPipelineAsset()
         {
-            RenderPipelineType pipelineType;
-            var pipeline = QualitySettings.renderPipeline;
-
+            var pipeline = GraphicsSettings.currentRenderPipeline;
             if (!pipeline)
             {
-                pipeline = GraphicsSettings.defaultRenderPipeline;
+                pipeline = QualitySettings.renderPipeline;
+                if (!pipeline)
+                {
+                    pipeline = GraphicsSettings.defaultRenderPipeline;
+                }
             }
+            return pipeline;
+        }
+
+        public static RenderPipelineType GetRenderPipelineType(RenderPipelineAsset pipeline)
+        {
+            RenderPipelineType pipelineType;
             if (pipeline)
             {
 #if UNITY_PIPELINE_URP
@@ -56,26 +63,41 @@ namespace MustHave
             return pipelineType;
         }
 
-//        public static void ExecuteCommandBuffer(ScriptableRenderContext context, Action<CommandBuffer> renderAction, bool submitContext = true)
-//        {
-//#if UNITY_PIPELINE_CORE
-//            var cmd = CommandBufferPool.Get();
-//#else
-//            var cmd = cmdBuffer = new CommandBuffer();
-//#endif
-//            renderAction(cmd);
+        public static RenderPipelineType GetRenderPipelineType(RenderPipeline pipeline)
+        {
+            RenderPipelineType pipelineType;
+            if (pipeline != null)
+            {
+#if UNITY_PIPELINE_URP
+                if (pipeline is UniversalRenderPipeline)
+                {
+                    pipelineType = RenderPipelineType.URP;
+                }
+                else
+#endif
+#if UNITY_PIPELINE_HDRP
+                if (pipeline is HDRenderPipeline)
+                {
+                    pipelineType = RenderPipelineType.HDRP;
+                }
+                else
+#endif
+                {
+                    pipelineType = RenderPipelineType.CustomSRP;
+                }
+                //Debug.Log($"RenderPipeline: {pipeline.GetType().Name} | {pipelineType}");
+            }
+            else
+            {
+                pipelineType = RenderPipelineType.Default;
+                //Debug.Log($"Built-in Render Pipeline | {pipelineType}");
+            }
+            return pipelineType;
+        }
 
-//            context.ExecuteCommandBuffer(cmd);
-
-//            if (submitContext)
-//            {
-//                context.Submit();
-//            }
-//#if UNITY_PIPELINE_CORE
-//            CommandBufferPool.Release(cmd);
-//#else
-//            cmd.Release();
-//#endif
-//        }
+        public static RenderPipelineType GetRenderPipelineType()
+        {
+            return GetRenderPipelineType(GetRenderPipelineAsset());
+        }
     }
 }

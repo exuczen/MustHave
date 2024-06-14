@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using UnityEngine.Rendering;
+#if UNITY_PIPELINE_HDRP
+using static UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData;
+#endif
 #if UNITY_PIPELINE_URP
 using UnityEngine.Rendering.Universal;
 #endif
@@ -159,13 +162,8 @@ namespace MustHave
             circleCamera.cullingMask = Layer.OutlineMask;
             circleCamera.enabled = true;
 
-#if UNITY_PIPELINE_URP
-            if (outlineCamera.PipelineType == RenderPipelineType.URP)
-            {
-                SetupURPCamera(shapeCamera);
-                SetupURPCamera(circleCamera);
-            }
-#endif
+            SetupCameraAdditionalData(shapeCamera, outlineCamera);
+            SetupCameraAdditionalData(circleCamera, outlineCamera);
         }
 
         public void AddOutlineObject(OutlineObject obj)
@@ -192,15 +190,42 @@ namespace MustHave
             }
         }
 
-#if UNITY_PIPELINE_URP
-        private void SetupURPCamera(Camera camera)
+        private void SetupCameraAdditionalData(Camera camera, OutlineCamera outlineCamera)
         {
-            var cameraData = camera.GetOrAddUniversalAdditionalCameraData();
+            var pipelineType = outlineCamera.PipelineType;
 
-            cameraData.requiresColorOption = CameraOverrideOption.On;
-            cameraData.requiresDepthOption = CameraOverrideOption.On;
-        }
+            switch (pipelineType)
+            {
+                case RenderPipelineType.Default:
+                    break;
+#if UNITY_PIPELINE_URP
+                case RenderPipelineType.URP:
+                {
+                    var cameraData = camera.GetOrAddUniversalAdditionalCameraData();
+
+                    cameraData.requiresColorOption = CameraOverrideOption.On;
+                    cameraData.requiresDepthOption = CameraOverrideOption.On;
+                }
+                break;
 #endif
+#if UNITY_PIPELINE_HDRP
+                case RenderPipelineType.HDRP:
+                {
+                    var cameraData = camera.GetOrAddHDAdditionalCameraData();
+
+                    cameraData.clearColorMode = ClearColorMode.Color;
+                    cameraData.backgroundColorHDR = Utils.ColorUtils.ColorWithAlpha(cameraData.backgroundColorHDR, 0f);
+                    cameraData.volumeLayerMask = 0;
+                    cameraData.probeLayerMask = 0;
+                }
+                break;
+#endif
+                case RenderPipelineType.CustomSRP:
+                    break;
+                default:
+                    break;
+            }
+        }
 
         private float GetExtendedOrthoSize(Camera parentCamera, int pixelOffset)
         {

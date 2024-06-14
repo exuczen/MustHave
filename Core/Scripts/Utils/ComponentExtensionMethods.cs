@@ -4,6 +4,16 @@ namespace MustHave.Utils
 {
     public static class ComponentExtensionMethods
     {
+        public static T GetOrAddComponent<T>(this Component thisComponent) where T : Component
+        {
+            var component = thisComponent.GetComponent<T>();
+            if (!component)
+            {
+                component = thisComponent.gameObject.AddComponent<T>();
+            }
+            return component;
+        }
+
         public static void SetGameObjectActive(this Component component, bool active)
         {
             component.gameObject.SetActive(active);
