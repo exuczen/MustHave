@@ -4,6 +4,15 @@ namespace MustHave.Utils
 {
     public static class ComponentExtensionMethods
     {
+        public static void DestroyComponentsInChilden<T>(this Component thisComponent) where T : Component
+        {
+            var components = thisComponent.GetComponentsInChildren<T>();
+            foreach (var cameraData in components)
+            {
+                ObjectUtils.DestroyComponent(cameraData);
+            }
+        }
+
         public static T GetOrAddComponent<T>(this Component thisComponent) where T : Component
         {
             var component = thisComponent.GetComponent<T>();

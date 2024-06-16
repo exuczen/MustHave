@@ -7,6 +7,7 @@ using static UnityEngine.GraphicsBuffer;
 using UnityEngine.Rendering;
 #if UNITY_PIPELINE_HDRP
 using static UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData;
+using UnityEngine.Rendering.HighDefinition;
 #endif
 #if UNITY_PIPELINE_URP
 using UnityEngine.Rendering.Universal;
@@ -17,6 +18,7 @@ namespace MustHave
     [RequireComponent(typeof(Camera))]
     public class OutlineObjectCamera : MonoBehaviour
     {
+        public const string PrefabPath = "Assets/Packages/MustHave/Outline/Prefabs/Resources/OutlineObjectCamera.prefab";
         public const string PrefabName = "OutlineObjectCamera";
 
         private const int RenderersCapacity = 1 << 10;
@@ -86,14 +88,13 @@ namespace MustHave
             public Vector2 scale;
         }
 
-        public void DestroyUniversalAdditionalCameraData()
+        public void DestroyAdditionalCameraData()
         {
+#if UNITY_PIPELINE_HDRP
+            this.DestroyComponentsInChilden<HDAdditionalCameraData>();
+#endif
 #if UNITY_PIPELINE_URP
-            var componens = GetComponentsInChildren<UniversalAdditionalCameraData>();
-            foreach (var cameraData in componens)
-            {
-                ObjectUtils.DestroyComponent(cameraData);
-            }
+            this.DestroyComponentsInChilden<UniversalAdditionalCameraData>();
 #endif
         }
 
@@ -172,8 +173,7 @@ namespace MustHave
             circleCamera.cullingMask = Layer.OutlineMask;
             circleCamera.enabled = true;
 
-            SetupCameraAdditionalData(shapeCamera, outlineCamera);
-            SetupCameraAdditionalData(circleCamera, outlineCamera);
+            SetupCameraAdditionalData(outlineCamera.PipelineType);
         }
 
         public void AddOutlineObject(OutlineObject obj)
@@ -195,10 +195,18 @@ namespace MustHave
             }
         }
 
-        private void SetupCameraAdditionalData(Camera camera, OutlineCamera outlineCamera)
+        public void SetupCameraAdditionalData(RenderPipelineType pipelineType)
         {
-            var pipelineType = outlineCamera.PipelineType;
+            if (!shapeCamera)
+            {
+                shapeCamera = GetComponent<Camera>();
+            }
+            SetupCameraAdditionalData(shapeCamera, pipelineType);
+            SetupCameraAdditionalData(circleCamera, pipelineType);
+        }
 
+        private void SetupCameraAdditionalData(Camera camera, RenderPipelineType pipelineType)
+        {
             switch (pipelineType)
             {
                 case RenderPipelineType.Default:

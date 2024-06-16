@@ -126,13 +126,12 @@ namespace MustHave
 
         public static void ExportMustHavePackage(PackageName enumName)
         {
-            if (RenderUtils.UniversalRenderPipelineInstalled && enumName == PackageName.Outline)
+            if ((RenderUtils.UniversalRenderPipelineInstalled || RenderUtils.HighDefinitionRenderPipelineInstalled) && enumName == PackageName.Outline)
             {
-                var prefabPath = "Assets/Packages/MustHave/Outline/Prefabs/Resources/OutlineObjectCamera.prefab";
                 AssetUtils.ModifyPrefab(prefab => {
                     var outlineObjectCamera = prefab.GetComponent<OutlineObjectCamera>();
-                    outlineObjectCamera.DestroyUniversalAdditionalCameraData();
-                }, prefabPath);
+                    outlineObjectCamera.DestroyAdditionalCameraData();
+                }, OutlineObjectCamera.PrefabPath);
             }
             var assetPaths = new string[] {
                 $"Assets/Packages/MustHave/{enumName}",

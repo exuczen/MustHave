@@ -19,6 +19,12 @@ namespace MustHave
             SaveAndRefresh();
         }
 
+        public static void SaveAsset<T>(T target) where T : UnityEngine.Object
+        {
+            EditorUtility.SetDirty(target);
+            AssetDatabase.SaveAssetIfDirty(target);
+        }
+
         public static void SaveAndRefresh()
         {
             AssetDatabase.SaveAssets();

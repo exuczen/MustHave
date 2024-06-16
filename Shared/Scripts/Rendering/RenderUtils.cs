@@ -16,6 +16,11 @@ namespace MustHave
 #else
         public static bool UniversalRenderPipelineInstalled => false;
 #endif
+#if UNITY_PIPELINE_HDRP
+        public static bool HighDefinitionRenderPipelineInstalled => true;
+#else
+        public static bool HighDefinitionRenderPipelineInstalled => false;
+#endif
 
         public static RenderPipelineAsset GetRenderPipelineAsset()
         {
