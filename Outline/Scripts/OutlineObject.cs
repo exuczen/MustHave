@@ -77,11 +77,11 @@ namespace MustHave
             }
         }
 
-        public void ForEachRendererData(Action<OutlineObject, RendererData> action)
+        public void ForEachRendererData(Action<RendererData> action)
         {
             foreach (var data in renderersData)
             {
-                action(this, data);
+                action(data);
             }
         }
 

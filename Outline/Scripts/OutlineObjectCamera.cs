@@ -433,12 +433,15 @@ namespace MustHave
             var getColor = Utils.ColorUtils.GetColorFromColorSpaceFunc(colorSpace);
 
             // At this point objects are sorted by distance from camera
-            // At this point renderers have Color and Depth values from outline objects sorted by distance from camera
             int j = 0;
             for (int i = objectsCount - 1; i >= 0; i--)
             {
-                objects[i].ForEachRendererData((obj, data) => {
-                    if (SetCircleInstanceData(obj, data, j, scaleXY, getColor))
+                var obj = objects[i];
+                var color = getColor(obj.Color);
+                float depth = obj.Depth;
+
+                obj.ForEachRendererData(data => {
+                    if (SetCircleInstanceData(data, j, scaleXY, depth, color))
                     {
                         j++;
                     }
@@ -473,7 +476,7 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(OutlineObject obj, RendererData data, int i, Vector2 scale, Func<Color, Color> getColor)
+        private bool SetCircleInstanceData(RendererData data, int i, Vector2 scale, float depth, Color color)
         {
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
@@ -490,14 +493,14 @@ namespace MustHave
             {
                 x = (viewPoint.x - 0.5f) * 2f,
                 y = (viewPoint.y - 0.5f) * 2f,
-                z = obj.Depth
+                z = depth
             };
             //Debug.Log($"{GetType().Name}.{i} | {data.CameraDistanceSqr} | {clipPoint.z}");
             circleInstanceData[i] = new InstanceData()
             {
                 objectToWorld = Matrix4x4.identity,
                 clipPosition = clipPoint,
-                color = getColor(obj.Color),
+                color = color,
                 scale = scale
             };
             return true;
