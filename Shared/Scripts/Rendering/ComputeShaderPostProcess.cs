@@ -31,7 +31,7 @@ namespace MustHave
         public Camera Camera => thisCamera;
         public RenderTexture OutputTexture => outputTexture;
         public RenderTexture SourceTexture => sourceTexture;
-        public RenderPipelineType PipelineType { get; set; } = RenderPipelineType.Default;
+        public RenderPipelineType PipelineType { get => pipelineType; set => pipelineType = value; }
 
         protected bool HasCommandBuffer => cmdBuffer != null;
 
@@ -43,6 +43,8 @@ namespace MustHave
 
         [SerializeField]
         protected ComputeShader shader = null;
+        [SerializeField]
+        protected RenderPipelineType pipelineType = RenderPipelineType.Default;
 #if UNITY_PIPELINE_URP
         [SerializeField]
         protected RenderPassSettings renderPassSettings = new();

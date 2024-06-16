@@ -49,6 +49,21 @@ namespace MustHave
         protected void Awake()
         {
             IOutlineCameraSingleton.SetInstanceOnAwake(this);
+#if UNITY_EDITOR
+            var prevPipelineType = pipelineType;
+            pipelineType = RenderUtils.GetRenderPipelineType();
+
+            if (!Application.isPlaying && pipelineType != prevPipelineType)
+            {
+                AssetUtils.ModifyPrefab<OutlineObjectCamera>(objectCamera => {
+                    objectCamera.SetupCameraAdditionalData(pipelineType);
+                }, OutlineObjectCamera.PrefabPath);
+
+                EditorApplication.QueuePlayerLoopUpdate();
+                EditorApplication.update += EnableOnEditorUpdate;
+                enabled = false;
+            }
+#endif
         }
 
         protected override void OnEnable()
@@ -275,6 +290,13 @@ namespace MustHave
                 ShaderSettings.SetDebugModeFromInit();
                 EditorApplication.QueuePlayerLoopUpdate();
             }
+        }
+
+        private void EnableOnEditorUpdate()
+        {
+            EditorApplication.update -= EnableOnEditorUpdate;
+
+            enabled = true;
         }
 
         private void SetObjectCameraActiveOnEditorUpdate()

@@ -102,7 +102,8 @@ namespace MustHave
                 renderersData.Add(data);
             }
             var outlineCamera = IOutlineCameraSingleton.Instance;
-            if (outlineCamera)
+            var objectCamera = outlineCamera ? outlineCamera.ObjectCamera : null;
+            if (objectCamera)
             {
                 objectCamera = outlineCamera.ObjectCamera;
                 objectCamera.AddOutlineObject(this);

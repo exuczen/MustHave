@@ -10,8 +10,7 @@ namespace MustHave
         {
             base.OnInspectorGUI();
 
-            var camera = CameraUtils.MainOrCurrent;
-            var outlineCamera = camera ? camera.GetComponent<OutlineCamera>() : null;
+            var outlineCamera = IOutlineCameraSingleton.Instance;
             if (outlineCamera)
             {
                 EditorGUI.BeginChangeCheck();

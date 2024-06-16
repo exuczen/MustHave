@@ -4,6 +4,23 @@ namespace MustHave.Utils
 {
     public static class ComponentExtensionMethods
     {
+        public static void DestroyMultipleComponentsInChilden<T>(this Component thisComponent, out T singleComponent) where T : Component
+        {
+            var components = thisComponent.GetComponentsInChildren<T>();
+            if (components.Length > 0)
+            {
+                for (int i = 1; i < components.Length; i++)
+                {
+                    ObjectUtils.DestroyComponent(components[i]);
+                }
+                singleComponent = components[0];
+            }
+            else
+            {
+                singleComponent = thisComponent.gameObject.AddComponent<T>();
+            }
+        }
+
         public static void DestroyComponentsInChilden<T>(this Component thisComponent) where T : Component
         {
             var components = thisComponent.GetComponentsInChildren<T>();
@@ -15,8 +32,7 @@ namespace MustHave.Utils
 
         public static T GetOrAddComponent<T>(this Component thisComponent) where T : Component
         {
-            var component = thisComponent.GetComponent<T>();
-            if (!component)
+            if (!thisComponent.TryGetComponent<T>(out var component))
             {
                 component = thisComponent.gameObject.AddComponent<T>();
             }
