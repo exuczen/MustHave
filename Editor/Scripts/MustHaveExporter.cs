@@ -128,9 +128,8 @@ namespace MustHave
         {
             if ((RenderUtils.UniversalRenderPipelineInstalled || RenderUtils.HighDefinitionRenderPipelineInstalled) && enumName == PackageName.Outline)
             {
-                AssetUtils.ModifyPrefab(prefab => {
-                    var outlineObjectCamera = prefab.GetComponent<OutlineObjectCamera>();
-                    outlineObjectCamera.DestroyAdditionalCameraData();
+                AssetUtils.ModifyPrefab<OutlineObjectCamera>(objectCamera => {
+                    objectCamera.DestroyAdditionalCameraData();
                 }, OutlineObjectCamera.PrefabPath);
             }
             var assetPaths = new string[] {

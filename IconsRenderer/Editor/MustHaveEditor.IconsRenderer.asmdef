@@ -2,6 +2,7 @@
     "name": "MustHaveEditor.IconsRenderer",
     "rootNamespace": "",
     "references": [
+        "MustHave.Core",
         "MustHave.IconsRenderer",
         "MustHaveEditor.Core"
     ],
