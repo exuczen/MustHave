@@ -46,21 +46,18 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool shaderSettingsExpanded = true;
 
-        protected void Awake()
+        protected override void OnAwake(bool pipelineChanged)
         {
             IOutlineCameraSingleton.SetInstanceOnAwake(this);
 #if UNITY_EDITOR
-            var prevPipelineType = pipelineType;
-            pipelineType = RenderUtils.GetRenderPipelineType();
-
-            if (!Application.isPlaying && pipelineType != prevPipelineType)
+            if (!Application.isPlaying && pipelineChanged)
             {
                 AssetUtils.ModifyPrefab<OutlineObjectCamera>(objectCamera => {
-                    objectCamera.SetupCameraAdditionalData(pipelineType);
+                    objectCamera.SetupCameraAdditionalData(PipelineType);
                 }, OutlineObjectCamera.PrefabPath);
 
-                EditorApplication.QueuePlayerLoopUpdate();
-                EditorApplication.update += EnableOnEditorUpdate;
+                EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => enabled = true);
+
                 enabled = false;
             }
 #endif
@@ -116,8 +113,7 @@ namespace MustHave
 
                 if (initialized && !Application.isPlaying)
                 {
-                    EditorApplication.QueuePlayerLoopUpdate();
-                    EditorApplication.update += SetObjectCameraActiveOnEditorUpdate;
+                    EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => objectCamera.SetGameObjectActive(true));
                 }
             }
             else
@@ -289,23 +285,6 @@ namespace MustHave
             {
                 ShaderSettings.SetDebugModeFromInit();
                 EditorApplication.QueuePlayerLoopUpdate();
-            }
-        }
-
-        private void EnableOnEditorUpdate()
-        {
-            EditorApplication.update -= EnableOnEditorUpdate;
-
-            enabled = true;
-        }
-
-        private void SetObjectCameraActiveOnEditorUpdate()
-        {
-            EditorApplication.update -= SetObjectCameraActiveOnEditorUpdate;
-
-            if (objectCamera)
-            {
-                objectCamera.SetGameObjectActive(true);
             }
         }
 #endif

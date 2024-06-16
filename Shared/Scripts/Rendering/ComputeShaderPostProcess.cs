@@ -11,6 +11,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 #endif
 #if UNITY_PIPELINE_HDRP
+using static UnityEngine.Rendering.HighDefinition.RenderPipelineSettings;
 using UnityEngine.Rendering.HighDefinition;
 #endif
 #if USE_EDITOR_SCENE_EVENTS
@@ -31,7 +32,7 @@ namespace MustHave
         public Camera Camera => thisCamera;
         public RenderTexture OutputTexture => outputTexture;
         public RenderTexture SourceTexture => sourceTexture;
-        public RenderPipelineType PipelineType { get => pipelineType; set => pipelineType = value; }
+        public RenderPipelineType PipelineType => pipelineType;
 
         protected bool HasCommandBuffer => cmdBuffer != null;
 
@@ -72,6 +73,28 @@ namespace MustHave
         protected int mainKernelID = -1;
         protected bool initialized = false;
 
+        protected void Awake()
+        {
+            var renderPipeline = RenderUtils.GetRenderPipelineAsset();
+
+            var prevPipelineType = pipelineType;
+            pipelineType = RenderUtils.GetRenderPipelineType(renderPipeline);
+
+#if UNITY_PIPELINE_HDRP
+            if (pipelineType == RenderPipelineType.HDRP)
+            {
+                var hdrp = renderPipeline as HDRenderPipelineAsset;
+                var colorBufferFormat = hdrp.currentPlatformRenderPipelineSettings.colorBufferFormat;
+                if (colorBufferFormat != ColorBufferFormat.R16G16B16A16)
+                {
+                    //TODO: change hdrp asset's colorBufferFormat to ColorBufferFormat.R16G16B16A16;
+                    //hdrp.currentPlatformRenderPipelineSettings.colorBufferFormat = ColorBufferFormat.R16G16B16A16;
+                }
+            }
+#endif
+            OnAwake(prevPipelineType != pipelineType);
+        }
+
         protected void Init()
         {
             if (initialized)
@@ -106,8 +129,6 @@ namespace MustHave
                 cameraChangeListener = gameObject.AddComponent<CameraChangeListener>();
             }
             mainKernelID = shader.FindKernel(MainKernelName);
-
-            PipelineType = RenderUtils.GetRenderPipelineType();
 
             ReleaseTextures();
             CreateTextures();
@@ -185,6 +206,8 @@ namespace MustHave
             shader.SetTexture(mainKernelID, SourceTextureID, sourceTexture);
             shader.SetTexture(mainKernelID, OutputTextureID, outputTexture);
         }
+
+        protected virtual void OnAwake(bool pipelineChanged) { }
 
         protected virtual void OnInit() { }
 
