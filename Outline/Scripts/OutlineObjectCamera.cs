@@ -118,6 +118,12 @@ namespace MustHave
             //circleCommandBuffer = null;
         }
 
+        public void ClearTextures()
+        {
+            circleTexture.Clear();
+            shapeTexture.Clear();
+        }
+
         public void Setup(OutlineCamera outlineCamera, bool copySettings = true)
         {
 #if UNITY_EDITOR
@@ -418,7 +424,7 @@ namespace MustHave
             OnEndRenderingShapes();
         }
 
-        public void RenderCircles(int radius/*, CommandBuffer cmd = null*/)
+        public void RenderCircles(int radius, CommandBuffer cmd = null)
         {
             circleTexture.Clear();
 
@@ -466,13 +472,15 @@ namespace MustHave
                 //circleCommandData[0].instanceCount = (uint)count;
                 //circleCommandBuffer.SetData(circleCommandData);
 
-                //if (cmd != null)
-                //{
-                //    //cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleMatrices, count, circlePropertyBlock);
-                //    //cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
-                //    //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
-                //}
-                //else
+                if (cmd != null)
+                {
+                    cmd.ClearRenderTarget(true, true, Color.clear);
+
+                    cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
+                    //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
+                    //cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleMatrices, count, circlePropertyBlock);
+                }
+                else
                 {
                     Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
                     //Graphics.RenderMeshIndirect(circleRenderParams, quadMeshFilter.sharedMesh, circleCommandBuffer);

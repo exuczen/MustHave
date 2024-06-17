@@ -199,8 +199,10 @@ namespace MustHave
         {
             objectCamera.OnLateUpdate();
 
-            objectCamera.RenderCircles(LineThickness);
-
+            if (PipelineType != RenderPipelineType.HDRP)
+            {
+                objectCamera.RenderCircles(LineThickness);
+            }
             shader.SetInt(ShaderData.LineThicknessID, lineThickness);
         }
 
@@ -270,6 +272,12 @@ namespace MustHave
                 if (camera == objectCamera.ShapeCamera)
                 {
                     objectCamera.OnEndRenderingShapes();
+                }
+                else if (camera == objectCamera.CircleCamera && PipelineType == RenderPipelineType.HDRP)
+                {
+                    context.ExecuteCommandBuffer(cmd => {
+                        objectCamera.RenderCircles(LineThickness, cmd);
+                    });
                 }
                 else
                 {

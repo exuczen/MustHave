@@ -465,7 +465,7 @@ namespace MustHave
             Debug.Log($"{GetType().Name}.OnSceneOpened: {scene.name} | {mode}");
         }
 #endif
-        private void OnAllAssetsPostprocessed()
+        protected virtual void OnAllAssetsPostprocessed()
         {
             ReInit();
             UnityEditor.EditorApplication.QueuePlayerLoopUpdate();

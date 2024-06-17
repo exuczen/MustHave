@@ -26,6 +26,5 @@ namespace MustHave
             cmd.Release();
 #endif
         }
-
     }
 }
