@@ -27,13 +27,15 @@ namespace MustHave
 
         protected static T instance = null;
 
-        protected static void SetInstanceOnAwake(T mono)
+        protected static void SetInstanceOnAwake(T mono, out GameObject gameObject)
         {
+            gameObject = mono.gameObject;
+
             if (instance && instance != mono)
             {
-                Debug.LogWarning($"An instance of {typeof(T).Name} is already in the scene. {mono.name} game object is to be destroyed.");
+                Debug.LogWarning($"An instance of {typeof(T).Name} is already in the scene. {mono.name} component is to be destroyed.");
 
-                ObjectUtils.DestroyGameObject(mono);
+                ObjectUtils.DestroyComponent(mono);
             }
             else
             {

@@ -48,17 +48,24 @@ namespace MustHave
 
         protected override void OnAwake(bool pipelineChanged)
         {
-            IOutlineCameraSingleton.SetInstanceOnAwake(this);
+            IOutlineCameraSingleton.SetInstanceOnAwake(this, out var gameObject);
 #if UNITY_EDITOR
-            if (!Application.isPlaying && pipelineChanged)
+            if (this == IOutlineCameraSingleton.Instance)
             {
-                AssetUtils.ModifyPrefab<OutlineObjectCamera>(objectCamera => {
-                    objectCamera.SetupCameraAdditionalData(PipelineType);
-                }, OutlineObjectCamera.PrefabPath);
+                if (!Application.isPlaying && pipelineChanged)
+                {
+                    AssetUtils.ModifyPrefab<OutlineObjectCamera>(objectCamera => {
+                        objectCamera.SetupCameraAdditionalData(PipelineType);
+                    }, OutlineObjectCamera.PrefabPath);
 
-                EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => enabled = true);
+                    EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => enabled = true);
 
-                enabled = false;
+                    enabled = false;
+                }
+            }
+            else if (gameObject.TryGetComponent<Camera>(out var camera))
+            {
+                camera.enabled = false;
             }
 #endif
         }

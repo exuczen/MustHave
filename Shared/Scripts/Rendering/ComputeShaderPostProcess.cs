@@ -330,6 +330,13 @@ namespace MustHave
                 RenderPipelineManager.endContextRendering -= OnEndContextRendering;
                 RenderPipelineManager.endContextRendering += OnEndContextRendering;
             }
+            //#if UNITY_PIPELINE_HDRP
+            //            if (PipelineType == RenderPipelineType.HDRP)
+            //            {
+            //                hdCameraData.customRender -= OnCustomRender;
+            //                hdCameraData.customRender += OnCustomRender;
+            //            }
+            //#endif
         }
 
         protected virtual void OnDisable()
@@ -357,6 +364,12 @@ namespace MustHave
                 RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
                 RenderPipelineManager.endContextRendering -= OnEndContextRendering;
             }
+            //#if UNITY_PIPELINE_HDRP
+            //            if (PipelineType == RenderPipelineType.HDRP)
+            //            {
+            //                hdCameraData.customRender -= OnCustomRender;
+            //            }
+            //#endif
             OnDisableOrDestroy();
         }
 
@@ -368,6 +381,10 @@ namespace MustHave
 #if UNITY_EDITOR
         protected virtual void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange stateChange) { }
 #endif
+
+        //#if UNITY_PIPELINE_HDRP
+        //        protected virtual void OnCustomRender(ScriptableRenderContext context, HDCamera camera) { }
+        //#endif
 
 #if UNITY_PIPELINE_URP
         public bool OnExecuteRenderPass(ComputeShaderRenderPass pass, ScriptableRenderContext context, RenderTargetIdentifier colorRenderTarget)
@@ -431,7 +448,7 @@ namespace MustHave
         {
             ReleaseTextures();
             initialized = false;
-            cmdBuffer = null; // It is released by ComputeShaderRenderPass
+            cmdBuffer = null; // It is released by ScriptableRenderContextExtensionMethods.ExecuteCommandBuffer
         }
 
         private void CheckResolution(out bool changed)
