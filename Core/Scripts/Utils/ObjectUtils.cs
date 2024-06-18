@@ -2,7 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct ObjectUtils
     {

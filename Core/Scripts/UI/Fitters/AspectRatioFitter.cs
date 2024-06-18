@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static UnityEngine.UI.AspectRatioFitter;
-using MustHave.Utils;
 
 namespace MustHave.UI
 {

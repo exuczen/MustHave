@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using MustHave.Utils;
 
 namespace MustHave.UI
 {
@@ -13,7 +11,7 @@ namespace MustHave.UI
         [SerializeField] protected RectTransform listItemSlotPrefab = null;
         [SerializeField] protected T listItemPrefab = null;
 
-        protected HashSet<Transform> itemsInView = new HashSet<Transform>();
+        protected HashSet<Transform> itemsInView = new();
         protected ScrollRect scrollRect = null;
         protected RectTransform viewport = null;
         protected RectTransform content = null;

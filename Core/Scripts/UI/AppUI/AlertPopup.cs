@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
-using MustHave.Utils;
 
 namespace MustHave.UI
 {

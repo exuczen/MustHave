@@ -5,7 +5,6 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using MustHave.Utils;
 #if WEBP
 using WebP;
 #endif
@@ -49,7 +48,7 @@ namespace MustHave.UI
                 switch (format)
                 {
                     case ImageDownloadFormat.PNG_JPG:
-                        Utils.ImageDownloader.DownloadIntoOrLoadFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
+                        MustHave.ImageDownloader.DownloadIntoOrLoadFromFolder(appDataFolderName, Canvas, imageURL, image, onEnd);
                         break;
 #if WEBP
                     case ImageDownloadFormat.WebP:

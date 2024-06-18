@@ -2,7 +2,6 @@
 //#define USE_EDITOR_SCENE_EVENTS
 #endif
 
-using MustHave.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -192,8 +191,8 @@ namespace MustHave
             textureSize.y = thisCamera.pixelHeight;
 
             shader.GetKernelThreadGroupSizes(mainKernelID, out uint x, out uint y, out _);
-            threadGroups.x = Utils.ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
-            threadGroups.y = Utils.ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
+            threadGroups.x = ShaderUtils.GetThreadGroupsCount(x, textureSize.x);
+            threadGroups.y = ShaderUtils.GetThreadGroupsCount(y, textureSize.y);
 
             CreateTexture(ref outputTexture);
             CreateTexture(ref sourceTexture);

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct WWWUtils
     {

@@ -1,5 +1,4 @@
-﻿using MustHave.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MustHave
 {

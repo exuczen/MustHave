@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public static class DropdownExtensionMethods
     {

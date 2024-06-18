@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public static class StringExtensionMethods
     {

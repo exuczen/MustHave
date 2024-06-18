@@ -1,4 +1,4 @@
-﻿namespace MustHave.Utils
+﻿namespace MustHave
 {
     public struct AudioUtils
     {

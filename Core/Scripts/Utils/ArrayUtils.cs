@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct ArrayUtils
     {

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MustHave.Utils;
 using MustHave.UI;
 
 namespace MustHave.Tweeners
@@ -25,7 +24,7 @@ namespace MustHave.Tweeners
 
         private void Awake()
         {
-            List<AudioSource> audioSourceList = new List<AudioSource>();
+            List<AudioSource> audioSourceList = new();
             GetComponents<AudioSource>(audioSourceList);
             audioSource = audioSourceList.Find(source => source.clip == null);
             if (audioSource)

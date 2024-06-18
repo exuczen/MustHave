@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public static class ScrollRectExtensionMethods
     {

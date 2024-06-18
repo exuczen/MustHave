@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct FileUtils
     {

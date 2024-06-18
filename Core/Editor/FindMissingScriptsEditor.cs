@@ -5,7 +5,7 @@ using UnityEditor.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using MustHave.Utils;
+using MustHave;
 #if MUSTHAVE_SHOW_TOOLS
 using MenuItem = UnityEditor.MenuItem;
 #else

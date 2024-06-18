@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public static class MonoBehaviourExtensionMethods
     {

@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-using MustHave.UI;
-using MustHave.Utils;
 
 namespace MustHave.UI
 {
@@ -25,7 +23,7 @@ namespace MustHave.UI
         [SerializeField, ConditionalHide("selectedOnEnable", true)]
         protected int selectedOnEnableIndex = 0;
 
-        protected List<T> buttons = new List<T>();
+        protected List<T> buttons = new();
         protected T selectedButton = null;
 
         private DeprecatedObjectPool<T> buttonPool = null;

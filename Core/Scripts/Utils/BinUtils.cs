@@ -4,7 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using UnityEngine;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public readonly struct BinUtils
     {

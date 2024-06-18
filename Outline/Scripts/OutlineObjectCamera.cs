@@ -1,6 +1,4 @@
-﻿using MustHave.Utils;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -228,7 +226,7 @@ namespace MustHave
                     var cameraData = camera.GetOrAddHDAdditionalCameraData();
 
                     cameraData.clearColorMode = ClearColorMode.Color;
-                    cameraData.backgroundColorHDR = Utils.ColorUtils.ColorWithAlpha(cameraData.backgroundColorHDR, 0f);
+                    cameraData.backgroundColorHDR = ColorUtils.ColorWithAlpha(cameraData.backgroundColorHDR, 0f);
                     cameraData.volumeLayerMask = 0;
                     cameraData.probeLayerMask = 0;
                 }
@@ -439,7 +437,7 @@ namespace MustHave
             var scaleXY = scale * Vector2.one;
             float minDepth = objectsCount > 0 ? 1f / objectsCount : 0f;
 
-            var getColor = Utils.ColorUtils.GetColorFromColorSpaceFunc(colorSpace);
+            var getColor = ColorUtils.GetColorFromColorSpaceFunc(colorSpace);
 
             // At this point objects are sorted by distance from camera
             int j = 0;

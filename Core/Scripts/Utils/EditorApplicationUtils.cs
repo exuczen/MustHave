@@ -3,7 +3,7 @@
 using UnityEditor;
 #endif
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct EditorApplicationUtils
     {

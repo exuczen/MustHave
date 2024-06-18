@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MustHave.Utils
+namespace MustHave
 {
     public struct MeshUtils
     {
