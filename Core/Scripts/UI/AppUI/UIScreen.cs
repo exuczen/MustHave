@@ -37,7 +37,7 @@ namespace MustHave.UI
 
         protected override void OnEnable()
         {
-            if (EditorApplicationUtils.IsInEditMode && CanvasScaler)
+            if (!Application.isPlaying && CanvasScaler)
             {
                 CanvasScaler.matchWidthOrHeight = canvasMatchAspectRatio;
             }

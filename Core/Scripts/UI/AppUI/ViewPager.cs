@@ -45,7 +45,7 @@ namespace MustHave.UI
 
         protected override void OnEnable()
         {
-            if (EditorApplicationUtils.IsInEditMode)
+            if (!Application.isPlaying)
             {
                 OnRectTransformDimensionsChange();
             }
