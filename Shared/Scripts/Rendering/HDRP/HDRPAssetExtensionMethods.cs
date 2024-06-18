@@ -15,7 +15,8 @@ namespace MustHave
         {
             var settings = asset.currentPlatformRenderPipelineSettings;
             modify(ref settings);
-            HDRPAssetInfo.m_RenderPipelineSettings.SetValue(asset, settings);
+            HDRPAssetInfo.m_RenderPipelineSettings?.SetValue(asset, settings);
+            //asset.SetFieldValue("m_RenderPipelineSettings", settings);
 #if UNITY_EDITOR
             AssetUtils.SaveAsset(asset);
 #endif
