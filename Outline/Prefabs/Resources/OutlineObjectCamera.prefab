@@ -96,6 +96,7 @@ MonoBehaviour:
   circleSpriteMaterial: {fileID: 2100000, guid: 11918368331216c4384cdb79fd7f52c0,
     type: 2}
   quadMeshFilter: {fileID: 8163909569428046519}
+  shapeCamera: {fileID: 8163909568474950640}
   circleCamera: {fileID: 8163909569494346248}
   colorSpace: -1
   layerAdded: 0

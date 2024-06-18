@@ -44,7 +44,7 @@ namespace MustHave
 
         [SerializeField]
         protected ComputeShader shader = null;
-        [SerializeField]
+        [SerializeField, HideInInspector]
         protected RenderPipelineType pipelineType = RenderPipelineType.Default;
 #if UNITY_PIPELINE_URP
         [SerializeField]

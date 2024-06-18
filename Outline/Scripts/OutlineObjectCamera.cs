@@ -55,6 +55,8 @@ namespace MustHave
         [SerializeField]
         private MeshFilter quadMeshFilter = null;
         [SerializeField]
+        private Camera shapeCamera = null;
+        [SerializeField]
         private Camera circleCamera = null;
         [SerializeField, HideInInspector]
         private ColorSpace colorSpace = ColorSpace.Uninitialized;
@@ -62,8 +64,6 @@ namespace MustHave
         [SerializeField]
         private bool layerAdded = false;
 #endif
-
-        private Camera shapeCamera = null;
 
         private RenderTexture shapeTexture = null;
         private RenderTexture circleTexture = null;
@@ -152,7 +152,6 @@ namespace MustHave
             }
 #endif
             var parentCamera = outlineCamera.Camera;
-            shapeCamera = GetComponent<Camera>();
 
             if (copySettings)
             {
@@ -203,10 +202,6 @@ namespace MustHave
 
         public void SetupCameraAdditionalData(RenderPipelineType pipelineType)
         {
-            if (!shapeCamera)
-            {
-                shapeCamera = GetComponent<Camera>();
-            }
             SetupCameraAdditionalData(shapeCamera, pipelineType);
             SetupCameraAdditionalData(circleCamera, pipelineType);
         }
