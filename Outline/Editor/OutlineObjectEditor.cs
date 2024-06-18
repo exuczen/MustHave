@@ -10,26 +10,30 @@ namespace MustHave
         {
             base.OnInspectorGUI();
 
-            var outlineCamera = IOutlineCameraSingleton.Instance;
-            if (outlineCamera)
+            var outlineObject = target as OutlineObject;
+            if (outlineObject.enabled)
             {
-                EditorGUI.BeginChangeCheck();
-
-                int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, OutlineCamera.LineMaxThickness);
-
-                if (EditorGUI.EndChangeCheck())
+                var outlineCamera = IOutlineCameraSingleton.Instance;
+                if (outlineCamera)
                 {
-                    Undo.RecordObject(outlineCamera, outlineCamera.name);
+                    EditorGUI.BeginChangeCheck();
 
-                    outlineCamera.LineThickness = lineThickness;
+                    int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, OutlineCamera.LineMaxThickness);
 
-                    var serializedCamera = new SerializedObject(outlineCamera);
-                    serializedCamera.ApplyModifiedProperties();
-
-                    if (!EditorApplication.isPlaying)
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        EditorUtils.SetSceneOrObjectDirty(outlineCamera);
-                        EditorApplication.QueuePlayerLoopUpdate();
+                        Undo.RecordObject(outlineCamera, outlineCamera.name);
+
+                        outlineCamera.LineThickness = lineThickness;
+
+                        var serializedCamera = new SerializedObject(outlineCamera);
+                        serializedCamera.ApplyModifiedProperties();
+
+                        if (!EditorApplication.isPlaying)
+                        {
+                            EditorUtils.SetSceneOrObjectDirty(outlineCamera);
+                            EditorApplication.QueuePlayerLoopUpdate();
+                        }
                     }
                 }
             }

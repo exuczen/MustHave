@@ -4,6 +4,7 @@ using UnityEngine;
 namespace MustHave
 {
     [ExecuteInEditMode]
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Camera))]
     public class CameraChangeListener : MonoBehaviour
     {

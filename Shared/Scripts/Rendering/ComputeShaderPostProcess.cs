@@ -111,10 +111,7 @@ namespace MustHave
                 Debug.LogError($"{GetType().Name}.Init: No shader.");
                 return;
             }
-            thisCamera = GetComponent<Camera>();
-            cameraChangeListener = GetComponent<CameraChangeListener>();
-
-            if (!thisCamera)
+            if (!TryGetComponent(out thisCamera))
             {
                 Debug.LogError($"{GetType().Name}.Init: Object has no Camera.");
                 return;
@@ -124,7 +121,7 @@ namespace MustHave
                 Debug.LogError($"{GetType().Name}.Init: Invalid camera pixel size: ({thisCamera.pixelWidth}, {thisCamera.pixelHeight}) OR aspect: {thisCamera.aspect}");
                 return;
             }
-            if (!cameraChangeListener)
+            if (!TryGetComponent(out cameraChangeListener))
             {
                 cameraChangeListener = gameObject.AddComponent<CameraChangeListener>();
             }
