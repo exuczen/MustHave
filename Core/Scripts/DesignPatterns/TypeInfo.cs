@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace MustHave
 {
-    public class TypeInfo<T>
+    public abstract class TypeInfo<T>
     {
         public const BindingFlags InternalFieldFlags = BindingFlags.Instance | BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic;
 

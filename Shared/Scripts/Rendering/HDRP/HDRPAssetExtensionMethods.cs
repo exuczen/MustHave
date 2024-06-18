@@ -4,7 +4,7 @@ using UnityEngine.Rendering.HighDefinition;
 
 namespace MustHave
 {
-    public class HDRPAssetInfo : TypeInfo<HDRenderPipelineAsset>
+    public abstract class HDRPAssetInfo : TypeInfo<HDRenderPipelineAsset>
     {
         public static readonly FieldInfo m_RenderPipelineSettings = GetFieldInfo("m_RenderPipelineSettings");
     }
