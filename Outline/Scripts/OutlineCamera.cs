@@ -120,7 +120,12 @@ namespace MustHave
 
                 if (initialized && !Application.isPlaying)
                 {
-                    EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => objectCamera.SetGameObjectActive(true));
+                    EditorApplicationUtils.AddSingleActionOnEditorUpdate(() => {
+                        if (objectCamera)
+                        {
+                            objectCamera.SetGameObjectActive(true);
+                        }
+                    });
                 }
             }
             else

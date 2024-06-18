@@ -46,6 +46,7 @@ Core/Scripts/Camera/CameraExtensionMethods.cs.meta
 Core/Scripts/Camera/CameraUtils.cs.meta
 Core/Scripts/Camera/ProjectionExtensionMethods.cs.meta
 Core/Scripts/DateTime/UDateTime.cs.meta
+Core/Scripts/DesignPatterns/Delegates.cs.meta
 Core/Scripts/MessageSystem/ActionMessageEvent.cs.meta
 Core/Scripts/MessageSystem/BoolMessageEvent.cs.meta
 Core/Scripts/MessageSystem/DataMessageEvent.cs.meta
@@ -68,6 +69,7 @@ Core/Scripts/UnityUtils/UnityUtils.cs.meta
 Core/Scripts/UnityUtils/AssetUtils.cs.meta
 Shared/Scripts/Rendering/RenderPipelineType.cs.meta
 Shared/Scripts/Rendering/RenderUtils.cs.meta
+Shared/Scripts/Rendering/HDRP/HDRPAssetConfiguration.cs.meta
 Shared/Scripts/Rendering/URP/RenderPassSettings.cs.meta
 Shared/Scripts/Rendering/URP/ComputeShaderRenderPass.cs.meta
 Shared/Scripts/Rendering/ScriptableRenderContextExtensionMethods.cs.meta

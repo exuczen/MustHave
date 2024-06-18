@@ -87,8 +87,9 @@ namespace MustHave
                 var colorBufferFormat = hdrp.currentPlatformRenderPipelineSettings.colorBufferFormat;
                 if (colorBufferFormat != ColorBufferFormat.R16G16B16A16)
                 {
-                    //TODO: change hdrp asset's colorBufferFormat to ColorBufferFormat.R16G16B16A16;
-                    //hdrp.currentPlatformRenderPipelineSettings.colorBufferFormat = ColorBufferFormat.R16G16B16A16;
+                    hdrp.ModifySettings((ref RenderPipelineSettings settings) => {
+                        settings.colorBufferFormat = ColorBufferFormat.R16G16B16A16;
+                    });
                 }
             }
 #endif
@@ -132,6 +133,8 @@ namespace MustHave
 
             ReleaseTextures();
             CreateTextures();
+
+            pipelineType = RenderUtils.GetRenderPipelineType();
 
 #if UNITY_PIPELINE_URP
             if (PipelineType == RenderPipelineType.URP)
