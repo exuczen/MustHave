@@ -1,10 +1,9 @@
-﻿using System;
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
+using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-#endif
 
 namespace MustHave
 {
@@ -12,7 +11,6 @@ namespace MustHave
     {
         public static Action<bool> UnityEditorFocusChanged
         {
-#if UNITY_EDITOR
             get
             {
                 var fieldInfo = typeof(EditorApplication).GetField("focusChanged", BindingFlags.Static | BindingFlags.NonPublic);
@@ -23,14 +21,10 @@ namespace MustHave
                 var fieldInfo = typeof(EditorApplication).GetField("focusChanged", BindingFlags.Static | BindingFlags.NonPublic);
                 fieldInfo.SetValue(null, value);
             }
-#else
-            get; set;
-#endif
         }
 
         public static bool AddLayer(string layerName, out bool exists)
         {
-#if UNITY_EDITOR
             //for (int i = 0; i < InternalEditorUtility.layers.Length; i++)
             //{
             //    Debug.Log($"AddLayer: Layer[{i}]: {InternalEditorUtility.layers[i]}");
@@ -80,22 +74,15 @@ namespace MustHave
 
                 return true;
             }
-#else
-            exists = false;
-            return false;
-#endif
         }
 
         public static string[] GetSortingLayerNames()
         {
-#if UNITY_EDITOR
             Type internalEditorUtilityType = typeof(InternalEditorUtility);
             PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
             var sortingLayers = (string[])sortingLayersProperty.GetValue(null, new object[0]);
             return sortingLayers;
-#else
-            return new string[0];
-#endif
         }
     }
 }
+#endif

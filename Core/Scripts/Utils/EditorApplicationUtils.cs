@@ -15,9 +15,9 @@ namespace MustHave.Utils
         public static bool IsInEditMode => false;
 #endif
 
+#if UNITY_EDITOR
         public static void AddSingleActionOnEditorUpdate(Action action)
         {
-#if UNITY_EDITOR
             void actionOnUpdate()
             {
                 EditorApplication.update -= actionOnUpdate;
@@ -25,7 +25,7 @@ namespace MustHave.Utils
             }
             EditorApplication.update += actionOnUpdate;
             EditorApplication.QueuePlayerLoopUpdate();
-#endif
         }
+#endif
     }
 }
