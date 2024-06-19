@@ -16,8 +16,7 @@ namespace MustHave
             public static readonly int MinDepthID = Shader.PropertyToID("_MinDepth");
         }
 
-        public Color32 Color32 { get => color; set => color = value; }
-        public Color Color { get => color; set => color = value; }
+        public Color ColorWithDepth { get; private set; } = Color.white;
         public float Depth { get; set; }
         public float CameraDistanceSqr => cameraDistanceSqr;
 
@@ -40,7 +39,7 @@ namespace MustHave
 
         public void SetupRenderers(Material material, int layer, float minDepth)
         {
-            material.SetColor(ShaderData.ColorID, Color);
+            material.SetColor(ShaderData.ColorID, ColorWithDepth);
             material.SetFloat(ShaderData.DepthID, Depth);
             material.SetFloat(ShaderData.MinDepthID, minDepth);
 
@@ -53,7 +52,7 @@ namespace MustHave
         public void SetColorWithDepth(float depth, float minDepth)
         {
             Depth = depth;
-            Color = GetColorWithAlphaDepth(depth, minDepth);
+            ColorWithDepth = GetColorWithAlphaDepth(depth, minDepth);
         }
 
         public void DrawBBoxGizmo()
@@ -62,7 +61,7 @@ namespace MustHave
             {
                 var bounds = data.Renderer.bounds;
                 Gizmos.matrix = Matrix4x4.identity;
-                Gizmos.color = new Color(color.r, color.g, color.b, 0.5f);
+                Gizmos.color = ColorUtils.ColorWithAlpha(color, 0.5f);
                 Gizmos.DrawCube(bounds.center, bounds.size);
                 Gizmos.color = Color.green;
                 Gizmos.DrawWireCube(bounds.center, bounds.size);
@@ -87,9 +86,8 @@ namespace MustHave
 
         private Color GetColorWithAlphaDepth(float depth, float minDepth)
         {
-            var color = Color;
-            color.a = Mathf.Clamp01(1f - depth + minDepth);
-            return color;
+            float alpha = Mathf.Clamp01(1f - depth + minDepth);
+            return ColorUtils.ColorWithAlpha(color, alpha);
         }
 
         private void OnEnable()

@@ -444,7 +444,7 @@ namespace MustHave
             for (int i = objectsCount - 1; i >= 0; i--)
             {
                 var obj = objects[i];
-                var color = getColor(obj.Color);
+                var color = getColor(obj.ColorWithDepth);
                 float depth = obj.Depth;
 
                 obj.ForEachRendererData(data => {
