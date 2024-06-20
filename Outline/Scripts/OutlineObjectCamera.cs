@@ -80,7 +80,6 @@ namespace MustHave
 
         private struct InstanceData
         {
-            public Matrix4x4 objectToWorld;
             public Vector3 clipPosition;
             public Vector4 color;
             public Vector2 scale;
@@ -507,7 +506,6 @@ namespace MustHave
             //Debug.Log($"{GetType().Name}.{i} | {data.CameraDistanceSqr} | {clipPoint.z}");
             circleInstanceData[i] = new InstanceData()
             {
-                objectToWorld = Matrix4x4.identity,
                 clipPosition = clipPoint,
                 color = color,
                 scale = scale

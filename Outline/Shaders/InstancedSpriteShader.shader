@@ -20,6 +20,7 @@
 		
 			CGPROGRAM
 			#pragma multi_compile_instancing
+			#pragma shader_feature INSTANCE_DATA_VARIANT INSTANCE_MATRIX_VARIANT
 
 			#pragma vertex vert
 			#pragma fragment frag
@@ -32,7 +33,6 @@
 
 			struct InstanceData
 			{
-				matrix objectToWorld;
 				float3 clipPosition;
 				float4 color;
 				float2 scale;
@@ -41,6 +41,8 @@
 			static const float ScreenAspect = _ScreenParams.y / _ScreenParams.x;
 
 			StructuredBuffer<InstanceData> _InstanceBuffer;
+
+			StructuredBuffer<float4> _ColorBuffer;
 
 			sampler2D _MainTex;
 
@@ -59,13 +61,17 @@
 				float4 color : COLOR;
 				float2 uv : TEXCOORD0;
 			};
-		
+
 			v2f vert(appdata v, uint vertexID: SV_VertexID, uint instanceID : SV_InstanceID)
 			{
+				UNITY_SETUP_INSTANCE_ID(v);
+
 				//InitIndirectDrawArgs(0);
 				//instanceID = GetIndirectInstanceID(instanceID);
 
 				v2f o; //= (v2f)0;
+
+				#ifdef INSTANCE_DATA_VARIANT
 
 				InstanceData instance = _InstanceBuffer[instanceID];
 				float3 iClipPos = instance.clipPosition;
@@ -87,10 +93,18 @@
 				xy.x *= ScreenAspect;
 
 				/* UnityObjectToClipPos must be called and used for Graphics.RenderMeshInstanced to work */
-				float4 clipPos = UnityObjectToClipPos(v.vertex);
+                float4 clipPos = UnityObjectToClipPos(v.vertex);
 
 				o.position = float4(iClipPos.xy + xy * iScale, iClipPos.z, clipPos.w);
 				o.color =  instance.color;
+
+				#elif defined (INSTANCE_MATRIX_VARIANT)
+				{
+					o.position = UnityObjectToClipPos(v.vertex);
+					o.color =  _ColorBuffer[instanceID];
+				}
+				#endif
+
 				o.uv = v.texcoord;
 
 				return o;
