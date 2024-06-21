@@ -471,14 +471,6 @@ namespace MustHave
             int count = j;
             if (count > 0)
             {
-                if (CircleShaderVariant == CircleShaderVariant.INSTANCE_DATA_VARIANT)
-                {
-                    circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
-                }
-                else if (CircleShaderVariant == CircleShaderVariant.INSTANCE_MATRIX_VARIANT)
-                {
-                    circleColorBuffer.SetData(circleColor, 0, 0, count);
-                }
                 circleRenderParams.material.SetFloat("_MinDepth", minDepth);
                 circleRenderParams.worldBounds = new Bounds(circlesCamTransform.position, Vector3.one);
 
@@ -486,22 +478,40 @@ namespace MustHave
                 //circleCommandData[0].instanceCount = (uint)count;
                 //circleCommandBuffer.SetData(circleCommandData);
 
-                if (cmd != null)
+                if (CircleShaderVariant == CircleShaderVariant.INSTANCE_DATA_VARIANT)
                 {
-                    cmd.ClearRenderTarget(true, true, Color.clear);
+                    circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
 
-                    cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleObjectToWorld, count, circlePropertyBlock);
-                    //cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
-                    //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
+                    if (cmd != null)
+                    {
+                        cmd.ClearRenderTarget(true, true, Color.clear);
+
+                        cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
+                        //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
+                    }
+                    else
+                    {
+                        Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
+                        //Graphics.RenderMeshIndirect(circleRenderParams, quadMeshFilter.sharedMesh, circleCommandBuffer);
+                        //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
+                        //    circleRenderParams.worldBounds, count, circlePropertyBlock,
+                        //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+                    }
                 }
-                else
+                else if (CircleShaderVariant == CircleShaderVariant.INSTANCE_MATRIX_VARIANT)
                 {
-                    Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleObjectToWorld, count);
-                    //Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
-                    //Graphics.RenderMeshIndirect(circleRenderParams, quadMeshFilter.sharedMesh, circleCommandBuffer);
-                    //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
-                    //    circleRenderParams.worldBounds, count, circlePropertyBlock,
-                    //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
+                    circleColorBuffer.SetData(circleColor, 0, 0, count);
+
+                    if (cmd != null)
+                    {
+                        cmd.ClearRenderTarget(true, true, Color.clear);
+
+                        cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleObjectToWorld, count, circlePropertyBlock);
+                    }
+                    else
+                    {
+                        Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleObjectToWorld, count);
+                    }
                 }
             }
         }

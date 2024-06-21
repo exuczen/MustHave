@@ -19,8 +19,13 @@ namespace MustHave
         public int LineThickness
         {
             get => lineThickness;
-            set => lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
+            set
+            {
+                lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
+                ScaledLineThickness = Mathf.Max(1, (int)(0.5f + thisCamera.pixelHeight * value / (7f * LineMaxThickness)));
+            }
         }
+        public int ScaledLineThickness { get; private set; }
 
         public OutlineShaderSettings ShaderSettings => objectCamera ? objectCamera.ShaderSettings : null;
         public bool ShaderSettingsExpanded { get => shaderSettingsExpanded; set => shaderSettingsExpanded = value; }
@@ -146,15 +151,15 @@ namespace MustHave
 
         protected override void OnValidate()
         {
-            if (objectCamera && initialized)
+            if (initialized)
             {
-                objectCamera.Setup(this, false);
+                SetupOnCameraChange(false);
             }
         }
 
         protected override void OnInit()
         {
-            objectCamera.Setup(this);
+            SetupOnCameraChange();
 
             if (SceneUtils.IsActiveSceneLoadedAndValid())
             {
@@ -189,12 +194,12 @@ namespace MustHave
 
         protected override void OnCameraPropertyChange()
         {
-            objectCamera.Setup(this);
+            SetupOnCameraChange();
         }
 
         protected override void OnScreenSizeChange()
         {
-            objectCamera.Setup(this);
+            SetupOnCameraChange();
         }
 
         protected override void SetupOnRenderImage()
@@ -212,9 +217,9 @@ namespace MustHave
 
             if (PipelineType != RenderPipelineType.HDRP)
             {
-                objectCamera.RenderCircles(LineThickness);
+                objectCamera.RenderCircles(ScaledLineThickness);
             }
-            shader.SetInt(ShaderData.LineThicknessID, lineThickness);
+            shader.SetInt(ShaderData.LineThicknessID, ScaledLineThickness);
         }
 
         protected override void OnDestroy()
@@ -229,6 +234,16 @@ namespace MustHave
 
             ObjectUtils.DestroyGameObject(ref objectCamera);
             ObjectUtils.DestroyComponent(ref cameraChangeListener);
+        }
+
+        private void SetupOnCameraChange(bool copySettings = true)
+        {
+            LineThickness = lineThickness;
+
+            if (objectCamera)
+            {
+                objectCamera.Setup(this, copySettings);
+            }
         }
 
         private Vector2Int GetShapeTexSize(out Vector2Int shapeTexOffset)
@@ -259,8 +274,6 @@ namespace MustHave
             return extendedSize;
         }
 
-
-
         protected override void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
             if (objectCamera)
@@ -287,7 +300,7 @@ namespace MustHave
                 else if (camera == objectCamera.CircleCamera && PipelineType == RenderPipelineType.HDRP)
                 {
                     context.ExecuteCommandBuffer(cmd => {
-                        objectCamera.RenderCircles(LineThickness, cmd);
+                        objectCamera.RenderCircles(ScaledLineThickness, cmd);
                     });
                 }
                 else
