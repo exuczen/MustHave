@@ -20,13 +20,13 @@ namespace MustHave
             INSTANCE_MATRIX_VARIANT
         }
 
-        public ComputeShader Shader => shader;
+        public ComputeShader ComputeShader => computeShader;
         public bool DebugEnabled { get => debugEnabled; set => debugEnabled = value; }
         public DebugMode ShaderDebugMode => debugMode;
         public CircleShaderVariant CirclesShaderVariant => circleShaderVariant;
 
         [SerializeField]
-        private ComputeShader shader = null;
+        private ComputeShader computeShader = null;
         [SerializeField]
         private bool debugEnabled = false;
         [SerializeField]
@@ -61,7 +61,7 @@ namespace MustHave
 
         public void SetDebugMode(DebugMode debugMode)
         {
-            if (!shader)
+            if (!computeShader)
             {
                 return;
             }
@@ -70,7 +70,7 @@ namespace MustHave
                 debugMode = DebugMode.DEBUG_NONE;
             }
             //var prevKeyword = new LocalKeyword(shader, this.debugMode.ToString());
-            var keyword = new LocalKeyword(shader, debugMode.ToString());
+            var keyword = new LocalKeyword(computeShader, debugMode.ToString());
 
             /* Disabled keyword validity check on purpose - there are scenarios, where skipping 
              * invalid keyword causes missing kernel errors after shader recompilation.
@@ -88,14 +88,14 @@ namespace MustHave
             //    }
             //    return;
             //}
-            if (this.debugMode == debugMode && shader.IsKeywordEnabled(keyword))
+            if (this.debugMode == debugMode && computeShader.IsKeywordEnabled(keyword))
             {
                 return;
             }
-            shader.DisableKeyword(this.debugMode.ToString());
+            computeShader.DisableKeyword(this.debugMode.ToString());
             this.debugMode = debugMode;
             debugModeOnInit = Application.isPlaying ? debugModeOnInit : debugMode;
-            shader.EnableKeyword(debugMode.ToString());
+            computeShader.EnableKeyword(debugMode.ToString());
         }
 
         public void SetCircleShaderVariant()

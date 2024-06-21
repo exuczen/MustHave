@@ -36,7 +36,7 @@ namespace MustHave
             }
         }
 
-        public ComputeShader ComputeShader => shaderSettings.Shader;
+        public ComputeShader ComputeShader => shaderSettings.ComputeShader;
         public CircleShaderVariant CircleShaderVariant => shaderSettings.CirclesShaderVariant;
         public OutlineShaderSettings ShaderSettings => shaderSettings;
         public RenderTexture ShapeTexture => shapeTexture;

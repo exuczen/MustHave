@@ -8,12 +8,12 @@ namespace MustHave
     {
         private const string UndoNotRecordedTooltipMessage = "Shader settings changes are not Undo recorded due to ComputeShader keyword errors on Undo.";
 
-        private SerializedProperty shaderProperty;
+        private SerializedProperty computeShaderProperty;
         private SerializedProperty circleSpriteMaterialProperty;
 
         private void OnEnable()
         {
-            shaderProperty = serializedObject.FindProperty("shader");
+            computeShaderProperty = serializedObject.FindProperty("computeShader");
             circleSpriteMaterialProperty = serializedObject.FindProperty("circleSpriteMaterial");
         }
 
@@ -29,7 +29,7 @@ namespace MustHave
 
             if (showShader)
             {
-                EditorGUILayout.PropertyField(shaderProperty);
+                EditorGUILayout.PropertyField(computeShaderProperty);
             }
             settings.DebugEnabled = EditorGUILayout.Toggle(new GUIContent("Debug Shader", UndoNotRecordedTooltipMessage), settings.DebugEnabled);
 
