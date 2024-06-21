@@ -14,9 +14,16 @@ namespace MustHave
             DEBUG_DEPTH
         }
 
+        public enum CircleShaderVariant
+        {
+            INSTANCE_DATA_VARIANT,
+            INSTANCE_MATRIX_VARIANT
+        }
+
         public ComputeShader Shader => shader;
         public bool DebugEnabled { get => debugEnabled; set => debugEnabled = value; }
         public DebugMode ShaderDebugMode => debugMode;
+        public CircleShaderVariant CirclesShaderVariant => circleShaderVariant;
 
         [SerializeField]
         private ComputeShader shader = null;
@@ -28,6 +35,10 @@ namespace MustHave
         private DebugMode debugMode = default;
         [SerializeField]
         private DebugMode debugModeOnInit = default;
+        [SerializeField]
+        private Material circleSpriteMaterial = null;
+        [SerializeField]
+        private CircleShaderVariant circleShaderVariant = CircleShaderVariant.INSTANCE_MATRIX_VARIANT;
 
         public void SetDebugModeOnInit()
         {
@@ -85,6 +96,22 @@ namespace MustHave
             this.debugMode = debugMode;
             debugModeOnInit = Application.isPlaying ? debugModeOnInit : debugMode;
             shader.EnableKeyword(debugMode.ToString());
+        }
+
+        public void SetCircleShaderVariant()
+        {
+            SetCircleShaderVariant(circleShaderVariant);
+        }
+
+        public void SetCircleShaderVariant(CircleShaderVariant variant)
+        {
+            if (circleShaderVariant == variant && circleSpriteMaterial.IsKeywordEnabled(variant.ToString()))
+            {
+                return;
+            }
+            circleSpriteMaterial.DisableKeyword(circleShaderVariant.ToString());
+            circleShaderVariant = variant;
+            circleSpriteMaterial.EnableKeyword(circleShaderVariant.ToString());
         }
     }
 }

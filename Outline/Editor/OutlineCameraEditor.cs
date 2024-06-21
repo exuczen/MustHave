@@ -34,7 +34,7 @@ namespace MustHave
                     EditorGUI.indentLevel++;
 
                     EditorGUILayout.ObjectField("Shader Settings", outlineCamera.ShaderSettings, typeof(OutlineShaderSettings), true);
-                    shaderSettingsEditor.OnInspectorGUI(false, out _);
+                    shaderSettingsEditor.OnInspectorGUI(false);
 
                     EditorGUI.indentLevel--;
                 }

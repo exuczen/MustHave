@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using UnityEngine.Rendering;
+using CircleShaderVariant = MustHave.OutlineShaderSettings.CircleShaderVariant;
 #if UNITY_PIPELINE_HDRP
 using static UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData;
 using UnityEngine.Rendering.HighDefinition;
@@ -36,6 +37,7 @@ namespace MustHave
         }
 
         public ComputeShader ComputeShader => shaderSettings.Shader;
+        public CircleShaderVariant CircleShaderVariant => shaderSettings.CirclesShaderVariant;
         public OutlineShaderSettings ShaderSettings => shaderSettings;
         public RenderTexture ShapeTexture => shapeTexture;
         public RenderTexture CircleTexture => circleTexture;
@@ -69,14 +71,16 @@ namespace MustHave
         private readonly List<OutlineObject> objects = new();
 
         private readonly InstanceData[] circleInstanceData = new InstanceData[RenderersCapacity];
+        private readonly Matrix4x4[] circleObjectToWorld = new Matrix4x4[RenderersCapacity];
+        private readonly Color[] circleColor = new Color[RenderersCapacity];
         private readonly Material[] shapeMaterials = new Material[RenderersCapacity];
 
         private GraphicsBuffer circleInstanceBuffer = null;
+        private GraphicsBuffer circleColorBuffer = null;
         private MaterialPropertyBlock circlePropertyBlock = null;
         private RenderParams circleRenderParams = default;
         //private GraphicsBuffer circleCommandBuffer = null;
         //private IndirectDrawIndexedArgs[] circleCommandData = null;
-        //private Matrix4x4[] circleMatrices = null;
 
         private struct InstanceData
         {
@@ -111,6 +115,8 @@ namespace MustHave
 
             circleInstanceBuffer?.Release();
             circleInstanceBuffer = null;
+            circleColorBuffer?.Release();
+            circleColorBuffer = null;
             //circleCommandBuffer?.Release();
             //circleCommandBuffer = null;
         }
@@ -318,8 +324,11 @@ namespace MustHave
         {
             circleInstanceBuffer?.Release();
             circleInstanceBuffer = new GraphicsBuffer(Target.Structured, circleInstanceData.Length, Marshal.SizeOf<InstanceData>());
+            circleColorBuffer?.Release();
+            circleColorBuffer = new GraphicsBuffer(Target.Structured, circleColor.Length, Marshal.SizeOf<Color>());
             circlePropertyBlock = new MaterialPropertyBlock();
             circlePropertyBlock.SetBuffer("_InstanceBuffer", circleInstanceBuffer);
+            circlePropertyBlock.SetBuffer("_ColorBuffer", circleColorBuffer);
             circleRenderParams = new RenderParams(circleSpriteMaterial)
             {
                 camera = circleCamera,
@@ -330,7 +339,8 @@ namespace MustHave
             };
             //circleCommandBuffer = new GraphicsBuffer(Target.IndirectArguments, 1, IndirectDrawIndexedArgs.size);
             //circleCommandData = new IndirectDrawIndexedArgs[1];
-            //circleMatrices = new Matrix4x4[RenderersCapacity];
+
+            shaderSettings.SetCircleShaderVariant();
         }
 
         private RenderTexture CreateTexture(Vector2Int size, string name = "")
@@ -432,9 +442,14 @@ namespace MustHave
             }
             var circlesCamTransform = circleCamera.transform;
 
-            float scale = 2f * (radius + 1) / circleCamera.pixelHeight;
-            var scaleXY = scale * Vector2.one;
+            float normScale = 2f * Mathf.Max(1, radius + 1) / circleCamera.pixelHeight;
+            float camScale = 2f * normScale * circleCamera.orthographicSize;
+            var normScaleXYZ = new Vector3(normScale, normScale, 1f);
+            var camScaleXYZ = new Vector3(camScale, camScale, 1f);
             float minDepth = objectsCount > 0 ? 1f / objectsCount : 0f;
+
+            var circleRotation = Quaternion.LookRotation(circlesCamTransform.forward, circlesCamTransform.up);
+            var scaledLookAtCamera = Matrix4x4.TRS(Vector3.zero, circleRotation, camScaleXYZ);
 
             var getColor = ColorUtils.GetColorFromColorSpaceFunc(colorSpace);
 
@@ -447,7 +462,7 @@ namespace MustHave
                 float depth = obj.Depth;
 
                 obj.ForEachRendererData(data => {
-                    if (SetCircleInstanceData(data, j, scaleXY, depth, color))
+                    if (SetCircleInstanceData(data, j, normScaleXYZ, depth, color, scaledLookAtCamera))
                     {
                         j++;
                     }
@@ -456,7 +471,14 @@ namespace MustHave
             int count = j;
             if (count > 0)
             {
-                circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
+                if (CircleShaderVariant == CircleShaderVariant.INSTANCE_DATA_VARIANT)
+                {
+                    circleInstanceBuffer.SetData(circleInstanceData, 0, 0, count);
+                }
+                else if (CircleShaderVariant == CircleShaderVariant.INSTANCE_MATRIX_VARIANT)
+                {
+                    circleColorBuffer.SetData(circleColor, 0, 0, count);
+                }
                 circleRenderParams.material.SetFloat("_MinDepth", minDepth);
                 circleRenderParams.worldBounds = new Bounds(circlesCamTransform.position, Vector3.one);
 
@@ -468,15 +490,15 @@ namespace MustHave
                 {
                     cmd.ClearRenderTarget(true, true, Color.clear);
 
-                    cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
+                    cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleObjectToWorld, count, circlePropertyBlock);
+                    //cmd.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, count, circlePropertyBlock);
                     //cmd.DrawMeshInstancedIndirect(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleCommandBuffer, 0, circlePropertyBlock);
-                    //cmd.DrawMeshInstanced(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial, 0, circleMatrices, count, circlePropertyBlock);
                 }
                 else
                 {
-                    Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
+                    Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleObjectToWorld, count);
+                    //Graphics.RenderMeshPrimitives(circleRenderParams, quadMeshFilter.sharedMesh, 0, count);
                     //Graphics.RenderMeshIndirect(circleRenderParams, quadMeshFilter.sharedMesh, circleCommandBuffer);
-                    //Graphics.RenderMeshInstanced(circleRenderParams, quadMeshFilter.sharedMesh, 0, circleInstanceData, count);
                     //Graphics.DrawMeshInstancedProcedural(quadMeshFilter.sharedMesh, 0, circleSpriteMaterial,
                     //    circleRenderParams.worldBounds, count, circlePropertyBlock,
                     //    UnityEngine.Rendering.ShadowCastingMode.Off, false, Layer.OutlineLayer, circleCamera);
@@ -484,7 +506,7 @@ namespace MustHave
             }
         }
 
-        private bool SetCircleInstanceData(RendererData data, int i, Vector2 scale, float depth, Color color)
+        private bool SetCircleInstanceData(RendererData data, int i, Vector3 scale, float depth, Color color, Matrix4x4 scaledLookAtCamera)
         {
             var renderer = data.Renderer;
             var center = renderer.bounds.center;
@@ -495,8 +517,12 @@ namespace MustHave
                 return false;
             }
             //Debug.Log($"{GetType().Name}.SetCircleInstanceData: {viewPoint}");
-            //var worldPoint = circlesCamera.ViewportToWorldPoint(viewPoint);
-            //objectToWorld.SetTRS(worldPoint, Quaternion.LookRotation(circlesCamTransform.forward, circlesCamTransform.up), Vector3.one);
+            viewPoint.z = circleCamera.nearClipPlane + depth;
+            var worldPoint = circleCamera.ViewportToWorldPoint(viewPoint);
+            var objectToWorld = scaledLookAtCamera;
+            objectToWorld.SetColumn(3, worldPoint);
+            objectToWorld.m33 = 1;
+
             var clipPoint = new Vector3()
             {
                 x = (viewPoint.x - 0.5f) * 2f,
@@ -504,6 +530,8 @@ namespace MustHave
                 z = depth
             };
             //Debug.Log($"{GetType().Name}.{i} | {data.CameraDistanceSqr} | {clipPoint.z}");
+            circleColor[i] = color;
+            circleObjectToWorld[i] = objectToWorld;
             circleInstanceData[i] = new InstanceData()
             {
                 clipPosition = clipPoint,
