@@ -72,36 +72,36 @@
 				v2f o; //= (v2f)0;
 
 				#ifdef INSTANCE_DATA_VARIANT
+				{
+					InstanceData instance = _InstanceBuffer[instanceID];
+					float3 iClipPos = instance.clipPosition;
+					float2 iScale = instance.scale;
 
-				InstanceData instance = _InstanceBuffer[instanceID];
-				float3 iClipPos = instance.clipPosition;
-				float2 iScale = instance.scale;
+					//float2 xy = v.vertex.xy * 2;
+					float2 xy = (v.texcoord - 0.5) * 2;
 
-				//float2 xy = v.vertex.xy * 2;
-				float2 xy = (v.texcoord - 0.5) * 2;
+					#if UNITY_REVERSED_Z
+					iClipPos.z = clamp(UNITY_NEAR_CLIP_VALUE - iClipPos.z + _MinDepth, -1, 1);
+					#else
+					iClipPos.z = clamp(UNITY_NEAR_CLIP_VALUE + iClipPos.z - EPSILON, -1, 1);
+					#endif
 
-				#if UNITY_REVERSED_Z
-				iClipPos.z = clamp(UNITY_NEAR_CLIP_VALUE - iClipPos.z + _MinDepth, -1, 1);
-				#else
-				iClipPos.z = clamp(UNITY_NEAR_CLIP_VALUE + iClipPos.z - EPSILON, -1, 1);
-				#endif
+					#if UNITY_UV_STARTS_AT_TOP
+					iClipPos.y *= -1;
+					xy.y *= -1;
+					#endif
+					xy.x *= ScreenAspect;
 
-				#if UNITY_UV_STARTS_AT_TOP
-				iClipPos.y *= -1;
-				xy.y *= -1;
-				#endif
-				xy.x *= ScreenAspect;
+					/* UnityObjectToClipPos must be called and used for Graphics.RenderMeshInstanced to work */
+					float4 clipPos = UnityObjectToClipPos(v.vertex);
 
-				/* UnityObjectToClipPos must be called and used for Graphics.RenderMeshInstanced to work */
-                float4 clipPos = UnityObjectToClipPos(v.vertex);
-
-				o.position = float4(iClipPos.xy + xy * iScale, iClipPos.z, clipPos.w);
-				o.color =  instance.color;
-
+					o.position = float4(iClipPos.xy + xy * iScale, iClipPos.z, clipPos.w);
+					o.color =  instance.color;
+				}
 				#elif defined (INSTANCE_MATRIX_VARIANT)
 				{
 					o.position = UnityObjectToClipPos(v.vertex);
-					o.color =  _ColorBuffer[instanceID];
+					o.color = _ColorBuffer[instanceID];
 				}
 				#endif
 
