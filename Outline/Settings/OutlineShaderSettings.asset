@@ -20,3 +20,6 @@ MonoBehaviour:
   circleSpriteMaterial: {fileID: 2100000, guid: 11918368331216c4384cdb79fd7f52c0,
     type: 2}
   circleShaderVariant: 1
+  smoothRadius: 3
+  smoothPower: 4
+  smoothWeightsPower: 4

@@ -10,11 +10,17 @@ namespace MustHave
 
         private SerializedProperty computeShaderProperty;
         private SerializedProperty circleSpriteMaterialProperty;
+        private SerializedProperty smoothRadiusProperty;
+        private SerializedProperty smoothPowerProperty;
+        private SerializedProperty smoothWeightsPowerProperty;
 
         private void OnEnable()
         {
             computeShaderProperty = serializedObject.FindProperty("computeShader");
             circleSpriteMaterialProperty = serializedObject.FindProperty("circleSpriteMaterial");
+            smoothRadiusProperty = serializedObject.FindProperty("smoothRadius");
+            smoothPowerProperty = serializedObject.FindProperty("smoothPower");
+            smoothWeightsPowerProperty = serializedObject.FindProperty("smoothWeightsPower");
         }
 
         public void OnInspectorGUI(bool showShader)
@@ -67,6 +73,22 @@ namespace MustHave
                 setDirty |= !Application.isPlaying;
             }
             bool modified = serializedObject.ApplyModifiedProperties();
+            serializedObject.Update();
+
+            EditorGUILayout.PropertyField(smoothRadiusProperty);
+            EditorGUILayout.PropertyField(smoothPowerProperty);
+            EditorGUILayout.PropertyField(smoothWeightsPowerProperty);
+
+            bool smoothModified = serializedObject.ApplyModifiedProperties();
+            if (smoothModified)
+            {
+                var outlineCamera = IOutlineCameraSingleton.Instance;
+                if (outlineCamera)
+                {
+                    outlineCamera.SetSmoothWeights(/*true*/);
+                }
+            }
+            modified |= smoothModified;
             setDirty |= modified;
 
             if (setDirty)

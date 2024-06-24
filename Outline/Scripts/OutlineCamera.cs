@@ -22,7 +22,8 @@ namespace MustHave
             set
             {
                 lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
-                ScaledLineThickness = Mathf.Max(1, (int)(0.5f + thisCamera.pixelHeight * value / (7f * LineMaxThickness)));
+                ScaledLineThickness = (int)(0.5f + thisCamera.pixelHeight * value / (7f * LineMaxThickness));
+                ScaledLineThickness = Mathf.Max(1 + ShaderSettings.SmoothRadius, ScaledLineThickness);
             }
         }
         public int ScaledLineThickness { get; private set; }
@@ -39,6 +40,9 @@ namespace MustHave
             public static readonly int ShapeTexOffsetID = Shader.PropertyToID("ShapeTexOffset");
             public static readonly int CircleTexID = Shader.PropertyToID("CircleTexture");
             public static readonly int LineThicknessID = Shader.PropertyToID("LineThickness");
+            public static readonly int SmoothWeightsID = Shader.PropertyToID("SmoothWeightsBuffer");
+            public static readonly int SmoothRadiusID = Shader.PropertyToID("SmoothRadius");
+            public static readonly int SmoothPowerID = Shader.PropertyToID("SmoothPower");
         }
 
         [SerializeField]
@@ -49,6 +53,84 @@ namespace MustHave
 
         [SerializeField, HideInInspector]
         private bool shaderSettingsExpanded = true;
+
+        private ComputeBuffer smoothWeightsBuffer = null;
+
+        private float[] smoothWeights = null;
+
+        private int mergeKernelID = -1;
+
+        public void SetSmoothWeights(bool log = false)
+        {
+            if (!ShaderSettings)
+            {
+                return;
+            }
+            // Fill weights array
+            {
+                int smoothRadius = ShaderSettings.SmoothRadius;
+                int smoothLength = (smoothRadius << 1) + 1;
+                smoothWeights = new float[smoothLength * smoothLength];
+
+                void setWeight(int dx, int dy, float weight)
+                {
+                    int xOffset = smoothRadius + dx;
+                    int yOffset = smoothRadius + dy;
+                    int index = xOffset + yOffset * smoothLength;
+                    smoothWeights[index] = weight;
+                }
+                float getWeight(int x, int y) => smoothWeights[x + y * smoothLength];
+
+                float maxRadius = Mathf.Max(1f, Mathf.Sqrt(2) * smoothRadius);
+                float minWeight = 1f / smoothLength;
+                int power = ShaderSettings.SmoothWeightsPower;
+
+                for (int dy = 0; dy <= smoothRadius; dy++)
+                {
+                    for (int dx = 0; dx <= smoothRadius; dx++)
+                    {
+                        float r = Mathf.Sqrt(dx * dx + dy * dy);
+                        float transition = Maths.GetTransitionAsymNormalized(r, maxRadius, 0.5f, power, power);
+                        float weight = 1f - transition + minWeight;
+
+                        setWeight(dx, dy, weight);
+                        setWeight(-dx, dy, weight);
+                        setWeight(dx, -dy, weight);
+                        setWeight(-dx, -dy, weight);
+                    }
+                }
+                if (log)
+                {
+                    string weightsString = "";
+                    for (int y = 0; y < smoothLength; y++)
+                    {
+                        for (int x = 0; x < smoothLength; x++)
+                        {
+                            weightsString = $"{weightsString} {getWeight(x, y):f2}";
+                        }
+                        weightsString = $"{weightsString}\n";
+                    }
+                    Debug.Log($"{GetType().Name}.SetSmoothWeghts:\n{weightsString}");
+                }
+            }
+            // Set shader data
+            {
+                if (smoothWeightsBuffer == null || smoothWeightsBuffer.count != smoothWeights.Length)
+                {
+                    smoothWeightsBuffer?.Release();
+                    smoothWeightsBuffer = new ComputeBuffer(smoothWeights.Length, sizeof(float));
+                }
+                smoothWeightsBuffer.SetData(smoothWeights);
+                shader.SetBuffer(mergeKernelID, ShaderData.SmoothWeightsID, smoothWeightsBuffer);
+
+                shader.SetInt(ShaderData.SmoothRadiusID, ShaderSettings.SmoothRadius);
+                shader.SetInt(ShaderData.SmoothPowerID, ShaderSettings.SmoothPower);
+            }
+            // Update line thickness
+            {
+                LineThickness = lineThickness;
+            }
+        }
 
         protected override void OnAwake(bool pipelineChanged)
         {
@@ -147,6 +229,8 @@ namespace MustHave
             {
                 objectCamera.SetGameObjectActive(false);
             }
+            smoothWeightsBuffer?.Release();
+            smoothWeightsBuffer = null;
         }
 
         protected override void OnValidate()
@@ -165,6 +249,14 @@ namespace MustHave
             {
                 ShaderSettings.SetDebugModeOnInit();
             }
+            SetSmoothWeights(false);
+        }
+
+        protected override void FindKernels()
+        {
+            base.FindKernels();
+
+            mergeKernelID = shader.FindKernel("Merge");
         }
 
         protected override void CreateTextures()
@@ -180,6 +272,11 @@ namespace MustHave
 
             shader.SetInts(ShaderData.ShapeTexSizeID, shapeTexSize.x, shapeTexSize.y);
             shader.SetInts(ShaderData.ShapeTexOffsetID, shapeTexOffset.x, shapeTexOffset.y);
+
+            shader.SetTexture(mergeKernelID, ShaderData.ShapeTexID, objectCamera.ShapeTexture);
+            shader.SetTexture(mergeKernelID, ShaderData.CircleTexID, objectCamera.CircleTexture);
+            shader.SetTexture(mergeKernelID, SourceTextureID, sourceTexture);
+            shader.SetTexture(mergeKernelID, OutputTextureID, outputTexture);
         }
 
         protected override void ReleaseTextures()
@@ -190,6 +287,20 @@ namespace MustHave
             {
                 objectCamera.DestroyRuntimeAssets();
             }
+        }
+
+        protected override void DispatchShader()
+        {
+            base.DispatchShader();
+
+            shader.Dispatch(mergeKernelID, threadGroups.x, threadGroups.y, 1);
+        }
+
+        protected override void DispatchShader(CommandBuffer cmd)
+        {
+            base.DispatchShader(cmd);
+
+            cmd.DispatchCompute(shader, mergeKernelID, threadGroups.x, threadGroups.y, 1);
         }
 
         protected override void OnCameraPropertyChange()

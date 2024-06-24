@@ -24,6 +24,9 @@ namespace MustHave
         public bool DebugEnabled { get => debugEnabled; set => debugEnabled = value; }
         public DebugMode ShaderDebugMode => debugMode;
         public CircleShaderVariant CirclesShaderVariant => circleShaderVariant;
+        public int SmoothRadius { get => smoothRadius; set => smoothRadius = value; }
+        public int SmoothPower{ get => smoothPower; set => smoothPower = value; }
+        public int SmoothWeightsPower { get => smoothWeightsPower; set => smoothWeightsPower = value; }
 
         [SerializeField]
         private ComputeShader computeShader = null;
@@ -39,6 +42,12 @@ namespace MustHave
         private Material circleSpriteMaterial = null;
         [SerializeField]
         private CircleShaderVariant circleShaderVariant = CircleShaderVariant.INSTANCE_MATRIX_VARIANT;
+        [SerializeField, Range(0, 3)]
+        private int smoothRadius = 3;
+        [SerializeField, Range(1, 6)]
+        private int smoothPower = 4;
+        [SerializeField, Range(1, 4)]
+        private int smoothWeightsPower = 4;
 
         public void SetDebugModeOnInit()
         {

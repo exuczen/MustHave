@@ -3,20 +3,25 @@
 
 #pragma multi_compile_local __ DEBUG_NONE DEBUG_SHAPES DEBUG_CIRCLES DEBUG_DEPTH
 #pragma kernel CSMain
+#pragma kernel Merge
 
 Texture2D<float4> Source;
 Texture2D<float4> ShapeTexture;
 Texture2D<float4> CircleTexture;
 RWTexture2D<float4> Output;
+RWStructuredBuffer<float> SmoothWeightsBuffer;
 
 int LineThickness;
 int2 ShapeTexSize;
 int2 ShapeTexOffset;
 
-int2 getShapeTexSize()
+uint SmoothPower;
+int SmoothRadius;
+
+int2 getTextureSize(Texture2D<float4> tex)
 {
     int width, height;
-    ShapeTexture.GetDimensions(width, height);
+    tex.GetDimensions(width, height);
     return int2(width, height);
 }
 
@@ -117,6 +122,68 @@ void getHornCircleIsecColor(int2 c, int r, inout float4 color)
     }
 }
 
+bool equalRGB(float4 color1, float4 color2)
+{
+    return all(abs(color1.rgb - color2.rgb) < EPSILON);
+}
+
+bool notEqualRGB(float4 color1, float4 color2)
+{
+    return any(abs(color1.rgb - color2.rgb) > EPSILON);
+}
+
+float4 getMergeColor(uint2 xy)
+{
+    float4 outlineColor = COLOR_CLEAR;
+    int2 sourceSize = getTextureSize(Source);
+
+    int2 beg = max(0, xy - SmoothRadius);
+    int2 end = min(sourceSize - 1, xy + SmoothRadius);
+        
+    int2 smoothOffset = xy - SmoothRadius;
+    int smoothLength = (SmoothRadius << 1) + 1;
+        
+    float smoothWeightsTotal = 0;
+    float outlineWeightsTotal = 0;
+        
+    for (int y = beg.y; y <= end.y; y++)
+    {
+        int smoothYOffset = (y - smoothOffset.y) * smoothLength;
+            
+        for (int x = beg.x; x <= end.x; x++)
+        {
+            int smoothX = x - smoothOffset.x;
+            float smoothWeight = SmoothWeightsBuffer[smoothX + smoothYOffset];
+            smoothWeightsTotal += smoothWeight;
+                
+            int2 ngbrXY = int2(x, y);
+            int2 ngbrShapeXY = ShapeTexOffset + ngbrXY;
+            float4 ngbrColor = Output[ngbrXY];
+            float4 ngbrShapeColor = ShapeTexture[ngbrShapeXY];
+                
+            if (ngbrColor.a > EPSILON)
+            {
+                outlineColor += ngbrColor * smoothWeight;
+                outlineWeightsTotal += smoothWeight;
+            }
+            else if (ngbrShapeColor.a > EPSILON)
+            {
+                outlineColor += ngbrShapeColor * smoothWeight;
+                outlineWeightsTotal += smoothWeight;
+            }
+        }
+    }
+    if (outlineWeightsTotal > 0)
+    {
+        outlineColor /= outlineWeightsTotal;
+        return lerp(Source[xy], outlineColor, pow(outlineWeightsTotal / smoothWeightsTotal, SmoothPower));
+    }
+    else
+    {
+        return Source[xy];
+    }
+}
+
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
@@ -124,13 +191,6 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     float4 shapeColor = ShapeTexture[shapeXY];
     float4 circleColor = CircleTexture[shapeXY];
 
-#ifdef DEBUG_SHAPES
-    Output[id.xy] = shapeColor.a > 0 ? shapeColor : Source[id.xy];
-#elif defined DEBUG_DEPTH
-    Output[id.xy] = shapeColor.a > 0 ? shapeColor.a : float4(0, 1, 0, 1);
-#elif defined DEBUG_CIRCLES
-    Output[id.xy] = circleColor.a > 0 ? circleColor : Source[id.xy];
-#else
     float4 color = COLOR_CLEAR;
     int r = LineThickness;
     
@@ -140,13 +200,24 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         getMidpointCircleIsecColor(shapeXY, r, color);
         getHornCircleIsecColor(shapeXY, r, color);
     }
-    if (color.a > EPSILON)
-    {
-        Output[id.xy] = color;
-    }
-    else
-    {
-        Output[id.xy] = Source[id.xy];
-    }
+    Output[id.xy] = color;
+}
+
+[numthreads(8, 8, 1)]
+void Merge(uint2 id : SV_DispatchThreadID)
+{
+    uint2 xy = id;
+    int2 shapeXY = ShapeTexOffset + xy;
+    float4 shapeColor = ShapeTexture[shapeXY];
+    float4 circleColor = CircleTexture[shapeXY];
+    
+#ifdef DEBUG_SHAPES
+    Output[xy] = shapeColor.a > 0 ? shapeColor : Source[xy];
+#elif defined DEBUG_DEPTH
+    Output[xy] = shapeColor.a > 0 ? shapeColor.a : float4(0, 1, 0, 1);
+#elif defined DEBUG_CIRCLES
+    Output[xy] = circleColor.a > 0 ? circleColor : Source[xy];
+#else
+    Output[xy] = shapeColor.a < EPSILON ? getMergeColor(xy) : Source[xy];
 #endif
 }
