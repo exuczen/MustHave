@@ -125,7 +125,7 @@ namespace MustHave
             {
                 cameraChangeListener = gameObject.AddComponent<CameraChangeListener>();
             }
-            mainKernelID = shader.FindKernel(MainKernelName);
+            FindKernels();
 
             ReleaseTextures();
             CreateTextures();
@@ -174,6 +174,11 @@ namespace MustHave
                 enableRandomWrite = true
             };
             texture.Create();
+        }
+
+        protected virtual void FindKernels()
+        {
+            mainKernelID = shader.FindKernel(MainKernelName);
         }
 
         protected virtual void ReleaseTextures()
