@@ -26,7 +26,6 @@ namespace MustHave
             BuildTarget.XboxOne => string.Empty,
             BuildTarget.tvOS => string.Empty,
             BuildTarget.Switch => string.Empty,
-            BuildTarget.Lumin => string.Empty,
             BuildTarget.Stadia => string.Empty,
             BuildTarget.GameCoreXboxOne => string.Empty,
             BuildTarget.PS5 => string.Empty,
@@ -51,6 +50,7 @@ namespace MustHave
             //BuildTarget.SamsungTV => throw new NotImplementedException(),
             //BuildTarget.N3DS => throw new NotImplementedException(),
             //BuildTarget.WiiU => throw new NotImplementedException(),
+            //BuildTarget.Lumin => throw new NotImplementedException(),
             //BuildTarget.iPhone => throw new NotImplementedException(),
             _ => throw new NotImplementedException(),
         };
