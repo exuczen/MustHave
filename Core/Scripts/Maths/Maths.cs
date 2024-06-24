@@ -29,7 +29,7 @@ namespace MustHave
     public struct Maths
     {
         public const float M_2PI = 2f * Mathf.PI;
-        public const float M_PI2 = Mathf.PI / 2f;
+        public const float M_PI2 = Mathf.PI * 0.5f;
         public const float M_PI = Mathf.PI;
 
         public static float Round(float x, float gradation)
@@ -45,17 +45,16 @@ namespace MustHave
         public static Quaternion GetRotationWithOrder(Vector3 euler, RotationOrder order)
         {
             GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, euler);
-            switch (order)
+            return order switch
             {
-                case RotationOrder.XYZ: return qx * qy * qz;
-                case RotationOrder.XZY: return qx * qz * qy;
-                case RotationOrder.YXZ: return qy * qx * qz;
-                case RotationOrder.YZX: return qy * qz * qx;
-                case RotationOrder.ZXY: return qz * qx * qy;
-                case RotationOrder.ZYX: return qz * qy * qx;
-                default:
-                    return Quaternion.identity;
-            }
+                RotationOrder.XYZ => qx * qy * qz,
+                RotationOrder.XZY => qx * qz * qy,
+                RotationOrder.YXZ => qy * qx * qz,
+                RotationOrder.YZX => qy * qz * qx,
+                RotationOrder.ZXY => qz * qx * qy,
+                RotationOrder.ZYX => qz * qy * qx,
+                _ => Quaternion.identity,
+            };
         }
 
         public static Vector3 GetComponentsWithOrder(Vector3 euler, RotationOrder order)
@@ -63,17 +62,16 @@ namespace MustHave
             float x = euler.x;
             float y = euler.y;
             float z = euler.z;
-            switch (order)
+            return order switch
             {
-                case RotationOrder.XYZ: return new Vector3(x, y, z);
-                case RotationOrder.XZY: return new Vector3(x, z, y);
-                case RotationOrder.YXZ: return new Vector3(y, x, z);
-                case RotationOrder.YZX: return new Vector3(y, z, x);
-                case RotationOrder.ZXY: return new Vector3(z, x, y);
-                case RotationOrder.ZYX: return new Vector3(z, y, x);
-                default:
-                    return euler;
-            }
+                RotationOrder.XYZ => new Vector3(x, y, z),
+                RotationOrder.XZY => new Vector3(x, z, y),
+                RotationOrder.YXZ => new Vector3(y, x, z),
+                RotationOrder.YZX => new Vector3(y, z, x),
+                RotationOrder.ZXY => new Vector3(z, x, y),
+                RotationOrder.ZYX => new Vector3(z, y, x),
+                _ => euler,
+            };
         }
 
         public static void GetRotationComponents(out Quaternion qx, out Quaternion qy, out Quaternion qz, Vector3 euler)
@@ -364,11 +362,12 @@ namespace MustHave
 
         public static int GetClosestPowerOf2(int i, bool upper)
         {
-            ////    int x = 1;
-            ////    while (x<i) {
-            ////        x<<=1;
-            ////    }
-            ////    return greater ? x : (x>>1);
+            //int x = 1;
+            //while (x < i)
+            //{
+            //    x <<= 1;
+            //}
+            //return greater ? x : (x >> 1);
             //int x = i;
             //if (x < 0)
             //    return 0;
@@ -421,7 +420,7 @@ namespace MustHave
 
         public static bool GetRayIntersectionWithPlane(Ray ray, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
         {
-            Plane plane = new Plane(planeUp, planePos);
+            var plane = new Plane(planeUp, planePos);
             if (plane.Raycast(ray, out float rayDistance))
             {
                 distance = rayDistance;
@@ -443,19 +442,19 @@ namespace MustHave
 
         public static bool GetRayIntersectionWithPlane(Vector3 rayOrig, Vector3 rayDir, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt, out float distance)
         {
-            Ray ray = new Ray(rayOrig, rayDir);
+            var ray = new Ray(rayOrig, rayDir);
             return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt, out distance);
         }
 
         public static bool GetLineIntersectionWithPlane(Vector3 pt1, Vector3 pt2, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
-            Ray ray = new Ray(pt1, pt2 - pt1);
+            var ray = new Ray(pt1, pt2 - pt1);
             return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
         }
 
         public static bool GetTouchRayIntersectionWithPlane(Camera camera, Vector3 touchPos, Vector3 planeUp, Vector3 planePos, out Vector3 isecPt)
         {
-            Ray ray = camera.ScreenPointToRay(touchPos);
+            var ray = camera.ScreenPointToRay(touchPos);
             return GetRayIntersectionWithPlane(ray, planeUp, planePos, out isecPt);
         }
 
