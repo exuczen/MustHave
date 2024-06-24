@@ -21,7 +21,7 @@ namespace MustHave
         COS_IN_PI2_RANGE,
         COS_IN_PI_RANGE,
         COS_IN_2PI_RANGE,
-        ASYMETRIC_NORMALISED,
+        ASYMETRIC_NORMALIZED,
         ASYMETRIC_INFLECTED,
         SYMMETRIC_INFLECTED,
     };
@@ -218,7 +218,7 @@ namespace MustHave
             return -2f * PowF(x, n) + 3f * PowF(x, m);
         }
 
-        public static float GetTransitionAsymNormalised(float elapsedTime, float duration, float inflectionPointNormalized, int n, int m)
+        public static float GetTransitionAsymNormalized(float elapsedTime, float duration, float inflectionPointNormalized, int n, int m)
         {
             float x0 = inflectionPointNormalized * duration;
             float denomPart = m * x0 - n * (x0 - duration);
@@ -247,11 +247,11 @@ namespace MustHave
             float shift;
             if (elapsedTime < halfDuration)
             {
-                shift = GetTransitionAsymNormalised(elapsedTime, halfDuration, inflPtNorm, n, m);
+                shift = GetTransitionAsymNormalized(elapsedTime, halfDuration, inflPtNorm, n, m);
             }
             else
             {
-                shift = 1f - GetTransitionAsymNormalised(elapsedTime - halfDuration, halfDuration, 1f - inflPtNorm, m, n);
+                shift = 1f - GetTransitionAsymNormalized(elapsedTime - halfDuration, halfDuration, 1f - inflPtNorm, m, n);
             }
             return shift;
         }
@@ -271,11 +271,11 @@ namespace MustHave
             float t0 = duration * xMax;
             if (elapsedTime < t0)
             {
-                shift = yMax * GetTransitionAsymNormalised(elapsedTime, t0, inflPtNorm0, N, M);
+                shift = yMax * GetTransitionAsymNormalized(elapsedTime, t0, inflPtNorm0, N, M);
             }
             else
             {
-                shift = 1f + (yMax - 1f) * (1f - GetTransitionAsymNormalised(elapsedTime - t0, duration * (1f - xMax), inflPtNorm1, n, m));
+                shift = 1f + (yMax - 1f) * (1f - GetTransitionAsymNormalized(elapsedTime - t0, duration * (1f - xMax), inflPtNorm1, n, m));
             }
             return shift;
         }
