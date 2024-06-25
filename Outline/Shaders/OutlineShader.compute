@@ -3,13 +3,11 @@
 
 #pragma multi_compile_local __ DEBUG_NONE DEBUG_SHAPES DEBUG_CIRCLES DEBUG_DEPTH
 #pragma kernel CSMain
-#pragma kernel MergeOutlines
-#pragma kernel MergeWithSource
+#pragma kernel Merge
 
 Texture2D<float4> Source;
 Texture2D<float4> ShapeTexture;
 Texture2D<float4> CircleTexture;
-RWTexture2DArray<float4> OutlineTextureArray; //: register(u0);
 RWTexture2D<float4> Output;
 RWStructuredBuffer<float> SmoothWeightsBuffer;
 
@@ -134,7 +132,7 @@ bool notEqualRGB(float4 color1, float4 color2)
     return any(abs(color1.rgb - color2.rgb) > EPSILON);
 }
 
-float4 getMergeWithSourceColor(uint2 xy)
+float4 getMergeColor(uint2 xy)
 {
     float4 outlineColor = COLOR_CLEAR;
     int2 sourceSize = getTextureSize(Source);
@@ -186,7 +184,7 @@ float4 getMergeWithSourceColor(uint2 xy)
     }
 }
 
-[numthreads(8, 8, 2)]
+[numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     int2 shapeXY = ShapeTexOffset + id.xy;
@@ -199,37 +197,14 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     if (shapeColor.a < EPSILON)
     {
         color = circleColor;
-        if (id.z == 0)
-        {
-            getMidpointCircleIsecColor(shapeXY, r, color);
-            //if (color.a > EPSILON)
-            //{
-            //    color.rgb = float3(1, 0, 0);
-            //}
-        }
-        else //if (id.z == 1)
-        {
-            getHornCircleIsecColor(shapeXY, r, color);
-            //if (color.a > EPSILON)
-            //{
-            //    color.rgb = float3(0, 0, 1);
-            //}
-        }
+        getMidpointCircleIsecColor(shapeXY, r, color);
+        getHornCircleIsecColor(shapeXY, r, color);
     }
-    OutlineTextureArray[id] = color;
+    Output[id.xy] = color;
 }
 
 [numthreads(8, 8, 1)]
-void MergeOutlines(uint3 id : SV_DispatchThreadID)
-{
-    float4 c0 = OutlineTextureArray[float3(id.xy, 0)];
-    float4 c1 = OutlineTextureArray[float3(id.xy, 1)];
-    //Output[id.xy] = (id.x + id.y) % 2 == 0 ? c0 : c1;
-    Output[id.xy] = c1.a >= c0.a ? c1 : c0;
-}
-
-[numthreads(8, 8, 1)]
-void MergeWithSource(uint2 id : SV_DispatchThreadID)
+void Merge(uint2 id : SV_DispatchThreadID)
 {
     uint2 xy = id;
     int2 shapeXY = ShapeTexOffset + xy;
@@ -243,6 +218,6 @@ void MergeWithSource(uint2 id : SV_DispatchThreadID)
 #elif defined DEBUG_CIRCLES
     Output[xy] = circleColor.a > 0 ? circleColor : Source[xy];
 #else
-    Output[xy] = shapeColor.a < EPSILON ? getMergeWithSourceColor(xy) : Source[xy];
+    Output[xy] = shapeColor.a < EPSILON ? getMergeColor(xy) : Source[xy];
 #endif
 }

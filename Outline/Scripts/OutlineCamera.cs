@@ -43,7 +43,6 @@ namespace MustHave
             public static readonly int SmoothWeightsID = Shader.PropertyToID("SmoothWeightsBuffer");
             public static readonly int SmoothRadiusID = Shader.PropertyToID("SmoothRadius");
             public static readonly int SmoothPowerID = Shader.PropertyToID("SmoothPower");
-            public static readonly int OutlineTextureArrayID = Shader.PropertyToID("OutlineTextureArray");
         }
 
         [SerializeField]
@@ -55,15 +54,11 @@ namespace MustHave
         [SerializeField, HideInInspector]
         private bool shaderSettingsExpanded = true;
 
-        private Texture2DArray outlineTextureArray = null;
-        private RenderTexture outlineTextures = null;
-
         private ComputeBuffer smoothWeightsBuffer = null;
 
         private float[] smoothWeights = null;
 
-        private int mergeOutlinesKernelID = -1;
-        private int mergeWithSourceKernelID = -1;
+        private int mergeKernelID = -1;
 
         public void SetSmoothWeights(bool log = false)
         {
@@ -126,7 +121,7 @@ namespace MustHave
                     smoothWeightsBuffer = new ComputeBuffer(smoothWeights.Length, sizeof(float));
                 }
                 smoothWeightsBuffer.SetData(smoothWeights);
-                shader.SetBuffer(mergeWithSourceKernelID, ShaderData.SmoothWeightsID, smoothWeightsBuffer);
+                shader.SetBuffer(mergeKernelID, ShaderData.SmoothWeightsID, smoothWeightsBuffer);
 
                 shader.SetInt(ShaderData.SmoothRadiusID, ShaderSettings.SmoothRadius);
                 shader.SetInt(ShaderData.SmoothPowerID, ShaderSettings.SmoothPower);
@@ -261,29 +256,12 @@ namespace MustHave
         {
             base.FindKernels();
 
-            mergeOutlinesKernelID = shader.FindKernel("MergeOutlines");
-            mergeWithSourceKernelID = shader.FindKernel("MergeWithSource");
+            mergeKernelID = shader.FindKernel("Merge");
         }
 
         protected override void CreateTextures()
         {
             base.CreateTextures();
-
-            outlineTextures = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGB32)
-            {
-                enableRandomWrite = true,
-                dimension = TextureDimension.Tex2DArray,
-                volumeDepth = 2,
-            };
-            outlineTextures.Create();
-
-            outlineTextureArray = new Texture2DArray(textureSize.x, textureSize.y, outlineTextures.volumeDepth, TextureFormat.ARGB32, false);
-            Graphics.CopyTexture(outlineTextures, outlineTextureArray);
-            outlineTextureArray.Apply();
-
-            shader.SetTexture(mainKernelID, ShaderData.OutlineTextureArrayID, outlineTextures);
-            shader.SetTexture(mergeOutlinesKernelID, ShaderData.OutlineTextureArrayID, outlineTextures);
-            shader.SetTexture(mergeOutlinesKernelID, OutputTextureID, outputTexture);
 
             var shapeTexSize = GetShapeTexSize(out var shapeTexOffset);
 
@@ -295,17 +273,15 @@ namespace MustHave
             shader.SetInts(ShaderData.ShapeTexSizeID, shapeTexSize.x, shapeTexSize.y);
             shader.SetInts(ShaderData.ShapeTexOffsetID, shapeTexOffset.x, shapeTexOffset.y);
 
-            shader.SetTexture(mergeWithSourceKernelID, ShaderData.ShapeTexID, objectCamera.ShapeTexture);
-            shader.SetTexture(mergeWithSourceKernelID, ShaderData.CircleTexID, objectCamera.CircleTexture);
-            shader.SetTexture(mergeWithSourceKernelID, SourceTextureID, sourceTexture);
-            shader.SetTexture(mergeWithSourceKernelID, OutputTextureID, outputTexture);
+            shader.SetTexture(mergeKernelID, ShaderData.ShapeTexID, objectCamera.ShapeTexture);
+            shader.SetTexture(mergeKernelID, ShaderData.CircleTexID, objectCamera.CircleTexture);
+            shader.SetTexture(mergeKernelID, SourceTextureID, sourceTexture);
+            shader.SetTexture(mergeKernelID, OutputTextureID, outputTexture);
         }
 
         protected override void ReleaseTextures()
         {
             base.ReleaseTextures();
-
-            ReleaseTexture(ref outlineTextures);
 
             if (objectCamera)
             {
@@ -317,18 +293,14 @@ namespace MustHave
         {
             base.DispatchShader();
 
-            shader.Dispatch(mergeOutlinesKernelID, threadGroups.x, threadGroups.y, 1);
-
-            shader.Dispatch(mergeWithSourceKernelID, threadGroups.x, threadGroups.y, 1);
+            shader.Dispatch(mergeKernelID, threadGroups.x, threadGroups.y, 1);
         }
 
         protected override void DispatchShader(CommandBuffer cmd)
         {
             base.DispatchShader(cmd);
 
-            cmd.DispatchCompute(shader, mergeOutlinesKernelID, threadGroups.x, threadGroups.y, 1);
-
-            cmd.DispatchCompute(shader, mergeWithSourceKernelID, threadGroups.x, threadGroups.y, 1);
+            cmd.DispatchCompute(shader, mergeKernelID, threadGroups.x, threadGroups.y, 1);
         }
 
         protected override void OnCameraPropertyChange()
