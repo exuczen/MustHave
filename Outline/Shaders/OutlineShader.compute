@@ -176,7 +176,7 @@ float4 getMergeColor(uint2 xy)
     if (outlineWeightsTotal > 0)
     {
         outlineColor /= outlineWeightsTotal;
-        return lerp(Source[xy], outlineColor, pow(outlineWeightsTotal / smoothWeightsTotal, SmoothPower));
+        return lerp(Source[xy], outlineColor, pow(abs(outlineWeightsTotal / smoothWeightsTotal), SmoothPower));
     }
     else
     {
@@ -197,7 +197,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     if (shapeColor.a < EPSILON)
     {
         color = circleColor;
-        getMidpointCircleIsecColor(shapeXY, r, color);
+        //getMidpointCircleIsecColor(shapeXY, r, color);
         getHornCircleIsecColor(shapeXY, r, color);
     }
     Output[id.xy] = color;

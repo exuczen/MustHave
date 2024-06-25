@@ -21,9 +21,9 @@ namespace MustHave
             get => lineThickness;
             set
             {
-                lineThickness = Mathf.Clamp(value, 1, LineMaxThickness);
+                lineThickness = Mathf.Clamp(value, Mathf.Max(1, ShaderSettings.SmoothRadius), LineMaxThickness);
                 ScaledLineThickness = (int)(0.5f + thisCamera.pixelHeight * value / (7f * LineMaxThickness));
-                ScaledLineThickness = Mathf.Max(1 + ShaderSettings.SmoothRadius, ScaledLineThickness);
+                ScaledLineThickness = Mathf.Max(1, ShaderSettings.SmoothRadius, ScaledLineThickness);
             }
         }
         public int ScaledLineThickness { get; private set; }
