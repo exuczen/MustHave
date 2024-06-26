@@ -8,6 +8,7 @@
 Texture2D<float4> Source;
 Texture2D<float4> ShapeTexture;
 Texture2D<float4> CircleTexture;
+RWTexture2D<float4> OutlineTexture;
 RWTexture2D<float4> Output;
 RWStructuredBuffer<float> SmoothWeightsBuffer;
 
@@ -132,7 +133,7 @@ bool notEqualRGB(float4 color1, float4 color2)
     return any(abs(color1.rgb - color2.rgb) > EPSILON);
 }
 
-float4 getMergeColor(uint2 xy)
+float4 getMergeColor(int2 xy)
 {
     float4 outlineColor = COLOR_CLEAR;
     int2 sourceSize = getTextureSize(Source);
@@ -158,12 +159,12 @@ float4 getMergeColor(uint2 xy)
                 
             int2 ngbrXY = int2(x, y);
             int2 ngbrShapeXY = ShapeTexOffset + ngbrXY;
-            float4 ngbrColor = Output[ngbrXY];
+            float4 ngbrOutlineColor = OutlineTexture[ngbrXY];
             float4 ngbrShapeColor = ShapeTexture[ngbrShapeXY];
                 
-            if (ngbrColor.a > EPSILON)
+            if (ngbrOutlineColor.a > EPSILON)
             {
-                outlineColor += ngbrColor * smoothWeight;
+                outlineColor += ngbrOutlineColor * smoothWeight;
                 outlineWeightsTotal += smoothWeight;
             }
             else if (ngbrShapeColor.a > EPSILON)
@@ -185,9 +186,10 @@ float4 getMergeColor(uint2 xy)
 }
 
 [numthreads(8, 8, 1)]
-void CSMain(uint3 id : SV_DispatchThreadID)
+void CSMain(uint2 id : SV_DispatchThreadID)
 {
-    int2 shapeXY = ShapeTexOffset + id.xy;
+    int2 xy = id;
+    int2 shapeXY = ShapeTexOffset + xy;
     float4 shapeColor = ShapeTexture[shapeXY];
     float4 circleColor = CircleTexture[shapeXY];
 
@@ -200,13 +202,13 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         //getMidpointCircleIsecColor(shapeXY, r, color);
         getHornCircleIsecColor(shapeXY, r, color);
     }
-    Output[id.xy] = color;
+    OutlineTexture[xy] = color;
 }
 
 [numthreads(8, 8, 1)]
 void Merge(uint2 id : SV_DispatchThreadID)
 {
-    uint2 xy = id;
+    int2 xy = id;
     int2 shapeXY = ShapeTexOffset + xy;
     float4 shapeColor = ShapeTexture[shapeXY];
     float4 circleColor = CircleTexture[shapeXY];

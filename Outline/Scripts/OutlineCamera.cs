@@ -39,6 +39,7 @@ namespace MustHave
             public static readonly int ShapeTexSizeID = Shader.PropertyToID("ShapeTexSize");
             public static readonly int ShapeTexOffsetID = Shader.PropertyToID("ShapeTexOffset");
             public static readonly int CircleTexID = Shader.PropertyToID("CircleTexture");
+            public static readonly int OutlineTexID = Shader.PropertyToID("OutlineTexture");
             public static readonly int LineThicknessID = Shader.PropertyToID("LineThickness");
             public static readonly int SmoothWeightsID = Shader.PropertyToID("SmoothWeightsBuffer");
             public static readonly int SmoothRadiusID = Shader.PropertyToID("SmoothRadius");
@@ -53,6 +54,8 @@ namespace MustHave
 
         [SerializeField, HideInInspector]
         private bool shaderSettingsExpanded = true;
+
+        private RenderTexture outlineTexture = null;
 
         private ComputeBuffer smoothWeightsBuffer = null;
 
@@ -263,18 +266,22 @@ namespace MustHave
         {
             base.CreateTextures();
 
+            CreateTexture(ref outlineTexture);
+
             var shapeTexSize = GetShapeTexSize(out var shapeTexOffset);
 
             objectCamera.CreateRuntimeAssets(shapeTexSize);
 
             shader.SetTexture(mainKernelID, ShaderData.ShapeTexID, objectCamera.ShapeTexture);
             shader.SetTexture(mainKernelID, ShaderData.CircleTexID, objectCamera.CircleTexture);
+            shader.SetTexture(mainKernelID, ShaderData.OutlineTexID, outlineTexture);
 
             shader.SetInts(ShaderData.ShapeTexSizeID, shapeTexSize.x, shapeTexSize.y);
             shader.SetInts(ShaderData.ShapeTexOffsetID, shapeTexOffset.x, shapeTexOffset.y);
 
             shader.SetTexture(mergeKernelID, ShaderData.ShapeTexID, objectCamera.ShapeTexture);
             shader.SetTexture(mergeKernelID, ShaderData.CircleTexID, objectCamera.CircleTexture);
+            shader.SetTexture(mergeKernelID, ShaderData.OutlineTexID, outlineTexture);
             shader.SetTexture(mergeKernelID, SourceTextureID, sourceTexture);
             shader.SetTexture(mergeKernelID, OutputTextureID, outputTexture);
         }
@@ -282,6 +289,8 @@ namespace MustHave
         protected override void ReleaseTextures()
         {
             base.ReleaseTextures();
+
+            ReleaseTexture(ref outlineTexture);
 
             if (objectCamera)
             {
