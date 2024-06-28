@@ -1,5 +1,6 @@
 ﻿#define EPSILON 0.00001f
 #define COLOR_CLEAR float4(0, 0, 0, 0)
+#define GROUP_THREADS int3(8, 8, 1)
 
 #pragma multi_compile_local __ DEBUG_NONE DEBUG_SHAPES DEBUG_CIRCLES DEBUG_DEPTH
 #pragma kernel CSMain
@@ -26,35 +27,43 @@ int2 getTextureSize(Texture2D<float4> tex)
     return int2(width, height);
 }
 
-bool getShapePixelColor(int2 xy, out float4 color)
+void getShapePixelColor(int x, int y, int2 center, inout float4 color)
 {
-    bool inBounds = all(xy >= 0 && xy < ShapeTexSize);
-    if (inBounds && ShapeTexture[xy].a > 0)
+    int2 xy = center + int2(x, y);
+    
+    if (all(xy >= 0 && xy < ShapeTexSize))
     {
-        color = ShapeTexture[xy];
-        return true;
-    }
-    else
-    {
-        color = COLOR_CLEAR;
-        return false;
+        float4 c = ShapeTexture[xy];
+        if (c.a > color.a)
+        {
+            color = c;
+        }
     }
 }
 
-void getShapeRect4Color(int x, int y, int2 center, inout float4 destColor)
+void getShapeRect4Color(int x, int y, int2 center, inout float4 color)
 {
-    float4 color = COLOR_CLEAR;
-    
     for (int i = -1; i <= 1; i += 2)
     {
         for (int j = -1; j <= 1; j += 2)
         {
-            int2 xy = center + int2(i * x, j * y);
-            
-            if (getShapePixelColor(xy, color) && color.w > destColor.w)
-            {
-                destColor = color;
-            }
+            getShapePixelColor(i * x, j * y, center, color);
+        }
+    }
+}
+
+void getShapeOctagonColor(int2 c, int r, inout float4 color)
+{
+    int d = r / sqrt(2) + 0.5;
+    
+    for (int i = -1; i <= 1; i += 2)
+    {
+        getShapePixelColor(i * r, 0, c, color);
+        getShapePixelColor(0, i * r, c, color);
+        
+        for (int j = -1; j <= 1; j += 2)
+        {
+            getShapePixelColor(i * d, j * d, c, color);
         }
     }
 }
@@ -185,7 +194,7 @@ float4 getMergeColor(int2 xy)
     }
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(GROUP_THREADS.x, GROUP_THREADS.y, GROUP_THREADS.z)]
 void CSMain(uint2 id : SV_DispatchThreadID)
 {
     int2 xy = id;
@@ -199,13 +208,15 @@ void CSMain(uint2 id : SV_DispatchThreadID)
     if (shapeColor.a < EPSILON)
     {
         color = circleColor;
+        //getShapeOctagonColor(shapeXY, r, color);
         //getMidpointCircleIsecColor(shapeXY, r, color);
         getHornCircleIsecColor(shapeXY, r, color);
     }
+    //OutlineTexture[xy] = Source[xy];
     OutlineTexture[xy] = color;
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(GROUP_THREADS.x, GROUP_THREADS.y, GROUP_THREADS.z)]
 void Merge(uint2 id : SV_DispatchThreadID)
 {
     int2 xy = id;
@@ -220,6 +231,7 @@ void Merge(uint2 id : SV_DispatchThreadID)
 #elif defined DEBUG_CIRCLES
     Output[xy] = circleColor.a > 0 ? circleColor : Source[xy];
 #else
+    //Output[xy] = shapeColor.a < EPSILON ? OutlineTexture[xy] : Source[xy];
     Output[xy] = shapeColor.a < EPSILON ? getMergeColor(xy) : Source[xy];
 #endif
 }
