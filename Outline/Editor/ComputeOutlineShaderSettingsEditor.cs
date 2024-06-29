@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace MustHave
 {
-    [CustomEditor(typeof(OutlineShaderSettings))]
-    public class OutlineShaderSettingsEditor : Editor
+    [CustomEditor(typeof(ComputeOutlineShaderSettings))]
+    public class ComputeOutlineShaderSettingsEditor : Editor
     {
         private const string UndoNotRecordedTooltipMessage = "Shader settings changes are not Undo recorded due to ComputeShader keyword errors on Undo.";
 
@@ -25,7 +25,7 @@ namespace MustHave
 
         public void OnInspectorGUI(bool showShader)
         {
-            var settings = target as OutlineShaderSettings;
+            var settings = target as ComputeOutlineShaderSettings;
 
             bool setDirty = false;
 
@@ -43,7 +43,7 @@ namespace MustHave
 
             if (settings.DebugEnabled)
             {
-                debugMode = (OutlineShaderSettings.DebugMode)EditorGUILayout.EnumPopup(new GUIContent("Debug Mode", UndoNotRecordedTooltipMessage), debugMode);
+                debugMode = (ComputeOutlineShaderSettings.DebugMode)EditorGUILayout.EnumPopup(new GUIContent("Debug Mode", UndoNotRecordedTooltipMessage), debugMode);
             }
             if (EditorGUI.EndChangeCheck())
             {
@@ -64,7 +64,7 @@ namespace MustHave
 
             var circleShaderVariant = settings.CirclesShaderVariant;
 
-            circleShaderVariant = (OutlineShaderSettings.CircleShaderVariant)EditorGUILayout.EnumPopup(new GUIContent("Circle Shader Variant", UndoNotRecordedTooltipMessage), circleShaderVariant);
+            circleShaderVariant = (ComputeOutlineShaderSettings.CircleShaderVariant)EditorGUILayout.EnumPopup(new GUIContent("Circle Shader Variant", UndoNotRecordedTooltipMessage), circleShaderVariant);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -82,7 +82,7 @@ namespace MustHave
             bool smoothModified = serializedObject.ApplyModifiedProperties();
             if (smoothModified)
             {
-                var outlineCamera = IOutlineCameraSingleton.Instance;
+                var outlineCamera = IComputeOutlineCamera.Instance;
                 if (outlineCamera)
                 {
                     outlineCamera.SetSmoothWeights(/*true*/);

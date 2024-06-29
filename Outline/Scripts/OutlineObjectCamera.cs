@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using UnityEngine.Rendering;
-using CircleShaderVariant = MustHave.OutlineShaderSettings.CircleShaderVariant;
+using CircleShaderVariant = MustHave.ComputeOutlineShaderSettings.CircleShaderVariant;
 #if UNITY_PIPELINE_HDRP
 using static UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData;
 using UnityEngine.Rendering.HighDefinition;
@@ -38,7 +38,7 @@ namespace MustHave
 
         public ComputeShader ComputeShader => shaderSettings.ComputeShader;
         public CircleShaderVariant CircleShaderVariant => shaderSettings.CirclesShaderVariant;
-        public OutlineShaderSettings ShaderSettings => shaderSettings;
+        public ComputeOutlineShaderSettings ShaderSettings => shaderSettings;
         public RenderTexture ShapeTexture => shapeTexture;
         public RenderTexture CircleTexture => circleTexture;
         public Material OutlineShapeMaterial => outlineShapeMaterial;
@@ -47,7 +47,7 @@ namespace MustHave
         public int ObjectsCount => Mathf.Min(RenderersCapacity, objects.Count);
 
         [SerializeField]
-        private OutlineShaderSettings shaderSettings = null;
+        private ComputeOutlineShaderSettings shaderSettings = null;
         [SerializeField]
         private Material outlineShapeMaterial = null;
         [SerializeField]
@@ -127,7 +127,7 @@ namespace MustHave
             shapeTexture.Clear();
         }
 
-        public void Setup(OutlineCamera outlineCamera, bool copySettings = true)
+        public void Setup(ComputeOutlineCamera outlineCamera, bool copySettings = true)
         {
 #if UNITY_EDITOR
             bool setDirty = false;
@@ -159,8 +159,8 @@ namespace MustHave
             if (copySettings)
             {
                 shapeCamera.CopyFrom(parentCamera);
-                shapeCamera.fieldOfView = GetExtendedFieldOfView(parentCamera, OutlineCamera.LineMaxThickness);
-                shapeCamera.orthographicSize = GetExtendedOrthoSize(parentCamera, OutlineCamera.LineMaxThickness);
+                shapeCamera.fieldOfView = GetExtendedFieldOfView(parentCamera, ComputeOutlineCamera.LineMaxThickness);
+                shapeCamera.orthographicSize = GetExtendedOrthoSize(parentCamera, ComputeOutlineCamera.LineMaxThickness);
                 //Debug.Log($"{GetType().Name}.Setup: srcFov: {parentCamera.fieldOfView:f2} dstFov: {shapeCamera.fieldOfView:f2}");
             }
             shapeCamera.targetTexture = shapeTexture;

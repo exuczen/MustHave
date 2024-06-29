@@ -13,12 +13,12 @@ namespace MustHave
             var outlineObject = target as OutlineObject;
             if (outlineObject.enabled)
             {
-                var outlineCamera = IOutlineCameraSingleton.Instance;
+                var outlineCamera = IComputeOutlineCamera.Instance;
                 if (outlineCamera)
                 {
                     EditorGUI.BeginChangeCheck();
 
-                    int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, OutlineCamera.LineMaxThickness);
+                    int lineThickness = EditorGUILayout.IntSlider("Line Thickness", outlineCamera.LineThickness, 1, ComputeOutlineCamera.LineMaxThickness);
 
                     if (EditorGUI.EndChangeCheck())
                     {

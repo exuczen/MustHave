@@ -3,8 +3,8 @@ using UnityEngine.Rendering;
 
 namespace MustHave
 {
-    [CreateAssetMenu(fileName = "OutlineShaderSettings", menuName = "MustHave/Outline/OutlineShaderSettings")]
-    public class OutlineShaderSettings : ScriptableObject
+    [CreateAssetMenu(fileName = "ComputeOutlineShaderSettings", menuName = "MustHave/Outline/ComputeOutlineShaderSettings")]
+    public class ComputeOutlineShaderSettings : ScriptableObject
     {
         public enum DebugMode
         {

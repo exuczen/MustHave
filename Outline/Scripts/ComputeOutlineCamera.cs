@@ -7,10 +7,10 @@ using UnityEngine.Rendering;
 
 namespace MustHave
 {
-    public interface IOutlineCameraSingleton : IMonoSingleton<OutlineCamera> { }
+    public interface IComputeOutlineCamera : IMonoSingleton<ComputeOutlineCamera> { }
 
     [ExecuteInEditMode]
-    public class OutlineCamera : ComputeShaderPostProcess, IOutlineCameraSingleton
+    public class ComputeOutlineCamera : ComputeShaderPostProcess, IComputeOutlineCamera
     {
         public const int LineMaxThickness = 100;
 
@@ -28,7 +28,7 @@ namespace MustHave
         }
         public int ScaledLineThickness { get; private set; }
 
-        public OutlineShaderSettings ShaderSettings => objectCamera ? objectCamera.ShaderSettings : null;
+        public ComputeOutlineShaderSettings ShaderSettings => objectCamera ? objectCamera.ShaderSettings : null;
         public bool ShaderSettingsExpanded { get => shaderSettingsExpanded; set => shaderSettingsExpanded = value; }
 
         protected override bool SkipDispatch => objectCamera.ObjectsCount == 0;
@@ -137,9 +137,9 @@ namespace MustHave
 
         protected override void OnAwake(bool pipelineChanged)
         {
-            IOutlineCameraSingleton.SetInstanceOnAwake(this, out var gameObject);
+            IComputeOutlineCamera.SetInstanceOnAwake(this, out var gameObject);
 #if UNITY_EDITOR
-            if (this == IOutlineCameraSingleton.Instance)
+            if (this == IComputeOutlineCamera.Instance)
             {
                 if (!Application.isPlaying && pipelineChanged)
                 {
@@ -161,7 +161,7 @@ namespace MustHave
 
         protected override void OnEnable()
         {
-            if (IOutlineCameraSingleton.Instance != this)
+            if (IComputeOutlineCamera.Instance != this)
             {
                 enabled = false;
                 return;
@@ -350,7 +350,7 @@ namespace MustHave
             //{
             //    ShaderSettings.SetDebugModeFromInit();
             //}
-            IOutlineCameraSingleton.ClearInstanceOnDestroy(this);
+            IComputeOutlineCamera.ClearInstanceOnDestroy(this);
 
             ObjectUtils.DestroyGameObject(ref objectCamera);
             ObjectUtils.DestroyComponent(ref cameraChangeListener);
